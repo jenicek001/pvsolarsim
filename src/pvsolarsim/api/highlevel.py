@@ -4,7 +4,7 @@ This module provides simple, easy-to-use functions for common use cases.
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pvsolarsim.core.location import Location
 from pvsolarsim.core.pvsystem import PVSystem

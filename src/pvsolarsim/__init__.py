@@ -16,9 +16,9 @@ __version__ = "0.1.0"
 __author__ = "jenicek001"
 __license__ = "MIT"
 
+from pvsolarsim.api.highlevel import calculate_power, simulate_annual
 from pvsolarsim.core.location import Location
 from pvsolarsim.core.pvsystem import PVSystem
-from pvsolarsim.api.highlevel import calculate_power, simulate_annual
 
 __all__ = [
     "Location",

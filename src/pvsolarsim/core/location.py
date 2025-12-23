@@ -1,7 +1,6 @@
 """Core data models for PVSolarSim."""
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -20,7 +19,7 @@ class Location:
     altitude: float = 0.0
     timezone: str = "UTC"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate location parameters."""
         if not -90 <= self.latitude <= 90:
             raise ValueError(f"Latitude must be between -90 and 90, got {self.latitude}")
