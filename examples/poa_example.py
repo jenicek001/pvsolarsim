@@ -29,11 +29,11 @@ def main():
     panel_tilt = 35.0  # degrees from horizontal
     panel_azimuth = 180.0  # South-facing
 
-    # Define time (summer midday)
-    timestamp = datetime(2025, 6, 21, 12, 0, tzinfo=pytz.UTC)
+    # Define time (summer midday in local time)
+    timestamp = datetime(2025, 6, 21, 12, 0, tzinfo=pytz.timezone("Europe/Prague"))
 
     print(f"\nLocation: Prague ({latitude}°N, {longitude}°E)")
-    print(f"Date/Time: {timestamp}")
+    print(f"Date/Time: {timestamp} (local time)")
     print(f"Panel: {panel_tilt}° tilt, {panel_azimuth}° azimuth (South)")
 
     # Step 1: Calculate solar position
@@ -149,7 +149,7 @@ def main():
     print("-" * 35)
 
     for hour in [6, 8, 10, 12, 14, 16, 18]:
-        ts = datetime(2025, 6, 21, hour, 0, tzinfo=pytz.UTC)
+        ts = datetime(2025, 6, 21, hour, 0, tzinfo=pytz.timezone("Europe/Prague"))
         sol_pos = calculate_solar_position(ts, latitude, longitude, altitude)
 
         if sol_pos.elevation > 0:

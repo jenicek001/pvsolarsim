@@ -270,7 +270,8 @@ class POAIrradiance:
         aoi = calculate_aoi(surface_tilt, surface_azimuth, solar_zenith, solar_azimuth)
 
         # Use pvlib for comprehensive POA calculation
-        # This delegates to validated models
+        # Note: pvlib.irradiance.get_total_irradiance does NOT apply IAM
+        # It returns DNI * cos(AOI) for poa_direct, we apply IAM separately
         poa_components = pvlib.irradiance.get_total_irradiance(
             surface_tilt=surface_tilt,
             surface_azimuth=surface_azimuth,
@@ -284,7 +285,8 @@ class POAIrradiance:
             model=self.diffuse_model.value,
         )
 
-        # Apply IAM to beam component
+        # Apply IAM to beam component (this is intentional and correct)
+        # pvlib's poa_direct is just DNI * cos(AOI), without IAM losses
         iam = self._calculate_iam(aoi)
         poa_direct = float(poa_components["poa_direct"]) * iam
         poa_diffuse = float(poa_components["poa_diffuse"])

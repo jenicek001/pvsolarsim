@@ -20,7 +20,12 @@ class TestAOI:
     """Tests for angle of incidence calculations."""
 
     def test_aoi_perpendicular_sun(self):
-        """Test AOI when sun is perpendicular to south-facing panel."""
+        """Test AOI when sun is perpendicular to south-facing panel.
+        
+        Note: For a 35° tilt panel with sun at 35° elevation, AOI is NOT 0°.
+        The AOI depends on both solar elevation and azimuth alignment.
+        Using spherical geometry: AOI ≈ 20° when sun is directly south at 35° elevation.
+        """
         # 35° tilt south-facing panel, sun at 35° elevation from south
         aoi = calculate_aoi(
             surface_tilt=35.0,
@@ -28,7 +33,7 @@ class TestAOI:
             solar_zenith=55.0,  # 35° elevation
             solar_azimuth=180.0,
         )
-        # AOI should be around 20° (not exactly 0 due to geometry)
+        # AOI should be around 20° (calculated via spherical geometry)
         assert aoi == pytest.approx(20.0, abs=1.0)
 
     def test_aoi_horizontal_panel(self):
@@ -56,7 +61,14 @@ class TestAOI:
         assert aoi == pytest.approx(45.0, abs=0.5)
 
     def test_aoi_sun_behind_panel(self):
-        """Test AOI when sun is behind the panel."""
+        """Test AOI when sun is behind the panel.
+        
+        For a south-facing 35° tilted panel with sun from the north,
+        the sun vector and panel normal vector form an angle of ~80°.
+        This is calculated using:
+        cos(AOI) = cos(zenith)·cos(tilt) + sin(zenith)·sin(tilt)·cos(azimuth_diff)
+        where azimuth_diff = 180° (sun from north, panel faces south).
+        """
         # South-facing panel, sun from north
         aoi = calculate_aoi(
             surface_tilt=35.0,
@@ -64,7 +76,7 @@ class TestAOI:
             solar_zenith=45.0,
             solar_azimuth=0.0,  # North
         )
-        # AOI should be 80° (close to perpendicular, but not > 90° due to tilt)
+        # AOI should be ~80° (sun illuminates back of panel at grazing angle)
         assert aoi == pytest.approx(80.0, abs=1.0)
 
 
