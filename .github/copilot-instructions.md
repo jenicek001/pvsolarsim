@@ -854,6 +854,71 @@ def _equation_of_time(julian_day: float) -> float:
 
 ---
 
+## Maintaining Project Documentation
+
+### Automatic PLANNING.md Updates
+
+**CRITICAL:** After completing any implementation work, you MUST update [PLANNING.md](../PLANNING.md) to reflect what was actually implemented.
+
+**When to Update PLANNING.md:**
+- After completing any week's implementation tasks
+- After finishing a phase or milestone
+- After merging a PR that implements features
+- When deviating from the original plan (document why)
+
+**How to Update:**
+1. **Mark completed tasks** with `[x]` checkboxes
+2. **Update status indicators:**
+   - ✅ COMPLETED for finished weeks
+   - 🔄 IN PROGRESS for current work
+   - ⬅️ NEXT for upcoming work
+3. **Add implementation notes** where actual implementation differs from plan
+   - Example: "Using pvlib instead of custom implementation"
+   - Note deferred features with reasons
+4. **Update metrics:**
+   - Test coverage percentages
+   - Number of tests
+   - Performance benchmarks
+5. **Update status header:**
+   - Current version
+   - Last updated date
+   - Overall project status
+
+**Template for Status Updates:**
+
+```markdown
+**Status:** ✅ COMPLETED (PR #X)
+**Actual Implementation:** [Brief description if different from plan]
+**Test Coverage:** X%
+**Tests:** X tests passing
+```
+
+**Example of Good Update:**
+
+```markdown
+- [x] Implement Solar Position Algorithm (SPA)
+  - ✅ Using pvlib.solarposition as dependency (validated, accurate)
+  - Delegated to pvlib's NREL numpy implementation
+  - Decision: No need for custom implementation, pvlib is industry standard
+
+**Status:** ✅ COMPLETED (PR #1)
+**Test Coverage:** 100%
+**Tests:** 12 tests passing
+```
+
+**Never:**
+- Leave PLANNING.md with outdated information
+- Mark tasks complete without updating details
+- Forget to document deviations from the plan
+
+**Always:**
+- Keep PLANNING.md in sync with reality
+- Document architectural decisions
+- Update success metrics as you go
+- Note dependencies or blockers
+
+---
+
 **Remember:** The goal is production-quality code that others will trust and use. Every line should serve a purpose, be tested, and be documented. Think of future users (including future you) reading this code.
 
 **When in doubt, refer to pvlib-python as a reference implementation.**
