@@ -9,25 +9,33 @@
 
 ## 🌞 Overview
 
-PVSolarSim is a comprehensive Python library for simulating photovoltaic solar energy production. It provides accurate calculations for:
+PVSolarSim is a comprehensive Python library for simulating photovoltaic solar energy production. 
 
-- **Solar position** (azimuth, zenith, elevation) using NREL's SPA algorithm
-- **Atmospheric modeling** (Linke turbidity, aerosol optical depth, clear-sky irradiance)
-- **Plane-of-array (POA) irradiance** with multiple diffuse models (Perez, Hay-Davies, Isotropic)
-- **Cell temperature** modeling (SAPM, Faiman, King models)
-- **Instantaneous power** calculation with temperature-dependent efficiency
-- **Annual energy simulation** with configurable time intervals (1-60 minutes)
-- **Weather integration** (OpenWeatherMap API, PVGIS TMY data, custom CSV files)
+### Currently Implemented (v0.1.0)
+
+- ✅ **Solar position** calculations using NREL's SPA algorithm (via pvlib)
+- ✅ **Atmospheric modeling** with clear-sky irradiance (Ineichen and Simplified Solis models)
+- ✅ **Location and PV system** data models with validation
+- ✅ **High accuracy**: Solar position <0.01° error
+- ✅ **Type-safe**: Full type hints with mypy validation
+- ✅ **Well-tested**: 98% code coverage with 36 comprehensive tests
+
+### Coming Soon (Roadmap)
+
+- 🔄 **Plane-of-array (POA) irradiance** with multiple diffuse models (Week 4)
+- 🔄 **Cell temperature** modeling (Week 5)
+- 🔄 **Instantaneous power** calculation (Week 6)
+- 🔄 **Annual energy simulation** (Week 7)
+- 🔄 **Weather integration** (Weeks 8-9)
 
 ### Key Features
 
 - ✅ **High Accuracy**: Solar position accuracy <0.01° using NREL SPA algorithm
-- ✅ **Multiple Clear-Sky Models**: Ineichen (Linke turbidity), Simplified Solis (AOD), Bird (validation)
-- ✅ **Flexible Weather Sources**: API integration, TMY data, custom CSV files
+- ✅ **Multiple Clear-Sky Models**: Ineichen (Linke turbidity), Simplified Solis (AOD)
 - ✅ **Vectorized Operations**: NumPy-based calculations for performance
 - ✅ **Type-Safe**: Full type hints and runtime validation
-- ✅ **Well-Tested**: >90% code coverage, validated against pvlib-python
-- ✅ **Easy to Use**: High-level API for simple use cases, low-level API for advanced control
+- ✅ **Well-Tested**: >95% code coverage, validated against pvlib-python
+- ✅ **Easy to Use**: Clean API with comprehensive documentation
 
 ## 🚀 Installation
 
@@ -44,14 +52,54 @@ pip install -e ".[dev]"
 
 ## 📖 Quick Start
 
-### Simple Instantaneous Power Calculation
+### Solar Position Calculation
 
 ```python
-import pvsolarsim
+from pvsolarsim.solar import calculate_solar_position
 from datetime import datetime
+import pytz
+
+# Calculate solar position at specific time
+timestamp = datetime(2025, 6, 21, 12, 0, tzinfo=pytz.UTC)
+position = calculate_solar_position(
+    timestamp=timestamp,
+    latitude=49.8,
+    longitude=15.5,
+    altitude=300
+)
+
+print(f"Azimuth: {position.azimuth:.2f}°")
+print(f"Elevation: {position.elevation:.2f}°")
+print(f"Zenith: {position.zenith:.2f}°")
+```
+
+### Clear-Sky Irradiance Calculation
+
+```python
+from pvsolarsim.atmosphere import calculate_clearsky_irradiance
+
+# Calculate clear-sky irradiance
+irradiance = calculate_clearsky_irradiance(
+    apparent_elevation=45.0,
+    latitude=49.8,
+    longitude=15.5,
+    altitude=300,
+    model="ineichen",
+    linke_turbidity=3.0
+)
+
+print(f"GHI: {irradiance.ghi:.2f} W/m²")
+print(f"DNI: {irradiance.dni:.2f} W/m²")
+print(f"DHI: {irradiance.dhi:.2f} W/m²")
+```
+
+### Define Location and PV System
+
+```python
+from pvsolarsim import Location, PVSystem
 
 # Define location
-location = pvsolarsim.Location(
+location = Location(
     latitude=49.8,
     longitude=15.5,
     altitude=300,
@@ -59,85 +107,17 @@ location = pvsolarsim.Location(
 )
 
 # Define PV system
-system = pvsolarsim.PVSystem(
+system = PVSystem(
     panel_area=20.0,        # m²
     panel_efficiency=0.20,  # 20%
     tilt=35.0,              # degrees
     azimuth=180.0,          # South-facing
     temp_coefficient=-0.004 # -0.4% per °C
 )
-
-# Calculate power at specific time
-timestamp = datetime(2025, 6, 21, 12, 0)  # Summer solstice, noon
-result = pvsolarsim.calculate_power(
-    location=location,
-    system=system,
-    timestamp=timestamp,
-    weather_source="clear_sky",
-    clear_sky_model="ineichen"
-)
-
-print(f"Power: {result.power_w:.2f} W")
-print(f"GHI: {result.ghi:.2f} W/m²")
-print(f"POA: {result.poa_irradiance:.2f} W/m²")
-print(f"Cell temp: {result.cell_temp_c:.2f} °C")
 ```
 
-### Annual Energy Simulation
-
-```python
-# Run annual simulation with 5-minute intervals
-results = pvsolarsim.simulate_annual(
-    location=location,
-    system=system,
-    year=2025,
-    interval=5,  # minutes
-    weather_source="openweathermap",
-    api_key="your_openweathermap_api_key"
-)
-
-# Print summary
-print(f"Total energy: {results.total_energy_kwh:.2f} kWh/year")
-print(f"Capacity factor: {results.capacity_factor:.2%}")
-print(f"Peak power: {results.peak_power_w:.2f} W")
-
-# Export to CSV
-results.to_csv("annual_simulation.csv")
-
-# Monthly breakdown
-for month, energy in results.monthly_totals.items():
-    print(f"{month}: {energy:.2f} kWh")
-```
-
-### Using Weather Data
-
-```python
-# Option 1: OpenWeatherMap API
-results = pvsolarsim.simulate_annual(
-    location=location,
-    system=system,
-    year=2025,
-    weather_source="openweathermap",
-    api_key="your_api_key"
-)
-
-# Option 2: PVGIS TMY data
-results = pvsolarsim.simulate_annual(
-    location=location,
-    system=system,
-    year=2025,
-    weather_source="pvgis"
-)
-
-# Option 3: Custom CSV file
-results = pvsolarsim.simulate_annual(
-    location=location,
-    system=system,
-    year=2025,
-    weather_source="csv",
-    csv_path="my_weather_data.csv"
-)
-```
+> **Note**: Full power calculation and annual simulation features are coming in Phase 2 (Weeks 5-7).
+> Currently available: Solar position calculations, clear-sky irradiance models, and core data models.
 
 ## 📚 Documentation
 

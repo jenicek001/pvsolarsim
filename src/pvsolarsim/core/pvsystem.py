@@ -1,7 +1,6 @@
 """PV system configuration."""
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -22,7 +21,7 @@ class PVSystem:
     azimuth: float
     temp_coefficient: float = -0.004
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate system parameters."""
         if self.panel_area <= 0:
             raise ValueError(f"Panel area must be positive, got {self.panel_area}")
