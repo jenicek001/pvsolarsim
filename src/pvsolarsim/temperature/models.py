@@ -139,7 +139,7 @@ def sapm_model(
     wind_speed: Union[float, ArrayLike],
     a: float = -3.47,
     b: float = -0.0594,
-    deltaT: float = 3.0,
+    delta_t: float = 3.0,  # noqa: N803 (matches pvlib parameter name)
     irrad_ref: float = 1000.0,
 ) -> Union[float, NDArray[np.float64]]:
     """
@@ -169,7 +169,7 @@ def sapm_model(
         Empirical parameter (default: -3.47, typical for glass/glass open rack)
     b : float, optional
         Empirical parameter (default: -0.0594, typical for glass/glass open rack)
-    deltaT : float, optional
+    delta_t : float, optional
         Temperature difference between cell and module back [°C]
         (default: 3.0, typical value)
     irrad_ref : float, optional
@@ -199,7 +199,7 @@ def sapm_model(
     ...     wind_speed=2,
     ...     a=-3.56,
     ...     b=-0.075,
-    ...     deltaT=3.5
+    ...     delta_t=3.5
     ... )
     >>> print(f"Cell temperature: {temp:.2f}°C")
     Cell temperature: 23.90°C
@@ -219,9 +219,9 @@ def sapm_model(
     temp_module = poa_global * np.exp(a + b * wind_speed) + temp_air
 
     # Calculate cell temperature (module temp + offset)
-    # T_cell = T_module + (E / E_ref) * deltaT
+    # T_cell = T_module + (E / E_ref) * delta_t
     irrad_normalized = poa_global / irrad_ref
-    cell_temp = temp_module + irrad_normalized * deltaT
+    cell_temp = temp_module + irrad_normalized * delta_t
 
     # Return scalar if input was scalar
     if cell_temp.ndim == 0:
@@ -494,12 +494,12 @@ def calculate_cell_temperature(
     if isinstance(model, str):
         try:
             model = TemperatureModel(model.lower())
-        except ValueError:
+        except ValueError as e:
             valid_models = [m.value for m in TemperatureModel]
             raise ValueError(
                 f"Invalid temperature model '{model}'. "
                 f"Valid options are: {', '.join(valid_models)}"
-            )
+            ) from e
 
     # Call appropriate model
     if model == TemperatureModel.FAIMAN:

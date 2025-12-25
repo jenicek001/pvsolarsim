@@ -17,14 +17,14 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 - ✅ **Atmospheric modeling** with clear-sky irradiance (Ineichen and Simplified Solis models)
 - ✅ **Plane-of-array (POA) irradiance** with multiple diffuse transposition models (Isotropic, Perez, Hay-Davies)
 - ✅ **Incidence angle modifiers (IAM)** for reflection losses (ASHRAE, Physical, Martin-Ruiz)
+- ✅ **Cell temperature modeling** with 4 validated models (Faiman, SAPM, PVsyst, Generic Linear)
 - ✅ **Location and PV system** data models with validation
-- ✅ **High accuracy**: Solar position <0.01° error
+- ✅ **High accuracy**: Solar position <0.01° error, temperature models validated against pvlib
 - ✅ **Type-safe**: Full type hints with mypy validation
-- ✅ **Well-tested**: 97.6% code coverage with 61 comprehensive tests
+- ✅ **Well-tested**: 97.96% code coverage with 113 comprehensive tests
 
 ### Coming Soon (Roadmap)
 
-- 🔄 **Cell temperature** modeling (Week 5)
 - 🔄 **Instantaneous power** calculation (Week 6)
 - 🔄 **Annual energy simulation** (Week 7)
 - 🔄 **Weather integration** (Weeks 8-9)
@@ -34,6 +34,7 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 - ✅ **High Accuracy**: Solar position accuracy <0.01° using NREL SPA algorithm
 - ✅ **Multiple Clear-Sky Models**: Ineichen (Linke turbidity), Simplified Solis (AOD)
 - ✅ **Multiple Diffuse Models**: Isotropic, Perez (industry standard), Hay-Davies
+- ✅ **Temperature Models**: Faiman, SAPM, PVsyst, Generic Linear (all validated against pvlib)
 - ✅ **IAM Support**: ASHRAE, Physical (Fresnel), Martin-Ruiz models
 - ✅ **Vectorized Operations**: NumPy-based calculations for performance
 - ✅ **Type-Safe**: Full type hints and runtime validation
@@ -120,6 +121,36 @@ print(f"POA Ground:   {poa.poa_ground:.2f} W/m²")
 print(f"POA Global:   {poa.poa_global:.2f} W/m²")
 ```
 
+### Cell Temperature Modeling
+
+```python
+from pvsolarsim import calculate_cell_temperature, calculate_temperature_correction_factor
+
+# Calculate cell temperature using Faiman model (default)
+cell_temp = calculate_cell_temperature(
+    poa_global=800,      # W/m²
+    temp_air=25,         # °C
+    wind_speed=3         # m/s
+)
+print(f"Cell temperature: {cell_temp:.2f}°C")
+
+# Calculate temperature correction factor for power
+correction = calculate_temperature_correction_factor(
+    cell_temperature=cell_temp,
+    temp_coefficient=-0.004  # -0.4%/°C for c-Si
+)
+print(f"Power correction: {correction:.4f}")  # e.g., 0.92 = 92% of STC power
+
+# Use different models: 'faiman', 'sapm', 'pvsyst', 'generic_linear'
+temp_sapm = calculate_cell_temperature(
+    poa_global=800,
+    temp_air=25,
+    wind_speed=3,
+    model='sapm'
+)
+print(f"SAPM cell temperature: {temp_sapm:.2f}°C")
+```
+
 ### Define Location and PV System
 
 ```python
@@ -143,7 +174,7 @@ system = PVSystem(
 )
 ```
 
-> **Note**: Full power calculation and annual simulation features are coming in Phase 2 (Weeks 5-7).
+> **Note**: Full power calculation and annual simulation features are coming in Phase 2 (Weeks 6-7).
 > 
 > **See more examples** in the [examples/](examples/) directory:
 > - [poa_example.py](examples/poa_example.py) - Comprehensive POA irradiance calculations

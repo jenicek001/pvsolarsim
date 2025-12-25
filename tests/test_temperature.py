@@ -136,7 +136,7 @@ class TestSAPMModel:
             wind_speed=2,
             a=-3.56,
             b=-0.075,
-            deltaT=3.5,
+            delta_t=3.5,
         )
         assert 45 < temp < 50
 
@@ -159,7 +159,7 @@ class TestSAPMModel:
                     wind_speed=wind,
                     a=-3.47,
                     b=-0.0594,
-                    deltaT=3.0,
+                    deltaT=3.0,  # pvlib uses deltaT, not delta_t
                 )
                 assert our_temp == pytest.approx(pvlib_temp, abs=0.1)
         except ImportError:
