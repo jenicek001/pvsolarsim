@@ -21,7 +21,7 @@ class TestAOI:
 
     def test_aoi_perpendicular_sun(self):
         """Test AOI when sun is perpendicular to south-facing panel.
-        
+
         Note: For a 35° tilt panel with sun at 35° elevation, AOI is NOT 0°.
         The AOI depends on both solar elevation and azimuth alignment.
         Using spherical geometry: AOI ≈ 20° when sun is directly south at 35° elevation.
@@ -62,7 +62,7 @@ class TestAOI:
 
     def test_aoi_sun_behind_panel(self):
         """Test AOI when sun is behind the panel.
-        
+
         For a south-facing 35° tilted panel with sun from the north,
         the sun vector and panel normal vector form an angle of ~80°.
         This is calculated using:
