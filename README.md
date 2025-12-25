@@ -15,14 +15,15 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 
 - ✅ **Solar position** calculations using NREL's SPA algorithm (via pvlib)
 - ✅ **Atmospheric modeling** with clear-sky irradiance (Ineichen and Simplified Solis models)
+- ✅ **Plane-of-array (POA) irradiance** with multiple diffuse transposition models (Isotropic, Perez, Hay-Davies)
+- ✅ **Incidence angle modifiers (IAM)** for reflection losses (ASHRAE, Physical, Martin-Ruiz)
 - ✅ **Location and PV system** data models with validation
 - ✅ **High accuracy**: Solar position <0.01° error
 - ✅ **Type-safe**: Full type hints with mypy validation
-- ✅ **Well-tested**: 98% code coverage with 36 comprehensive tests
+- ✅ **Well-tested**: 97.6% code coverage with 61 comprehensive tests
 
 ### Coming Soon (Roadmap)
 
-- 🔄 **Plane-of-array (POA) irradiance** with multiple diffuse models (Week 4)
 - 🔄 **Cell temperature** modeling (Week 5)
 - 🔄 **Instantaneous power** calculation (Week 6)
 - 🔄 **Annual energy simulation** (Week 7)
@@ -32,9 +33,11 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 
 - ✅ **High Accuracy**: Solar position accuracy <0.01° using NREL SPA algorithm
 - ✅ **Multiple Clear-Sky Models**: Ineichen (Linke turbidity), Simplified Solis (AOD)
+- ✅ **Multiple Diffuse Models**: Isotropic, Perez (industry standard), Hay-Davies
+- ✅ **IAM Support**: ASHRAE, Physical (Fresnel), Martin-Ruiz models
 - ✅ **Vectorized Operations**: NumPy-based calculations for performance
 - ✅ **Type-Safe**: Full type hints and runtime validation
-- ✅ **Well-Tested**: >95% code coverage, validated against pvlib-python
+- ✅ **Well-Tested**: >97% code coverage, validated against pvlib-python
 - ✅ **Easy to Use**: Clean API with comprehensive documentation
 
 ## 🚀 Installation
@@ -93,6 +96,30 @@ print(f"DNI: {irradiance.dni:.2f} W/m²")
 print(f"DHI: {irradiance.dhi:.2f} W/m²")
 ```
 
+### Plane-of-Array (POA) Irradiance
+
+```python
+from pvsolarsim.irradiance import calculate_poa_irradiance
+
+# Calculate irradiance on tilted panel
+poa = calculate_poa_irradiance(
+    surface_tilt=35.0,        # Panel tilt angle
+    surface_azimuth=180.0,    # South-facing
+    solar_zenith=position.zenith,
+    solar_azimuth=position.azimuth,
+    dni=irradiance.dni,
+    ghi=irradiance.ghi,
+    dhi=irradiance.dhi,
+    diffuse_model="perez",    # Industry standard
+    albedo=0.2                # Ground reflectance
+)
+
+print(f"POA Direct:   {poa.poa_direct:.2f} W/m²")
+print(f"POA Diffuse:  {poa.poa_diffuse:.2f} W/m²")
+print(f"POA Ground:   {poa.poa_ground:.2f} W/m²")
+print(f"POA Global:   {poa.poa_global:.2f} W/m²")
+```
+
 ### Define Location and PV System
 
 ```python
@@ -117,7 +144,9 @@ system = PVSystem(
 ```
 
 > **Note**: Full power calculation and annual simulation features are coming in Phase 2 (Weeks 5-7).
-> Currently available: Solar position calculations, clear-sky irradiance models, and core data models.
+> 
+> **See more examples** in the [examples/](examples/) directory:
+> - [poa_example.py](examples/poa_example.py) - Comprehensive POA irradiance calculations
 
 ## 📚 Documentation
 
