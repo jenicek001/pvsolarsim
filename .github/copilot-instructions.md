@@ -27,6 +27,47 @@ You are working on PVSolarSim, a Python library for accurate photovoltaic energy
 
 ---
 
+## Development Environment Setup
+
+**CRITICAL: Always Use Virtual Environment**
+
+- **NEVER install packages system-wide** - Always use the project's virtual environment
+- **Virtual environment location:** `.venv/` in the project root
+- **Before any Python operation** (running tests, installing packages, executing scripts):
+  1. Activate the virtual environment: `source .venv/bin/activate`
+  2. Verify you're using the correct Python: `which python` should show `.venv/bin/python`
+
+**Setup Commands:**
+```bash
+# Initial setup (if .venv doesn't exist)
+cd /home/honzik/GitHub/pvsolarsim
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -e ".[dev]"
+
+# Daily workflow (if .venv exists)
+cd /home/honzik/GitHub/pvsolarsim
+source .venv/bin/activate
+# Now run tests, install packages, etc.
+```
+
+**When Running Commands:**
+- ✅ **DO:** `source .venv/bin/activate && python test_pr1.py`
+- ✅ **DO:** `source .venv/bin/activate && pytest`
+- ✅ **DO:** `source .venv/bin/activate && pip install numpy`
+- ❌ **DON'T:** `python test_pr1.py` (without activating venv)
+- ❌ **DON'T:** `sudo pip install ...` (NEVER use sudo for Python packages)
+
+**Verification:**
+```bash
+# Always verify before running code
+which python  # Should output: /home/honzik/GitHub/pvsolarsim/.venv/bin/python
+pip list      # Should show project dependencies in isolation
+```
+
+---
+
 ## Development Principles
 
 ### 1. Code Quality Standards
