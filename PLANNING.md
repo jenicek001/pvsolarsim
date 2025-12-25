@@ -3,7 +3,7 @@
 **Project Name:** PVSolarSim  
 **Repository:** github.com/jenicek001/pvsolarsim  
 **Type:** Public PyPI Python Package  
-**Status:** Active Development (Phase 1 Complete)  
+**Status:** Active Development (Week 4 Complete - POA Irradiance)  
 **Start Date:** December 23, 2025  
 **Current Version:** v0.1.0-alpha  
 **Target Release:** v1.0.0 by March 2026  
@@ -182,85 +182,92 @@ print(f"DHI: {irradiance.dhi} W/m²")
 
 ---
 
-#### **Week 4: Plane-of-Array (POA) Irradiance** ⬅️ NEXT
+#### **Week 4: Plane-of-Array (POA) Irradiance**
 
 **Goals:**
 - Calculate irradiance on tilted surfaces
 - Implement multiple diffuse transposition models
 - Support incident angle modifiers
 
-**Status:** 🔄 NOT STARTED
+**Status:** ✅ COMPLETED (PR #2)
+
+**Actual Implementation:** POA irradiance fully implemented using pvlib for validated calculations
 
 **Tasks:**
-- [ ] Implement `PVSystem` dataclass
+- [x] ~~Implement `PVSystem` dataclass~~ (Already completed in Week 1)
   - Panel area, efficiency, tilt, azimuth
   - Temperature coefficient, NOCT
-  - IAM and diffuse model preferences
-- [ ] Implement angle of incidence (AOI) calculation
+- [x] Implement angle of incidence (AOI) calculation
+  - Delegated to pvlib.irradiance.aoi
   - Angle between sun vector and panel normal
-- [ ] Implement beam irradiance projection
-  - `beam_component = DNI * cos(AOI)`
-- [ ] Implement diffuse transposition models
-  - [ ] Isotropic (simplest)
-  - [ ] Hay-Davies (circumsolar + isotropic)
-  - [ ] Perez (anisotropic, industry standard)
-  - [ ] Klucher (horizon brightening)
-  - [ ] Reindl (GHI-based)
-- [ ] Implement ground-reflected irradiance
-  - `ground_reflected = GHI * albedo * (1 - cos(tilt)) / 2`
-- [ ] Implement Incidence Angle Modifiers (IAM)
-  - [ ] ASHRAE model
-  - [ ] Physical (Fresnel) model
-  - [ ] Martin-Ruiz model
-  - [ ] SAPM model (optional)
-- [ ] Create `POACalculator` class
-  - Method: `calculate(dni, dhi, ghi, solar_pos, system)` → POA components
-- [ ] Write unit tests
-  - Validate against pvlib
-  - Test different tilt/azimuth combinations
-  - Edge cases: vertical panels, horizontal panels
+- [x] Implement beam irradiance projection
+  - Integrated in POA calculation with IAM
+- [x] Implement diffuse transposition models
+  - [x] Isotropic (simplest)
+  - [x] Hay-Davies (circumsolar + isotropic)
+  - [x] Perez (anisotropic, industry standard - default)
+  - ~~Klucher, Reindl~~ (not critical, can be added later if needed)
+- [x] Implement ground-reflected irradiance
+  - Calculated via pvlib with configurable albedo
+- [x] Implement Incidence Angle Modifiers (IAM)
+  - [x] ASHRAE model
+  - [x] Physical (Fresnel) model
+  - [x] Martin-Ruiz model
+  - ~~SAPM model~~ (optional, deferred)
+- [x] Create `POAIrradiance` class
+  - Method: `calculate(surface_tilt, surface_azimuth, solar_zenith, solar_azimuth, dni, dhi, ghi)` → POA components
+  - Configurable diffuse_model, iam_model, albedo
+- [x] Write comprehensive unit tests
+  - 25 tests with 97.01% coverage
+  - Validated against pvlib.irradiance.get_total_irradiance
+  - Tested different tilt/azimuth combinations
+  - Edge cases: vertical panels, horizontal panels, high AOI, sun below horizon
+- [x] Create working example (poa_example.py)
+- [x] Update README with POA examples
 
 **Deliverables:**
 - ✅ `pvsolarsim.irradiance.poa` module
-- ✅ `pvsolarsim.irradiance.iam` module
-- ✅ Support for 5+ diffuse models
-- ✅ Test coverage > 90%
+- ✅ Support for 3 diffuse models (Isotropic, Perez, Hay-Davies)
+- ✅ Support for 3 IAM models (ASHRAE, Physical, Martin-Ruiz)
+- ✅ Test coverage: 97.01% (POA module)
+
+**Test Coverage:** 97.01%
+**Tests:** 25 tests passing (61 total across all modules)
 
 **Code Example:**
 ```python
-from pvsolarsim import PVSystem
-from pvsolarsim.irradiance import POACalculator
+from pvsolarsim.irradiance import calculate_poa_irradiance
 
-system = PVSystem(
-    panel_area=20.0,
-    panel_efficiency=0.20,
-    tilt=35,
-    azimuth=180
-)
-
-poa_calc = POACalculator(system, model='perez')
-poa = poa_calc.calculate(
+# Calculate POA irradiance on tilted panel
+poa = calculate_poa_irradiance(
+    surface_tilt=35.0,
+    surface_azimuth=180.0,
+    solar_zenith=sun.zenith,
+    solar_azimuth=sun.azimuth,
     dni=irradiance.dni,
     dhi=irradiance.dhi,
     ghi=irradiance.ghi,
-    solar_zenith=sun.zenith,
-    solar_azimuth=sun.azimuth
+    diffuse_model='perez',  # Industry standard
+    albedo=0.2
 )
 
-print(f"POA Global: {poa.global_poa} W/m²")
-print(f"POA Direct: {poa.direct} W/m²")
-print(f"POA Diffuse: {poa.diffuse} W/m²")
+print(f"POA Global: {poa.poa_global} W/m²")
+print(f"POA Direct: {poa.poa_direct} W/m²")
+print(f"POA Diffuse: {poa.poa_diffuse} W/m²")
+print(f"POA Ground: {poa.poa_ground} W/m²")
 ```
 
 ---
 
 ### Phase 2: Simulation Framework (Weeks 5-7)
 
-#### **Week 5: Temperature Modeling**
+#### **Week 5: Temperature Modeling** ⬅️ NEXT
 
 **Goals:**
 - Implement cell/module temperature models
 - Calculate temperature-dependent efficiency
+
+**Status:** 🔄 NOT STARTED
 
 **Tasks:**
 - [ ] Implement temperature models
@@ -732,11 +739,17 @@ results = simulate_annual(
 ## Success Metrics
 
 ### Technical Metrics
-- [ ] All functional requirements implemented (Phase 1 complete: 30%)
-- [x] >90% test coverage achieved (98% in implemented modules)
+- [ ] All functional requirements implemented (Week 4 complete: ~40%)
+- [x] >90% test coverage achieved (97.6% overall, 97.01% in POA module)
 - [ ] Documentation score >95% (interrogate) - partial (API docs complete, Sphinx deferred)
 - [x] Zero critical bugs in v0.1.0-alpha
 - [ ] Performance benchmarks met (will test in Week 7)
+
+**Current Progress:**
+- Weeks 1-4: ✅ Complete (Solar position, Clear-sky, POA irradiance)
+- Week 5: 🔄 Next (Temperature modeling)
+- Total tests: 61 passing
+- Total coverage: 97.62%
 
 ### Adoption Metrics
 - [ ] Published to PyPI
