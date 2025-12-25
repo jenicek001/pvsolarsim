@@ -208,9 +208,7 @@ class TestPVsystModel:
 
     def test_pvsyst_absorption_effect(self):
         """Test PVsyst: higher absorption increases heating."""
-        temp_low_abs = pvsyst_model(
-            poa_global=800, temp_air=25, wind_speed=3, alpha_absorption=0.8
-        )
+        temp_low_abs = pvsyst_model(poa_global=800, temp_air=25, wind_speed=3, alpha_absorption=0.8)
         temp_high_abs = pvsyst_model(
             poa_global=800, temp_air=25, wind_speed=3, alpha_absorption=0.95
         )
@@ -339,25 +337,19 @@ class TestCalculateCellTemperature:
 
     def test_faiman_by_name(self):
         """Test specifying Faiman model by name."""
-        temp = calculate_cell_temperature(
-            poa_global=800, temp_air=25, wind_speed=3, model="faiman"
-        )
+        temp = calculate_cell_temperature(poa_global=800, temp_air=25, wind_speed=3, model="faiman")
         temp_direct = faiman_model(poa_global=800, temp_air=25, wind_speed=3)
         assert temp == pytest.approx(temp_direct)
 
     def test_sapm_by_name(self):
         """Test specifying SAPM model by name."""
-        temp = calculate_cell_temperature(
-            poa_global=800, temp_air=25, wind_speed=3, model="sapm"
-        )
+        temp = calculate_cell_temperature(poa_global=800, temp_air=25, wind_speed=3, model="sapm")
         temp_direct = sapm_model(poa_global=800, temp_air=25, wind_speed=3)
         assert temp == pytest.approx(temp_direct)
 
     def test_pvsyst_by_name(self):
         """Test specifying PVsyst model by name."""
-        temp = calculate_cell_temperature(
-            poa_global=800, temp_air=25, wind_speed=3, model="pvsyst"
-        )
+        temp = calculate_cell_temperature(poa_global=800, temp_air=25, wind_speed=3, model="pvsyst")
         temp_direct = pvsyst_model(poa_global=800, temp_air=25, wind_speed=3)
         assert temp == pytest.approx(temp_direct)
 
@@ -480,9 +472,7 @@ class TestTemperatureCorrectionFactor:
 
     def test_custom_reference(self):
         """Test correction with custom reference temperature."""
-        factor = calculate_temperature_correction_factor(
-            cell_temperature=30, temp_ref=30
-        )
+        factor = calculate_temperature_correction_factor(cell_temperature=30, temp_ref=30)
         assert factor == pytest.approx(1.0)
 
     def test_realistic_scenario(self):

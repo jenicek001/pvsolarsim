@@ -34,9 +34,7 @@ def example_basic_temperature():
 
     # Calculate using Faiman model (default)
     cell_temp = calculate_cell_temperature(
-        poa_global=poa_irradiance,
-        temp_air=ambient_temp,
-        wind_speed=wind_speed
+        poa_global=poa_irradiance, temp_air=ambient_temp, wind_speed=wind_speed
     )
 
     print(f"Irradiance: {poa_irradiance} W/m²")
@@ -69,11 +67,7 @@ def example_compare_models():
     print(f"SAPM model:           {temp_sapm:.2f}°C")
 
     # PVsyst model (with typical c-Si parameters)
-    temp_pvsyst = pvsyst_model(
-        poa, t_air, wind,
-        module_efficiency=0.20,
-        alpha_absorption=0.88
-    )
+    temp_pvsyst = pvsyst_model(poa, t_air, wind, module_efficiency=0.20, alpha_absorption=0.88)
     print(f"PVsyst model:         {temp_pvsyst:.2f}°C")
     print(f"\nTemperature range:    {temp_pvsyst:.2f}°C - {temp_sapm:.2f}°C")
     print(f"Model variation:      {temp_sapm - temp_pvsyst:.2f}°C")
@@ -99,8 +93,7 @@ def example_power_impact():
 
     # Calculate temperature correction
     temp_correction = calculate_temperature_correction_factor(
-        cell_temperature=cell_temp,
-        temp_coefficient=temp_coefficient
+        cell_temperature=cell_temp, temp_coefficient=temp_coefficient
     )
 
     # Actual power (considering only temperature loss)
@@ -119,7 +112,9 @@ def example_power_impact():
     print(f"  Temp. rise:         {cell_temp - 25:.1f}°C above STC")
     print(f"  Correction factor:  {temp_correction:.4f}")
     print(f"  Power output:       {actual_power:.1f}W")
-    print(f"  Power loss:         {rated_power - actual_power:.1f}W ({(1-temp_correction)*100:.1f}%)")
+    print(
+        f"  Power loss:         {rated_power - actual_power:.1f}W ({(1-temp_correction)*100:.1f}%)"
+    )
     print()
 
 
@@ -140,19 +135,18 @@ def example_daily_variation():
 
     for i in range(len(hours)):
         cell_temp = calculate_cell_temperature(
-            poa_global=irradiance[i],
-            temp_air=ambient_temps[i],
-            wind_speed=wind_speeds[i]
+            poa_global=irradiance[i], temp_air=ambient_temps[i], wind_speed=wind_speeds[i]
         )
 
         correction = calculate_temperature_correction_factor(
-            cell_temperature=cell_temp,
-            temp_coefficient=-0.004
+            cell_temperature=cell_temp, temp_coefficient=-0.004
         )
 
-        print(f"{hours[i]:2d}:00 | {irradiance[i]:4.0f} W | "
-              f"{ambient_temps[i]:4.1f}° | {wind_speeds[i]:3.1f}  | "
-              f"{cell_temp:5.1f}° | {(1-correction)*100:5.1f}%")
+        print(
+            f"{hours[i]:2d}:00 | {irradiance[i]:4.0f} W | "
+            f"{ambient_temps[i]:4.1f}° | {wind_speeds[i]:3.1f}  | "
+            f"{cell_temp:5.1f}° | {(1-correction)*100:5.1f}%"
+        )
 
     print()
 
