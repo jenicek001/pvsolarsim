@@ -19,11 +19,19 @@ __license__ = "MIT"
 from pvsolarsim.api.highlevel import calculate_power, simulate_annual
 from pvsolarsim.core.location import Location
 from pvsolarsim.core.pvsystem import PVSystem
+from pvsolarsim.temperature import (
+    TemperatureModel,
+    calculate_cell_temperature,
+    calculate_temperature_correction_factor,
+)
 
 __all__ = [
     "Location",
     "PVSystem",
     "calculate_power",
     "simulate_annual",
+    "TemperatureModel",
+    "calculate_cell_temperature",
+    "calculate_temperature_correction_factor",
     "__version__",
 ]
