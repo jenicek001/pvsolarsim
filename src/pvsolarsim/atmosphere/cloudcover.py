@@ -69,18 +69,18 @@ def calculate_cloud_attenuation(
     """
     # Convert cloud cover to fraction if given as percentage
     cloud_fraction = np.asarray(cloud_cover, dtype=float)
-    
+
     # Validate input range first
     if np.any(cloud_fraction < 0):
         raise ValueError(f"Cloud cover must be 0-100% or 0-1, got {cloud_cover}")
-    
+
     # Check for ambiguous range (> 1 but < 2) - not clearly percentage or fraction
     if np.any((cloud_fraction > 1.0) & (cloud_fraction < 2.0)):
         raise ValueError(
             f"Cloud cover values between 1.0 and 2.0 are ambiguous. "
             f"Use 0-1 for fraction or 0-100 for percentage, got {cloud_cover}"
         )
-    
+
     # Convert percentage to fraction if needed
     if np.any(cloud_fraction >= 2.0):
         if np.any(cloud_fraction > 100):
@@ -91,11 +91,11 @@ def calculate_cloud_attenuation(
     if isinstance(model, str):
         try:
             model = CloudCoverModel(model.lower())
-        except ValueError:
+        except ValueError as e:
             raise ValueError(
                 f"Invalid cloud cover model: {model}. "
                 f"Valid options: {[m.value for m in CloudCoverModel]}"
-            )
+            ) from e
 
     # Apply selected model
     if model == CloudCoverModel.CAMPBELL_NORMAN:
@@ -231,7 +231,6 @@ def apply_cloud_cover(
     attenuation = calculate_cloud_attenuation(cloud_cover, solar_elevation, model)
 
     # Convert to arrays for consistent processing
-    ghi_arr = np.asarray(ghi)
     dni_arr = np.asarray(dni)
     dhi_arr = np.asarray(dhi)
 

@@ -6,10 +6,10 @@ This module provides simple, easy-to-use functions for common use cases.
 from datetime import datetime
 from typing import Any, Optional
 
-from pvsolarsim.atmosphere import ClearSkyModel
 from pvsolarsim.core.location import Location
 from pvsolarsim.core.pvsystem import PVSystem
-from pvsolarsim.power import PowerResult, calculate_power as _calculate_power
+from pvsolarsim.power import PowerResult
+from pvsolarsim.power import calculate_power as _calculate_power
 
 
 def calculate_power(

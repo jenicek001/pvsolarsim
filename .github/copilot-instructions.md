@@ -68,6 +68,52 @@ pip list      # Should show project dependencies in isolation
 
 ---
 
+## Project Organization
+
+### File Structure Principles
+
+**CRITICAL: Keep root directory clean and organized**
+
+**Root Directory Guidelines:**
+- ✅ **Keep in root:** Core project files only (README.md, LICENSE, pyproject.toml, PLANNING.md, PRODUCT_REQUIREMENTS.md)
+- ❌ **Never in root:** Implementation status files, test result documents, integration test scripts
+
+**Proper File Organization:**
+```
+pvsolarsim/
+├── docs/                       # All documentation
+│   ├── implementation/         # Implementation status, PR results
+│   │   ├── PR*_TEST_RESULTS.md
+│   │   ├── WEEK*_IMPLEMENTATION_SUMMARY.md
+│   │   └── IMPLEMENTATION_SUMMARY.md
+│   └── api/                    # Sphinx-generated API docs (when added)
+├── tests/
+│   ├── integration/            # Integration tests (test_pr*.py, etc.)
+│   │   ├── test_pr1.py
+│   │   ├── test_pr2.py
+│   │   └── ...
+│   ├── test_*.py               # Unit tests only
+│   └── conftest.py
+├── examples/                   # Example scripts for users
+│   ├── basic_example.py
+│   └── README.md
+└── src/pvsolarsim/             # Package source code
+```
+
+**Rules for New Files:**
+1. **Test Results/Reports:** Always → `docs/implementation/`
+2. **Integration Tests:** Always → `tests/integration/`
+3. **Unit Tests:** Always → `tests/` (not subdirectory)
+4. **Examples:** Always → `examples/`
+5. **Temporary Analysis:** Create in `.scratch/` (add to .gitignore)
+
+**When Creating Files:**
+- BEFORE creating a file, check if it belongs in a subdirectory
+- Use descriptive filenames with clear purpose
+- Add README.md in subdirectories to explain content
+
+---
+
 ## Development Principles
 
 ### 1. Code Quality Standards
