@@ -79,7 +79,7 @@ def simulate_annual(
     location: Location,
     system: PVSystem,
     year: int = 2025,
-    interval: int = 5,
+    interval_minutes: int = 5,
     weather_source: str = "clear_sky",
     **kwargs: Any,
 ) -> Any:
@@ -89,16 +89,24 @@ def simulate_annual(
         location: Geographic location
         system: PV system configuration
         year: Year for simulation
-        interval: Time interval in minutes (1-60)
+        interval_minutes: Time interval in minutes (1-60)
         weather_source: Weather data source
         **kwargs: Additional arguments for weather source
 
     Returns:
-        AnnualResults with time series data and summary statistics
+        SimulationResult with time series data and summary statistics
 
     Example:
-        >>> results = simulate_annual(location, system, year=2025, interval=5)
-        >>> print(f"Total: {results.total_energy_kwh:.2f} kWh/year")
+        >>> results = simulate_annual(location, system, year=2025, interval_minutes=5)
+        >>> print(f"Total: {results.statistics.total_energy_kwh:.2f} kWh/year")
     """
-    # TODO: Implementation in Week 7
-    raise NotImplementedError("Coming in Week 7 (Time Series & Annual Simulation)")
+    from pvsolarsim.simulation.engine import simulate_annual as _simulate_annual
+
+    return _simulate_annual(
+        location=location,
+        system=system,
+        year=year,
+        interval_minutes=interval_minutes,
+        weather_source=weather_source,
+        **kwargs,
+    )
