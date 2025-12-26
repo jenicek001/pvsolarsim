@@ -422,7 +422,7 @@ def calculate_cell_temperature(
     temp_air: Union[float, ArrayLike],
     wind_speed: Union[float, ArrayLike],
     model: Union[str, TemperatureModel] = TemperatureModel.FAIMAN,
-    **model_params,
+    **model_params: float,
 ) -> Union[float, NDArray[np.float64]]:
     """
     Calculate cell temperature using the specified model.
