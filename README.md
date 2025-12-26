@@ -15,17 +15,18 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 
 - ✅ **Solar position** calculations using NREL's SPA algorithm (via pvlib)
 - ✅ **Atmospheric modeling** with clear-sky irradiance (Ineichen and Simplified Solis models)
+- ✅ **Cloud cover modeling** with 3 validated models (Campbell-Norman, Simple Linear, Kasten-Czeplak)
 - ✅ **Plane-of-array (POA) irradiance** with multiple diffuse transposition models (Isotropic, Perez, Hay-Davies)
 - ✅ **Incidence angle modifiers (IAM)** for reflection losses (ASHRAE, Physical, Martin-Ruiz)
 - ✅ **Cell temperature modeling** with 4 validated models (Faiman, SAPM, PVsyst, Generic Linear)
+- ✅ **Instantaneous power calculation** integrating all PV modeling components
 - ✅ **Location and PV system** data models with validation
-- ✅ **High accuracy**: Solar position <0.01° error, temperature models validated against pvlib
+- ✅ **High accuracy**: Solar position <0.01° error, all models validated against pvlib
 - ✅ **Type-safe**: Full type hints with mypy validation
-- ✅ **Well-tested**: 97.96% code coverage with 113 comprehensive tests
+- ✅ **Well-tested**: 98.64% code coverage with 161 comprehensive tests
 
 ### Coming Soon (Roadmap)
 
-- 🔄 **Instantaneous power** calculation (Week 6)
 - 🔄 **Annual energy simulation** (Week 7)
 - 🔄 **Weather integration** (Weeks 8-9)
 
@@ -33,6 +34,8 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 
 - ✅ **High Accuracy**: Solar position accuracy <0.01° using NREL SPA algorithm
 - ✅ **Multiple Clear-Sky Models**: Ineichen (Linke turbidity), Simplified Solis (AOD)
+- ✅ **Cloud Cover Models**: Campbell-Norman, Simple Linear, Kasten-Czeplak
+- ✅ **Multiple Diffuse Models**: Isotropic, Perez (industry standard), Hay-Davies
 - ✅ **Multiple Diffuse Models**: Isotropic, Perez (industry standard), Hay-Davies
 - ✅ **Temperature Models**: Faiman, SAPM, PVsyst, Generic Linear (all validated against pvlib)
 - ✅ **IAM Support**: ASHRAE, Physical (Fresnel), Martin-Ruiz models
@@ -151,10 +154,12 @@ temp_sapm = calculate_cell_temperature(
 print(f"SAPM cell temperature: {temp_sapm:.2f}°C")
 ```
 
-### Define Location and PV System
+### Instantaneous Power Calculation
 
 ```python
-from pvsolarsim import Location, PVSystem
+from pvsolarsim import Location, PVSystem, calculate_power
+from datetime import datetime
+import pytz
 
 # Define location
 location = Location(
@@ -172,12 +177,43 @@ system = PVSystem(
     azimuth=180.0,          # South-facing
     temp_coefficient=-0.004 # -0.4% per °C
 )
+
+# Calculate power at specific time
+timestamp = datetime(2025, 6, 21, 12, 0, tzinfo=pytz.UTC)
+result = calculate_power(
+    location=location,
+    system=system,
+    timestamp=timestamp,
+    ambient_temp=25,      # °C
+    wind_speed=3,         # m/s
+    cloud_cover=0         # 0-100%
+)
+
+print(f"DC Power: {result.power_w:.2f} W ({result.power_w/1000:.2f} kW)")
+print(f"POA Irradiance: {result.poa_irradiance:.2f} W/m²")
+print(f"Cell Temperature: {result.cell_temperature:.2f}°C")
+print(f"Solar Elevation: {result.solar_elevation:.2f}°")
+
+# With cloud cover
+result_cloudy = calculate_power(
+    location, system, timestamp,
+    ambient_temp=25, wind_speed=3, cloud_cover=50
+)
+print(f"Cloudy Power: {result_cloudy.power_w:.2f} W (50% cloud cover)")
+
+# With soiling and degradation
+result_aged = calculate_power(
+    location, system, timestamp,
+    soiling_factor=0.95,      # 5% soiling loss
+    degradation_factor=0.97,  # 3% degradation
+    inverter_efficiency=0.96  # 96% inverter efficiency
+)
+print(f"AC Power (aged system): {result_aged.power_ac_w:.2f} W")
 ```
 
-> **Note**: Full power calculation and annual simulation features are coming in Phase 2 (Weeks 6-7).
-> 
 > **See more examples** in the [examples/](examples/) directory:
-> - [poa_example.py](examples/poa_example.py) - Comprehensive POA irradiance calculations
+> - [power_calculation_example.py](examples/power_calculation_example.py) - Comprehensive power calculation demonstrations
+> - [poa_example.py](examples/poa_example.py) - POA irradiance calculations
 
 ## 📚 Documentation
 
