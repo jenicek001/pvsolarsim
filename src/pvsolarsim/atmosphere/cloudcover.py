@@ -142,7 +142,7 @@ def _campbell_norman_attenuation(
     tau_overcast = 0.35 + 0.1 * sin_elevation
 
     # Interpolate between clear (1.0) and overcast based on cloud fraction
-    attenuation = 1.0 - cloud_fraction * (1.0 - tau_overcast)
+    attenuation: Union[float, np.ndarray] = 1.0 - cloud_fraction * (1.0 - tau_overcast)
 
     return attenuation
 
@@ -190,10 +190,10 @@ def _kasten_czeplak_attenuation(
     b = -0.84
 
     # Calculate attenuation
-    attenuation = 1.0 + b * cloud_fraction**a
+    attenuation_calc: Union[float, np.ndarray] = 1.0 + b * cloud_fraction**a
 
     # Ensure non-negative
-    attenuation = np.maximum(attenuation, 0.0)
+    attenuation: Union[float, np.ndarray] = np.maximum(attenuation_calc, 0.0)
 
     return attenuation
 
