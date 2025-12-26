@@ -3,7 +3,7 @@
 **Project Name:** PVSolarSim  
 **Repository:** github.com/jenicek001/pvsolarsim  
 **Type:** Public PyPI Python Package  
-**Status:** Active Development (Week 4 Complete - POA Irradiance)  
+**Status:** Active Development (Week 5 Complete - Temperature Modeling)  
 **Start Date:** December 23, 2025  
 **Current Version:** v0.1.0-alpha  
 **Target Release:** v1.0.0 by March 2026  
@@ -261,51 +261,65 @@ print(f"POA Ground: {poa.poa_ground} W/m²")
 
 ### Phase 2: Simulation Framework (Weeks 5-7)
 
-#### **Week 5: Temperature Modeling** ⬅️ NEXT
+#### **Week 5: Temperature Modeling**
 
 **Goals:**
 - Implement cell/module temperature models
 - Calculate temperature-dependent efficiency
 
-**Status:** 🔄 NOT STARTED
+**Status:** ✅ COMPLETED (PR #3)
+
+**Actual Implementation:** All temperature models implemented and validated against pvlib
 
 **Tasks:**
-- [ ] Implement temperature models
-  - [ ] Faiman model (radiative + convective)
-  - [ ] SAPM (Sandia Array Performance Model)
-  - [ ] King model
-  - [ ] Generic linear model
-- [ ] Create `CellTemperatureModel` base class
-- [ ] Implement temperature correction factor
+- [x] Implement temperature models
+  - [x] Faiman model (radiative + convective)
+  - [x] SAPM (Sandia Array Performance Model)
+  - [x] PVsyst model (efficiency and absorption aware)
+  - [x] Generic linear model
+- [x] Create temperature model interface
+  - Using enum-based model selection
+  - Unified `calculate_cell_temperature()` function
+- [x] Implement temperature correction factor
   - `P_corrected = P_stc * [1 + temp_coeff * (T_cell - T_ref)]`
-- [ ] Account for wind speed effects
-- [ ] Write unit tests
-  - Validate against literature values
-  - Test extreme temperatures (-20°C to 60°C)
+- [x] Account for wind speed effects (all models)
+- [x] Write unit tests
+  - 52 comprehensive tests
+  - Validated against pvlib for all models
+  - Test extreme temperatures (-20°C to 80°C)
+  - Edge cases (zero irradiance, high wind, etc.)
 
 **Deliverables:**
 - ✅ `pvsolarsim.temperature.models` module
-- ✅ Multiple model options
-- ✅ Test coverage > 85%
+- ✅ 4 model options (Faiman, SAPM, PVsyst, Generic Linear)
+- ✅ Test coverage: 98.67%
+
+**Test Coverage:** 98.67%
+**Tests:** 52 tests passing (113 total across all modules)
 
 **Code Example:**
 ```python
-from pvsolarsim.temperature import CellTemperatureModel
+from pvsolarsim import calculate_cell_temperature, calculate_temperature_correction_factor
 
-temp_model = CellTemperatureModel(model='sapm')
-cell_temp = temp_model.calculate(
-    poa_irradiance=800,  # W/m²
-    ambient_temp=25,     # °C
-    wind_speed=3         # m/s
+# Calculate cell temperature
+cell_temp = calculate_cell_temperature(
+    poa_global=800,      # W/m²
+    temp_air=25,         # °C
+    wind_speed=3,        # m/s
+    model='faiman'       # or 'sapm', 'pvsyst', 'generic_linear'
 )
 
-temp_factor = 1 + system.temp_coefficient * (cell_temp - 25)
+# Calculate temperature correction factor
+temp_factor = calculate_temperature_correction_factor(
+    cell_temperature=cell_temp,
+    temp_coefficient=-0.004  # -0.4%/°C
+)
 print(f"Temperature correction: {temp_factor:.4f}")
 ```
 
 ---
 
-#### **Week 6: Instantaneous Power Calculation**
+#### **Week 6: Instantaneous Power Calculation** ⬅️ NEXT
 
 **Goals:**
 - Integrate all components into power calculation
@@ -739,17 +753,17 @@ results = simulate_annual(
 ## Success Metrics
 
 ### Technical Metrics
-- [ ] All functional requirements implemented (Week 4 complete: ~40%)
-- [x] >90% test coverage achieved (97.6% overall, 97.01% in POA module)
+- [ ] All functional requirements implemented (Week 5 complete: ~50%)
+- [x] >90% test coverage achieved (97.96% overall, 98.67% in temperature module)
 - [ ] Documentation score >95% (interrogate) - partial (API docs complete, Sphinx deferred)
 - [x] Zero critical bugs in v0.1.0-alpha
 - [ ] Performance benchmarks met (will test in Week 7)
 
 **Current Progress:**
-- Weeks 1-4: ✅ Complete (Solar position, Clear-sky, POA irradiance)
-- Week 5: 🔄 Next (Temperature modeling)
-- Total tests: 61 passing
-- Total coverage: 97.62%
+- Weeks 1-5: ✅ Complete (Solar position, Clear-sky, POA irradiance, Temperature)
+- Week 6: 🔄 Next (Instantaneous power calculation)
+- Total tests: 113 passing
+- Total coverage: 97.96%
 
 ### Adoption Metrics
 - [ ] Published to PyPI
