@@ -14,7 +14,7 @@ References
 from dataclasses import dataclass
 from datetime import datetime
 
-import pandas as pd  # type: ignore[import-untyped]
+import pandas as pd
 import pvlib  # type: ignore[import-untyped]
 
 __all__ = ["SolarPosition", "calculate_solar_position"]

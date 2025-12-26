@@ -107,10 +107,10 @@ class SimulationResult:
             {
                 "energy_kwh": self.statistics.monthly_energy_kwh,
                 "avg_power_w": self.time_series.groupby(
-                    self.time_series.index.to_period("M")
+                    self.time_series.index.to_period("M")  # type: ignore[attr-defined]
                 )["power_w"].mean(),
                 "peak_power_w": self.time_series.groupby(
-                    self.time_series.index.to_period("M")
+                    self.time_series.index.to_period("M")  # type: ignore[attr-defined]
                 )["power_w"].max(),
             }
         )
@@ -133,10 +133,10 @@ class SimulationResult:
             {
                 "energy_kwh": self.statistics.daily_energy_kwh,
                 "avg_power_w": self.time_series.groupby(
-                    self.time_series.index.to_period("D")
+                    self.time_series.index.to_period("D")  # type: ignore[attr-defined]
                 )["power_w"].mean(),
                 "peak_power_w": self.time_series.groupby(
-                    self.time_series.index.to_period("D")
+                    self.time_series.index.to_period("D")  # type: ignore[attr-defined]
                 )["power_w"].max(),
             }
         )

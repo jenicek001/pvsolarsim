@@ -198,10 +198,10 @@ def _calculate_statistics(
     """
     # Energy calculation (power * time interval)
     interval_hours = interval_minutes / 60.0
-    energy_kwh_per_step = df["power_w"] * interval_hours / 1000.0
+    energy_kwh_per_step: pd.Series = df["power_w"] * interval_hours / 1000.0
 
     # Total energy
-    total_energy_kwh = energy_kwh_per_step.sum()
+    total_energy_kwh: float = energy_kwh_per_step.sum()
 
     # Peak power
     peak_power_w = df["power_w"].max()
@@ -229,10 +229,10 @@ def _calculate_statistics(
     # Monthly aggregation
     df_monthly = df.copy()
     df_monthly["energy_kwh"] = energy_kwh_per_step
-    monthly_energy = df_monthly.groupby(df_monthly.index.to_period("M"))["energy_kwh"].sum()
+    monthly_energy = df_monthly.groupby(df_monthly.index.to_period("M"))["energy_kwh"].sum()  # type: ignore[attr-defined]
 
     # Daily aggregation
-    daily_energy = df_monthly.groupby(df_monthly.index.to_period("D"))["energy_kwh"].sum()
+    daily_energy = df_monthly.groupby(df_monthly.index.to_period("D"))["energy_kwh"].sum()  # type: ignore[attr-defined]
 
     return AnnualStatistics(
         total_energy_kwh=total_energy_kwh,
