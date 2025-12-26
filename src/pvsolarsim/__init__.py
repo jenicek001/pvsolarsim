@@ -20,6 +20,7 @@ from pvsolarsim.api.highlevel import calculate_power, simulate_annual
 from pvsolarsim.core.location import Location
 from pvsolarsim.core.pvsystem import PVSystem
 from pvsolarsim.power import PowerResult
+from pvsolarsim.simulation import AnnualStatistics, SimulationResult
 from pvsolarsim.temperature import (
     TemperatureModel,
     calculate_cell_temperature,
@@ -32,6 +33,8 @@ __all__ = [
     "calculate_power",
     "simulate_annual",
     "PowerResult",
+    "SimulationResult",
+    "AnnualStatistics",
     "TemperatureModel",
     "calculate_cell_temperature",
     "calculate_temperature_correction_factor",

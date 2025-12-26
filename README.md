@@ -20,15 +20,16 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 - ✅ **Incidence angle modifiers (IAM)** for reflection losses (ASHRAE, Physical, Martin-Ruiz)
 - ✅ **Cell temperature modeling** with 4 validated models (Faiman, SAPM, PVsyst, Generic Linear)
 - ✅ **Instantaneous power calculation** integrating all PV modeling components
+- ✅ **Annual energy simulation** with time series and statistical analysis
 - ✅ **Location and PV system** data models with validation
 - ✅ **High accuracy**: Solar position <0.01° error, all models validated against pvlib
 - ✅ **Type-safe**: Full type hints with mypy validation
-- ✅ **Well-tested**: 98.64% code coverage with 161 comprehensive tests
+- ✅ **Well-tested**: 98.52% code coverage with 199 comprehensive tests
 
 ### Coming Soon (Roadmap)
 
-- 🔄 **Annual energy simulation** (Week 7)
-- 🔄 **Weather integration** (Weeks 8-9)
+- 🔄 **Weather data integration** (OpenWeatherMap, PVGIS, CSV) - Weeks 8-9
+- 🔄 **Documentation with Sphinx** - Week 11
 
 ### Key Features
 
@@ -211,7 +212,64 @@ result_aged = calculate_power(
 print(f"AC Power (aged system): {result_aged.power_ac_w:.2f} W")
 ```
 
+### Annual Energy Simulation
+
+```python
+from pvsolarsim import Location, PVSystem, simulate_annual
+
+# Define location and system
+location = Location(
+    latitude=40.0,
+    longitude=-105.0,
+    altitude=1655,
+    timezone="America/Denver"
+)
+
+system = PVSystem(
+    panel_area=20.0,        # m²
+    panel_efficiency=0.20,  # 20%
+    tilt=35.0,              # degrees
+    azimuth=180.0,          # South-facing
+    temp_coefficient=-0.004 # -0.4% per °C
+)
+
+# Simulate full year with 5-minute intervals
+results = simulate_annual(
+    location=location,
+    system=system,
+    year=2025,
+    interval_minutes=5,
+    weather_source="clear_sky"
+)
+
+# Display annual statistics
+print(f"Total energy: {results.statistics.total_energy_kwh:.2f} kWh")
+print(f"Capacity factor: {results.statistics.capacity_factor * 100:.2f}%")
+print(f"Peak power: {results.statistics.peak_power_w:.0f} W")
+print(f"Performance ratio: {results.statistics.performance_ratio:.2%}")
+
+# Monthly energy production
+for month, energy in results.statistics.monthly_energy_kwh.items():
+    print(f"{month}: {energy:.2f} kWh")
+
+# Export time series to CSV
+results.export_csv("annual_production_2025.csv")
+
+# With cloud cover, soiling, and inverter efficiency
+results_realistic = simulate_annual(
+    location=location,
+    system=system,
+    year=2025,
+    interval_minutes=60,  # Hourly for faster simulation
+    cloud_cover=30,       # 30% average cloud cover
+    soiling_factor=0.98,  # 2% soiling loss
+    inverter_efficiency=0.96  # 96% inverter efficiency
+)
+print(f"Realistic annual energy: {results_realistic.statistics.total_energy_kwh:.2f} kWh")
+```
+
 > **See more examples** in the [examples/](examples/) directory:
+> - [annual_simulation_example.py](examples/annual_simulation_example.py) - Annual energy production simulation
 > - [power_calculation_example.py](examples/power_calculation_example.py) - Comprehensive power calculation demonstrations
 > - [poa_example.py](examples/poa_example.py) - POA irradiance calculations
 
