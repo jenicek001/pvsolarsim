@@ -5,7 +5,7 @@ performance over extended periods using vectorized operations for efficiency.
 """
 
 from datetime import datetime
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 
 import pandas as pd
 import pytz
@@ -23,6 +23,7 @@ def simulate_annual(
     year: int = 2025,
     interval_minutes: int = 5,
     weather_source: str = "clear_sky",
+    weather_data: Optional[Union[pd.DataFrame, "WeatherDataSource"]] = None,
     ambient_temp: float = 25.0,
     wind_speed: float = 1.0,
     cloud_cover: float = 0.0,
@@ -49,7 +50,10 @@ def simulate_annual(
     interval_minutes : int, default 5
         Time interval in minutes (1-60 recommended)
     weather_source : str, default 'clear_sky'
-        Weather data source ('clear_sky' only in this version)
+        Weather data source ('clear_sky', 'weather_data', 'csv', 'pvgis', 'openweathermap')
+    weather_data : pd.DataFrame or WeatherDataSource, optional
+        Pre-loaded weather data or data source instance.
+        Required if weather_source is not 'clear_sky'.
     ambient_temp : float, default 25.0
         Ambient temperature in °C (used for clear_sky)
     wind_speed : float, default 1.0
@@ -65,7 +69,7 @@ def simulate_annual(
     progress_callback : callable, optional
         Function called with progress (0.0 to 1.0)
     **kwargs : dict
-        Additional parameters for future weather sources
+        Additional parameters for weather sources (e.g., api_key, file_path)
 
     Returns
     -------
@@ -75,9 +79,7 @@ def simulate_annual(
     Raises
     ------
     ValueError
-        If parameters are invalid
-    NotImplementedError
-        If weather_source is not 'clear_sky'
+        If parameters are invalid or weather_data is missing when required
 
     Examples
     --------
@@ -101,12 +103,6 @@ def simulate_annual(
     >>> results.export_csv('annual_production.csv')
     """
     # Validate parameters
-    if weather_source != "clear_sky":
-        raise NotImplementedError(
-            f"Weather source '{weather_source}' not yet implemented. "
-            "Only 'clear_sky' is currently supported."
-        )
-
     if not 1 <= interval_minutes <= 60:
         raise ValueError("interval_minutes must be between 1 and 60")
 
@@ -119,19 +115,68 @@ def simulate_annual(
         start=start, end=end, interval_minutes=interval_minutes, timezone=location.timezone
     )
 
+    # Load weather data if needed
+    weather_df: Optional[pd.DataFrame] = None
+    # Extract weather-specific kwargs before passing to calculate_power
+    weather_kwargs = {
+        "file_path": kwargs.pop("file_path", None),
+        "filepath": kwargs.pop("filepath", None),
+        "column_mapping": kwargs.pop("column_mapping", None),
+        "timestamp_column": kwargs.pop("timestamp_column", "timestamp"),
+        "timestamp_format": kwargs.pop("timestamp_format", None),
+        "timezone": kwargs.pop("timezone", None),
+        "api_key": kwargs.pop("api_key", None),
+        "cache_ttl": kwargs.pop("cache_ttl", None),
+        "timeout": kwargs.pop("timeout", None),
+    }
+
+    if weather_source != "clear_sky":
+        weather_df = _load_weather_data(
+            weather_source, weather_data, location, start, end, **weather_kwargs
+        )
+
     # Calculate power for each timestamp
     power_results = []
     total_steps = len(times)
 
     for i, timestamp in enumerate(times):
+        # Get weather parameters for this timestamp
+        if weather_df is not None:
+            # Find closest timestamp in weather data
+            idx = weather_df.index.asof(timestamp)
+            if pd.isna(idx):
+                # No weather data available, skip or use defaults
+                weather_row = {}
+            else:
+                weather_row = weather_df.loc[idx].to_dict()
+
+            # Extract weather parameters
+            temp = weather_row.get("temp_air", ambient_temp)
+            wind = weather_row.get("wind_speed", wind_speed)
+            clouds = weather_row.get("cloud_cover", cloud_cover)
+            ghi_val = weather_row.get("ghi", None)
+            dni_val = weather_row.get("dni", None)
+            dhi_val = weather_row.get("dhi", None)
+        else:
+            # Use default clear_sky parameters
+            temp = ambient_temp
+            wind = wind_speed
+            clouds = cloud_cover
+            ghi_val = None
+            dni_val = None
+            dhi_val = None
+
         # Calculate instantaneous power
         result = calculate_power(
             location=location,
             system=system,
             timestamp=timestamp,
-            ambient_temp=ambient_temp,
-            wind_speed=wind_speed,
-            cloud_cover=cloud_cover,
+            ambient_temp=temp,
+            wind_speed=wind,
+            cloud_cover=clouds,
+            ghi=ghi_val,
+            dni=dni_val,
+            dhi=dhi_val,
             soiling_factor=soiling_factor,
             degradation_factor=degradation_factor,
             inverter_efficiency=inverter_efficiency,
@@ -175,6 +220,109 @@ def simulate_annual(
         system=system,
         interval_minutes=interval_minutes,
     )
+
+
+def _load_weather_data(
+    weather_source: str,
+    weather_data: Optional[Union[pd.DataFrame, Any]],
+    location: Location,
+    start: datetime,
+    end: datetime,
+    **kwargs: Any,
+) -> pd.DataFrame:
+    """Load weather data from various sources.
+
+    Parameters
+    ----------
+    weather_source : str
+        Type of weather source ('weather_data', 'csv', 'pvgis', 'openweathermap')
+    weather_data : pd.DataFrame or WeatherDataSource, optional
+        Pre-loaded data or data source instance
+    location : Location
+        Geographic location
+    start : datetime
+        Start time
+    end : datetime
+        End time
+    **kwargs : dict
+        Additional parameters (file_path, api_key, etc.)
+
+    Returns
+    -------
+    pd.DataFrame
+        Weather data with datetime index
+
+    Raises
+    ------
+    ValueError
+        If weather_source is invalid or required parameters are missing
+    """
+    if weather_source == "weather_data":
+        # User provided DataFrame directly
+        if weather_data is None:
+            raise ValueError("weather_data must be provided when weather_source='weather_data'")
+
+        if isinstance(weather_data, pd.DataFrame):
+            return weather_data
+        else:
+            # Assume it's a WeatherDataSource instance
+            return weather_data.read(start=start, end=end)
+
+    elif weather_source == "csv":
+        # Load from CSV file
+        from pvsolarsim.weather import CSVWeatherReader
+
+        file_path = kwargs.get("file_path") or kwargs.get("filepath")
+        if not file_path:
+            raise ValueError("file_path must be provided when weather_source='csv'")
+
+        reader = CSVWeatherReader(
+            filepath=file_path,
+            column_mapping=kwargs.get("column_mapping"),
+            timestamp_column=kwargs.get("timestamp_column", "timestamp"),
+            timestamp_format=kwargs.get("timestamp_format"),
+            timezone=kwargs.get("timezone") or location.timezone,
+        )
+        return reader.read(start=start, end=end)
+
+    elif weather_source == "pvgis":
+        # Load from PVGIS API
+        from pvsolarsim.weather import PVGISClient
+
+        client = PVGISClient(
+            cache_ttl=kwargs.get("cache_ttl", 604800),
+            timeout=kwargs.get("timeout", 60),
+        )
+        return client.read_tmy(
+            latitude=location.latitude,
+            longitude=location.longitude,
+        )
+
+    elif weather_source == "openweathermap":
+        # Load from OpenWeatherMap API
+        from pvsolarsim.weather import OpenWeatherMapClient
+
+        api_key = kwargs.get("api_key")
+        if not api_key:
+            raise ValueError("api_key must be provided when weather_source='openweathermap'")
+
+        client = OpenWeatherMapClient(
+            api_key=api_key,
+            cache_ttl=kwargs.get("cache_ttl", 86400),
+            timeout=kwargs.get("timeout", 30),
+        )
+        return client.read(
+            latitude=location.latitude,
+            longitude=location.longitude,
+            start=start,
+            end=end,
+        )
+
+    else:
+        raise ValueError(
+            f"Unknown weather_source: '{weather_source}'. "
+            "Supported sources: 'clear_sky', 'weather_data', 'csv', 'pvgis', 'openweathermap'"
+        )
 
 
 def _calculate_statistics(
