@@ -20,6 +20,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Union
 
+import numpy as np
 import pvlib  # type: ignore[import-untyped]
 
 __all__ = ["IrradianceComponents", "ClearSkyModel", "calculate_clearsky_irradiance"]
@@ -32,17 +33,17 @@ class IrradianceComponents:
 
     Attributes
     ----------
-    ghi : float
+    ghi : float or ndarray
         Global Horizontal Irradiance in W/m²
-    dni : float
+    dni : float or ndarray
         Direct Normal Irradiance in W/m²
-    dhi : float
+    dhi : float or ndarray
         Diffuse Horizontal Irradiance in W/m²
     """
 
-    ghi: float
-    dni: float
-    dhi: float
+    ghi: Union[float, np.ndarray]
+    dni: Union[float, np.ndarray]
+    dhi: Union[float, np.ndarray]
 
 
 class ClearSkyModel(str, Enum):

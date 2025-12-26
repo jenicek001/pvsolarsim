@@ -23,7 +23,7 @@ from pvsolarsim.irradiance import calculate_poa_irradiance
 from pvsolarsim.solar import calculate_solar_position
 
 
-def main():
+def main():  # noqa: C901 - Integration test demo script
     print("=" * 80)
     print("Testing PR #3: Temperature Modeling with Real-World Scenario")
     print("=" * 80)

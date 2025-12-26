@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Union
 
+import numpy as np
 import pvlib  # type: ignore[import-untyped]
 
 __all__ = [
@@ -45,20 +46,20 @@ class POAComponents:
 
     Attributes
     ----------
-    poa_direct : float
+    poa_direct : float or ndarray
         Direct (beam) component on tilted surface in W/m²
-    poa_diffuse : float
+    poa_diffuse : float or ndarray
         Diffuse component on tilted surface in W/m²
-    poa_ground : float
+    poa_ground : float or ndarray
         Ground-reflected component in W/m²
-    poa_global : float
+    poa_global : float or ndarray
         Total POA irradiance (direct + diffuse + ground) in W/m²
     """
 
-    poa_direct: float
-    poa_diffuse: float
-    poa_ground: float
-    poa_global: float
+    poa_direct: Union[float, np.ndarray]
+    poa_diffuse: Union[float, np.ndarray]
+    poa_ground: Union[float, np.ndarray]
+    poa_global: Union[float, np.ndarray]
 
 
 class DiffuseModel(str, Enum):
@@ -214,9 +215,9 @@ class POAIrradiance:
         surface_azimuth: float,
         solar_zenith: float,
         solar_azimuth: float,
-        dni: float,
-        ghi: float,
-        dhi: float,
+        dni: Union[float, np.ndarray],
+        ghi: Union[float, np.ndarray],
+        dhi: Union[float, np.ndarray],
         dni_extra: float = 1367.0,
     ) -> POAComponents:
         """
@@ -337,9 +338,9 @@ def calculate_poa_irradiance(
     surface_azimuth: float,
     solar_zenith: float,
     solar_azimuth: float,
-    dni: float,
-    ghi: float,
-    dhi: float,
+    dni: Union[float, np.ndarray],
+    ghi: Union[float, np.ndarray],
+    dhi: Union[float, np.ndarray],
     diffuse_model: Union[str, DiffuseModel] = DiffuseModel.PEREZ,
     iam_model: Union[str, IAMModel] = IAMModel.PHYSICAL,
     albedo: float = 0.2,
