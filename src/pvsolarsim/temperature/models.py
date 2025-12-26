@@ -22,7 +22,7 @@ References
 """
 
 from enum import Enum
-from typing import Union
+from typing import Union, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -130,7 +130,7 @@ def faiman_model(
     # Return scalar if input was scalar
     if cell_temp.ndim == 0:
         return float(cell_temp)
-    return cell_temp
+    return cast(NDArray[np.float64], cell_temp)
 
 
 def sapm_model(
@@ -226,7 +226,7 @@ def sapm_model(
     # Return scalar if input was scalar
     if cell_temp.ndim == 0:
         return float(cell_temp)
-    return cell_temp
+    return cast(NDArray[np.float64], cell_temp)
 
 
 def pvsyst_model(
