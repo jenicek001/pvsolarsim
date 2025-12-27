@@ -109,10 +109,10 @@ def main():
 
     # Print quality summary
     summary = quality_flags.summary()
-    print(f"\nQuality Summary:")
+    print("\nQuality Summary:")
     print(f"  Total data points: {summary['total_points']}")
     print(f"  Quality percentage: {summary['quality_percentage']:.2f}%")
-    print(f"  Issues found:")
+    print("  Issues found:")
     print(f"    - Nighttime GHI > 0: {summary['nighttime_ghi_count']}")
     print(f"    - Negative values: {summary['negative_values_count']}")
     print(f"    - Out of range: {summary['out_of_range_count']}")
