@@ -27,6 +27,42 @@ You are working on PVSolarSim, a Python library for accurate photovoltaic energy
 
 ---
 
+## Git Workflow & Branch Strategy
+
+**Branch Model:**
+
+This project uses a **single-branch workflow** optimized for GitHub Copilot automation:
+
+- **`master`** - Main development and production branch
+  - All feature PRs target `master` directly
+  - GitHub Copilot creates feature branches and PRs to `master`
+  - CI runs automatically on all PRs to `master`
+  - Releases are tagged from `master` (e.g., v1.0.0)
+
+**GitHub Copilot Workflow:**
+
+1. Copilot creates feature branch: `copilot/feature-name`
+2. Copilot implements changes and commits
+3. Copilot creates PR targeting `master`
+4. CI runs automatically (no manual approval needed)
+5. Human reviews and merges PR
+6. Feature branch auto-deleted after merge
+
+**Why No Develop Branch?**
+
+- Small team/solo development - no need for complex branching
+- GitHub Copilot works best with direct-to-main workflow
+- Faster iteration and simpler CI configuration
+- `master` is always in releasable state (>90% test coverage enforced)
+
+**CI/CD Configuration:**
+
+- Workflow file: `.github/workflows/test.yml`
+- Triggers: All pushes to `master` and `copilot/**` branches, all PRs to `master`
+- No manual approval required for CI on PRs from `copilot/**` branches
+
+---
+
 ## Development Environment Setup
 
 **CRITICAL: Always Use Virtual Environment**
