@@ -21,14 +21,15 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 - ✅ **Cell temperature modeling** with 4 validated models (Faiman, SAPM, PVsyst, Generic Linear)
 - ✅ **Instantaneous power calculation** integrating all PV modeling components
 - ✅ **Annual energy simulation** with time series and statistical analysis
+- ✅ **Weather data integration** with CSV, JSON, OpenWeatherMap, and PVGIS support
 - ✅ **Location and PV system** data models with validation
 - ✅ **High accuracy**: Solar position <0.01° error, all models validated against pvlib
 - ✅ **Type-safe**: Full type hints with mypy validation
-- ✅ **Well-tested**: 98.52% code coverage with 199 comprehensive tests
+- ✅ **Well-tested**: 85%+ code coverage with 226+ comprehensive tests
 
 ### Coming Soon (Roadmap)
 
-- 🔄 **Weather data integration** (OpenWeatherMap, PVGIS, CSV) - Weeks 8-9
+- 🔄 **Advanced weather data handling** (interpolation, quality checks) - Week 9
 - 🔄 **Documentation with Sphinx** - Week 11
 
 ### Key Features
@@ -247,6 +248,62 @@ print(f"Total energy: {results.statistics.total_energy_kwh:.2f} kWh")
 print(f"Capacity factor: {results.statistics.capacity_factor * 100:.2f}%")
 print(f"Peak power: {results.statistics.peak_power_w:.0f} W")
 print(f"Performance ratio: {results.statistics.performance_ratio:.2%}")
+
+# Export to CSV
+results.export_csv("annual_production.csv")
+```
+
+### Weather Data Integration
+
+```python
+from pvsolarsim import Location, PVSystem, simulate_annual
+
+location = Location(latitude=40.0, longitude=-105.0, altitude=1655, timezone="America/Denver")
+system = PVSystem(panel_area=20.0, panel_efficiency=0.20, tilt=35, azimuth=180)
+
+# Option 1: Use CSV file with weather data
+results = simulate_annual(
+    location=location,
+    system=system,
+    year=2025,
+    interval_minutes=60,
+    weather_source="csv",
+    file_path="weather_data.csv",
+    column_mapping={
+        'ghi': 'global_irradiance',
+        'temp_air': 'temperature_c'
+    }
+)
+
+# Option 2: Use PVGIS TMY (Typical Meteorological Year) data
+results = simulate_annual(
+    location=location,
+    system=system,
+    year=2025,
+    weather_source="pvgis"
+)
+
+# Option 3: Use pandas DataFrame directly
+import pandas as pd
+
+weather_df = pd.DataFrame({
+    'ghi': [...],        # Global Horizontal Irradiance (W/m²)
+    'dni': [...],        # Direct Normal Irradiance (W/m²)
+    'dhi': [...],        # Diffuse Horizontal Irradiance (W/m²)
+    'temp_air': [...],   # Air temperature (°C)
+    'wind_speed': [...]  # Wind speed (m/s)
+}, index=pd.date_range('2025-01-01', periods=8760, freq='H', tz='UTC'))
+
+results = simulate_annual(
+    location=location,
+    system=system,
+    year=2025,
+    weather_source="weather_data",
+    weather_data=weather_df
+)
+
+print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
+```
 
 # Monthly energy production
 for month, energy in results.statistics.monthly_energy_kwh.items():

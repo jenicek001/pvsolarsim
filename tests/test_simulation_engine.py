@@ -7,6 +7,7 @@ from pvsolarsim import Location, PVSystem
 from pvsolarsim.simulation import SimulationResult, simulate_annual
 
 
+@pytest.mark.slow
 class TestSimulateAnnual:
     """Test suite for annual simulation."""
 
