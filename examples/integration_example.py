@@ -33,7 +33,7 @@ def main():
         timezone="America/Denver",
     )
 
-    print(f"Location: Denver, Colorado")
+    print("Location: Denver, Colorado")
     print(f"  Latitude:  {location.latitude}°")
     print(f"  Longitude: {location.longitude}°")
     print(f"  Altitude:  {location.altitude} m")
@@ -52,7 +52,7 @@ def main():
         temp_coefficient=-0.004,  # -0.4%/°C (typical for silicon)
     )
 
-    print(f"PV System Configuration:")
+    print("PV System Configuration:")
     print(f"  Panel Area:        {system.panel_area} m²")
     print(f"  Panel Efficiency:  {system.panel_efficiency * 100}%")
     print(f"  Tilt Angle:        {system.tilt}° from horizontal")
@@ -76,7 +76,7 @@ def main():
         altitude=location.altitude,
     )
 
-    print(f"\nSolar Position:")
+    print("\nSolar Position:")
     print(f"  Azimuth:    {solar_pos.azimuth:.2f}° (0° = North, 180° = South)")
     print(f"  Elevation:  {solar_pos.elevation:.2f}° (angle above horizon)")
     print(f"  Zenith:     {solar_pos.zenith:.2f}° (angle from vertical)")
@@ -91,7 +91,7 @@ def main():
         linke_turbidity=3.0,  # Clear sky
     )
 
-    print(f"\nClear-Sky Irradiance:")
+    print("\nClear-Sky Irradiance:")
     print(f"  GHI (Global Horizontal): {irradiance.ghi:.2f} W/m²")
     print(f"  DNI (Direct Normal):     {irradiance.dni:.2f} W/m²")
     print(f"  DHI (Diffuse Horizontal): {irradiance.dhi:.2f} W/m²")
@@ -109,7 +109,7 @@ def main():
         albedo=0.2,
     )
 
-    print(f"\nPlane-of-Array (POA) Irradiance:")
+    print("\nPlane-of-Array (POA) Irradiance:")
     print(f"  Direct Component:   {poa.poa_direct:.2f} W/m²")
     print(f"  Diffuse Component:  {poa.poa_diffuse:.2f} W/m²")
     print(f"  Ground Reflected:   {poa.poa_ground:.2f} W/m²")
@@ -117,7 +117,7 @@ def main():
 
     # Calculate instantaneous DC power (simplified, without temperature effects)
     dc_power = poa.poa_global * system.panel_area * system.panel_efficiency
-    print(f"\nEstimated DC Power Output (at STC temperature):")
+    print("\nEstimated DC Power Output (at STC temperature):")
     print(f"  {dc_power:.2f} W ({dc_power / 1000:.2f} kW)")
 
     # Step 4: Daily Profile
@@ -174,8 +174,8 @@ def main():
     daily_energy_kwh = daily_energy_wh / 1000
     print(f"\nEstimated Daily Energy Production: {daily_energy_kwh:.2f} kWh")
     print(
-        f"(Note: This is a simplified calculation. Actual production depends on "
-        f"temperature, soiling, inverter efficiency, etc.)"
+        "(Note: This is a simplified calculation. Actual production depends on "
+        "temperature, soiling, inverter efficiency, etc.)"
     )
 
     # Step 5: Comparison with Different Orientations
