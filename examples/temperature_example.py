@@ -10,15 +10,14 @@ Temperature significantly affects PV performance - typically reducing power by
 0.3-0.5% per degree Celsius above 25°C (STC conditions).
 """
 
+
 import numpy as np
-from datetime import datetime
-import pytz
 
 from pvsolarsim import (
     calculate_cell_temperature,
     calculate_temperature_correction_factor,
 )
-from pvsolarsim.temperature import faiman_model, sapm_model, pvsyst_model
+from pvsolarsim.temperature import faiman_model, pvsyst_model, sapm_model
 
 
 def example_basic_temperature():
@@ -102,12 +101,12 @@ def example_power_impact():
     print(f"Module: {rated_power}W at STC (1000 W/m², 25°C)")
     print(f"Temperature coefficient: {temp_coefficient*100:.1f}%/°C")
     print()
-    print(f"Conditions:")
+    print("Conditions:")
     print(f"  Irradiance:         {poa} W/m²")
     print(f"  Ambient temp:       {t_air}°C")
     print(f"  Wind speed:         {wind} m/s")
     print()
-    print(f"Results:")
+    print("Results:")
     print(f"  Cell temperature:   {cell_temp:.1f}°C")
     print(f"  Temp. rise:         {cell_temp - 25:.1f}°C above STC")
     print(f"  Correction factor:  {temp_correction:.4f}")
