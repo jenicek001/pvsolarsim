@@ -5,7 +5,7 @@ performance over extended periods using vectorized operations for efficiency.
 """
 
 from datetime import datetime
-from typing import Any, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
 import pandas as pd
 import pytz
@@ -15,6 +15,9 @@ from pvsolarsim.core.pvsystem import PVSystem
 from pvsolarsim.power import calculate_power
 from pvsolarsim.simulation.results import AnnualStatistics, SimulationResult
 from pvsolarsim.simulation.timeseries import generate_time_series
+
+if TYPE_CHECKING:
+    from pvsolarsim.weather.base import WeatherDataSource
 
 
 def simulate_annual(
@@ -289,11 +292,11 @@ def _load_weather_data(
         # Load from PVGIS API
         from pvsolarsim.weather import PVGISClient
 
-        client = PVGISClient(
+        pvgis_client = PVGISClient(
             cache_ttl=kwargs.get("cache_ttl", 604800),
             timeout=kwargs.get("timeout", 60),
         )
-        return client.read_tmy(
+        return pvgis_client.read_tmy(
             latitude=location.latitude,
             longitude=location.longitude,
         )
@@ -306,12 +309,12 @@ def _load_weather_data(
         if not api_key:
             raise ValueError("api_key must be provided when weather_source='openweathermap'")
 
-        client = OpenWeatherMapClient(
+        owm_client = OpenWeatherMapClient(
             api_key=api_key,
             cache_ttl=kwargs.get("cache_ttl", 86400),
             timeout=kwargs.get("timeout", 30),
         )
-        return client.read(
+        return owm_client.read(
             latitude=location.latitude,
             longitude=location.longitude,
             start=start,

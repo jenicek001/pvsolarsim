@@ -2,7 +2,6 @@
 
 import pandas as pd
 import pytest
-import pytz
 
 from pvsolarsim.weather.base import WeatherDataSource
 

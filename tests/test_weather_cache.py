@@ -5,7 +5,6 @@ import time
 from pathlib import Path
 
 import pandas as pd
-import pytest
 
 from pvsolarsim.weather.cache import WeatherCache
 
@@ -139,7 +138,7 @@ def test_cache_directory_creation():
         cache_dir = Path(tmpdir) / "subdir" / "cache"
         assert not cache_dir.exists()
 
-        cache = WeatherCache(cache_dir=cache_dir, ttl=3600)
+        WeatherCache(cache_dir=cache_dir, ttl=3600)
 
         # Directory should be created
         assert cache_dir.exists()

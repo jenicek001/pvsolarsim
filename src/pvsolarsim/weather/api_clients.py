@@ -122,8 +122,8 @@ class OpenWeatherMapClient(WeatherDataSource):
             return cached_data
 
         # Convert timestamps to Unix time
-        start_ts = int(start.timestamp())
-        end_ts = int(end.timestamp())
+        int(start.timestamp())
+        int(end.timestamp())
 
         # Fetch current weather for solar data
         # Note: OpenWeatherMap's free tier has limited historical data
@@ -141,7 +141,7 @@ class OpenWeatherMapClient(WeatherDataSource):
             response.raise_for_status()
             data = response.json()
         except requests.RequestException as e:
-            raise ValueError(f"Failed to fetch data from OpenWeatherMap: {e}")
+            raise ValueError(f"Failed to fetch data from OpenWeatherMap: {e}") from e
 
         # Parse response
         df = self._parse_response(data, start, end)
@@ -330,7 +330,7 @@ class PVGISClient(WeatherDataSource):
             response.raise_for_status()
             data = response.json()
         except requests.RequestException as e:
-            raise ValueError(f"Failed to fetch data from PVGIS: {e}")
+            raise ValueError(f"Failed to fetch data from PVGIS: {e}") from e
 
         # Parse response
         df = self._parse_tmy_response(data)

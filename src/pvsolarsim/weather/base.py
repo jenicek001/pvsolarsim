@@ -67,14 +67,20 @@ class WeatherDataSource(ABC):
         ValueError
             If validation fails
         """
-        # Check for datetime index
+        self._validate_index(data)
+        self._validate_required_columns(data)
+        self._validate_value_ranges(data)
+
+    def _validate_index(self, data: pd.DataFrame) -> None:
+        """Validate DataFrame index is timezone-aware DatetimeIndex."""
         if not isinstance(data.index, pd.DatetimeIndex):
             raise ValueError("Weather data must have a DatetimeIndex")
 
         if data.index.tz is None:
             raise ValueError("Weather data timestamps must be timezone-aware")
 
-        # Check required columns
+    def _validate_required_columns(self, data: pd.DataFrame) -> None:
+        """Validate required columns are present."""
         required_columns = ["temp_air"]
         missing_columns = [col for col in required_columns if col not in data.columns]
         if missing_columns:
@@ -88,27 +94,25 @@ class WeatherDataSource(ABC):
                 "Weather data must contain at least one irradiance column (ghi, dni, or dhi)"
             )
 
-        # Validate value ranges
-        if "ghi" in data.columns:
-            if (data["ghi"] < 0).any() or (data["ghi"] > 1500).any():
-                raise ValueError("GHI values must be between 0 and 1500 W/m²")
+    def _validate_value_ranges(self, data: pd.DataFrame) -> None:
+        """Validate all values are within acceptable ranges."""
+        # Define validation rules: (column_name, min, max, unit, error_msg_prefix)
+        validations = [
+            ("ghi", 0, 1500, "W/m²", "GHI values"),
+            ("dni", 0, 1500, "W/m²", "DNI values"),
+            ("dhi", 0, 1000, "W/m²", "DHI values"),
+            ("temp_air", -60, 60, "°C", "Air temperature"),
+            ("wind_speed", 0, 50, "m/s", "Wind speed"),
+            ("cloud_cover", 0, 100, "%", "Cloud cover"),
+        ]
 
-        if "dni" in data.columns:
-            if (data["dni"] < 0).any() or (data["dni"] > 1500).any():
-                raise ValueError("DNI values must be between 0 and 1500 W/m²")
+        for col_name, min_val, max_val, unit, msg_prefix in validations:
+            if col_name in data.columns:
+                self._validate_column_range(data[col_name], msg_prefix, min_val, max_val, unit)
 
-        if "dhi" in data.columns:
-            if (data["dhi"] < 0).any() or (data["dhi"] > 1000).any():
-                raise ValueError("DHI values must be between 0 and 1000 W/m²")
-
-        if "temp_air" in data.columns:
-            if (data["temp_air"] < -60).any() or (data["temp_air"] > 60).any():
-                raise ValueError("Air temperature must be between -60 and 60 °C")
-
-        if "wind_speed" in data.columns:
-            if (data["wind_speed"] < 0).any() or (data["wind_speed"] > 50).any():
-                raise ValueError("Wind speed must be between 0 and 50 m/s")
-
-        if "cloud_cover" in data.columns:
-            if (data["cloud_cover"] < 0).any() or (data["cloud_cover"] > 100).any():
-                raise ValueError("Cloud cover must be between 0 and 100%")
+    def _validate_column_range(
+        self, series: pd.Series, msg_prefix: str, min_val: float, max_val: float, unit: str
+    ) -> None:
+        """Validate a column is within specified range."""
+        if (series < min_val).any() or (series > max_val).any():
+            raise ValueError(f"{msg_prefix} must be between {min_val} and {max_val} {unit}")
