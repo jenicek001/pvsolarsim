@@ -56,3 +56,4 @@ dmypy.json
 
 # Ruff
 .ruff_cache/
+tests/integration/sample_data/
