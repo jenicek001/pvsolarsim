@@ -4,7 +4,7 @@ This module provides functions to interpolate missing weather data
 and fill gaps in time series.
 """
 
-from typing import Optional
+from typing import List, Optional
 
 import pandas as pd
 
@@ -66,7 +66,7 @@ def interpolate_weather_data(
 
 
 def forward_fill(
-    data: pd.DataFrame, limit: Optional[int] = None, columns: Optional[list[str]] = None
+    data: pd.DataFrame, limit: Optional[int] = None, columns: Optional[List[str]] = None
 ) -> pd.DataFrame:
     """Fill missing values by propagating forward the last valid value.
 
@@ -103,7 +103,7 @@ def forward_fill(
 
 
 def backward_fill(
-    data: pd.DataFrame, limit: Optional[int] = None, columns: Optional[list[str]] = None
+    data: pd.DataFrame, limit: Optional[int] = None, columns: Optional[List[str]] = None
 ) -> pd.DataFrame:
     """Fill missing values by propagating backward the next valid value.
 
