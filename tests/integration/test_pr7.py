@@ -16,12 +16,11 @@ Expected Performance (Czech Republic averages):
 - Capacity factor: 10-13%
 """
 
-import os
 from pathlib import Path
 
 import pandas as pd
 
-from pvsolarsim import Location, PVSystem, simulate_annual
+from pvsolarsim import Location
 from pvsolarsim.weather import (
     CSVWeatherReader,
     create_quality_report,
@@ -32,7 +31,7 @@ from pvsolarsim.weather import (
 )
 
 
-def main():
+def main():  # noqa: C901 - Integration test with multiple demonstration sections
     print("=" * 80)
     print("Testing PR #7: Weather Data Quality Validation & Interpolation")
     print("Real-World System: 14.04 kWp in Prague, Czech Republic")
@@ -46,42 +45,62 @@ def main():
     # Location: Prague area, Czech Republic
     latitude = 50.0807494
     longitude = 14.8594164
-    altitude = 300  # meters
+    altitude = 220  # meters
     timezone = "Europe/Prague"
 
+    # System parameters - Real installation with 2 panel types
+    # String 1: 16x München Energieprodukte MSMD450M6-72 M6
+    munchen_panels = {
+        'count': 16,
+        'power_wp': 450,
+        'efficiency': 0.2037,  # 20.37%
+        'temp_coeff_pmax': -0.0035,  # -0.35%/°C
+        'area_m2': 2.108 * 1.048,  # 2.209 m²
+    }
+
+    # String 2: 18x Canadian Solar HiKu CS3L-380MS
+    canadian_panels = {
+        'count': 18,
+        'power_wp': 380,
+        'efficiency': 0.205,  # ~20.5%
+        'temp_coeff_pmax': -0.0037,  # -0.37%/°C
+        'area_m2': 1.765 * 1.048,  # 1.850 m²
+    }
+
+    # Total system
+    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
+                      canadian_panels['count'] * canadian_panels['power_wp'])
+    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
+                     canadian_panels['count'] * canadian_panels['area_m2'])
+    weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
+    weighted_temp_coeff = ((munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff_pmax'] +
+                           canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff_pmax']) /
+                          total_power_wp)
+    tilt = 35.0  # degrees (optimal for Central Europe)
+    azimuth = 202.0  # degrees (SSW orientation)
+
+    print("System Configuration:")
+    print(f"  Location: {latitude}°N, {longitude}°E, {altitude}m")
+    print(f"  String 1: {munchen_panels['count']}x München MSMD450M6-72 @ {munchen_panels['power_wp']}W")
+    print(f"    - Capacity: {munchen_panels['count'] * munchen_panels['power_wp']/1000:.2f} kWp")
+    print(f"    - Efficiency: {munchen_panels['efficiency']*100:.2f}%")
+    print(f"  String 2: {canadian_panels['count']}x Canadian Solar CS3L-380MS @ {canadian_panels['power_wp']}W")
+    print(f"    - Capacity: {canadian_panels['count'] * canadian_panels['power_wp']/1000:.2f} kWp")
+    print(f"    - Efficiency: {canadian_panels['efficiency']*100:.2f}%")
+    print(f"  Total Capacity: {total_power_wp/1000:.2f} kWp")
+    print(f"  Total Area: {total_area_m2:.2f} m²")
+    print(f"  Weighted Efficiency: {weighted_efficiency*100:.2f}%")
+    print(f"  Weighted Temperature Coefficient: {weighted_temp_coeff*100:.3f}%/°C")
+    print(f"  Tilt: {tilt}°, Azimuth: {azimuth}° (SSW)")
+    print()
+
+    # Create Location and PVSystem objects for quality checks
     location = Location(
         latitude=latitude,
         longitude=longitude,
         altitude=altitude,
         timezone=timezone,
     )
-
-    # System parameters - Typical residential installation
-    # 36 panels × 390Wp = 14.04 kWp
-    total_power_wp = 14040  # 14.04 kWp
-    total_area_m2 = 68.64  # Total panel area (36 panels × 1.9 m²)
-    weighted_efficiency = 0.2045  # 20.45% (modern monocrystalline)
-    weighted_temp_coeff = -0.0036  # -0.36%/°C
-    tilt = 35.0  # degrees (optimal for Central Europe)
-    azimuth = 202.0  # degrees (SSW orientation)
-
-    system = PVSystem(
-        panel_area=total_area_m2,
-        panel_efficiency=weighted_efficiency,
-        tilt=tilt,
-        azimuth=azimuth,
-        temp_coefficient=weighted_temp_coeff,
-    )
-
-    print("System Configuration:")
-    print(f"  Location: {latitude}°N, {longitude}°E, {altitude}m")
-    print(f"  Capacity: {total_power_wp/1000:.2f} kWp")
-    print(f"  Panel Area: {total_area_m2:.2f} m²")
-    print(f"  Efficiency: {weighted_efficiency*100:.2f}%")
-    print(f"  Temperature Coefficient: {weighted_temp_coeff*100:.2f}%/°C")
-    print(f"  Tilt: {tilt}°")
-    print(f"  Azimuth: {azimuth}° (SSW)")
-    print()
 
     # ==================================================================================
     # PART 1: LOAD SAMPLE WEATHER DATA
@@ -123,18 +142,18 @@ def main():
     # Perform comprehensive quality checks
     quality_flags = perform_quality_checks(
         weather_data,
-        latitude=latitude,
-        longitude=longitude,
+        latitude=location.latitude,
+        longitude=location.longitude,
     )
 
     # Get quality summary
     summary = quality_flags.summary()
 
-    print(f"Quality Check Results:")
+    print("Quality Check Results:")
     print(f"  Total data points: {summary['total_points']}")
     print(f"  Quality percentage: {summary['quality_percentage']:.2f}%")
     print()
-    print(f"  Issues detected:")
+    print("  Issues detected:")
     print(f"    - Nighttime GHI > 0:        {summary['nighttime_ghi_count']:>6}")
     print(f"    - Negative values:          {summary['negative_values_count']:>6}")
     print(f"    - Out of range:             {summary['out_of_range_count']:>6}")
@@ -177,7 +196,7 @@ def main():
             expected_freq="1h",
         )
 
-        print(f"✓ Weather data after gap filling:")
+        print("✓ Weather data after gap filling:")
         print(f"  Original points: {len(weather_data)}")
         print(f"  Filled points:   {len(filled_weather)}")
         print(f"  Added points:    {len(filled_weather) - len(weather_data)}")
@@ -214,7 +233,7 @@ def main():
 
         # Check remaining NaNs
         remaining_nans = clean_weather.isna().sum().sum()
-        print(f"✓ Interpolation complete:")
+        print("✓ Interpolation complete:")
         print(f"  Original NaNs:  {total_nans}")
         print(f"  Remaining NaNs: {remaining_nans}")
         print(f"  Filled:         {total_nans - remaining_nans}")
@@ -246,12 +265,11 @@ def main():
     print("Analyzing sample data characteristics:")
     print()
 
-    # Calculate average daily energy from sample days
-    daily_energies = []
+    # Calculate average daily GHI from sample days
     for date in pd.unique(clean_weather.index.date):
         day_data = clean_weather[clean_weather.index.date == date]
         if len(day_data) >= 12:  # Reasonable amount of data
-            # Calculate daily energy for this sample day
+            # Calculate daily average for this sample day
             hourly_ghi = day_data["ghi"].mean()
             print(f"  {date}: Average GHI = {hourly_ghi:.1f} W/m²")
 
@@ -386,9 +404,9 @@ def main():
     print("System Performance vs Czech Republic Benchmarks:")
     print()
     print(f"  Our estimate:          {kwh_per_kwp:.0f} kWh/kWp")
-    print(f"  Czech average:         950 kWh/kWp")
-    print(f"  Good installations:    1,000 - 1,100 kWh/kWp")
-    print(f"  Excellent:             >1,100 kWh/kWp")
+    print("  Czech average:         950 kWh/kWp")
+    print("  Good installations:    1,000 - 1,100 kWh/kWp")
+    print("  Excellent:             >1,100 kWh/kWp")
     print()
 
     if kwh_per_kwp >= 1100:
@@ -402,7 +420,7 @@ def main():
 
     print()
     print(f"  Capacity Factor:       {expected_capacity_factor*100:.1f}%")
-    print(f"  Czech typical range:   10-13%")
+    print("  Czech typical range:   10-13%")
 
     if 10 <= expected_capacity_factor * 100 <= 13:
         print("  ✓ Within typical range for Czech Republic")
@@ -428,7 +446,7 @@ def main():
     print("  ✓ Data quality reporting")
     print("  ✓ Czech Republic performance benchmarking")
     print()
-    print(f"Expected Annual Performance (14.04 kWp system in Prague):")
+    print("Expected Annual Performance (14.04 kWp system in Prague):")
     print(f"  Annual Energy:    {expected_annual_kwh:,.0f} kWh")
     print(f"  kWh/kWp ratio:    {kwh_per_kwp:.0f} kWh/kWp")
     print(f"  Capacity Factor:  {expected_capacity_factor*100:.1f}%")
