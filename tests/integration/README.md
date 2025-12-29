@@ -9,6 +9,20 @@ This directory contains integration tests that validate complete workflows and r
   - Uses real-world system configurations
   - Validates end-to-end workflows
 
+### Current Integration Tests
+
+- **test_pr1.py** - Solar position and clear-sky irradiance (Week 2-3)
+- **test_pr2.py** - POA irradiance calculations (Week 4)
+- **test_pr3.py** - Temperature modeling (Week 5)
+- **test_pr4.py** - Power calculation with cloud cover (Week 6)
+- **test_pr5.py** - Annual simulation (Week 7)
+- **test_pr6.py** - Weather data integration (Week 8)
+- **test_pr7.py** - Weather quality validation & interpolation (Week 9)
+  - **Real-world demonstration:** Prague 14.04 kWp system
+  - **Features:** Quality checks, gap filling, NaN interpolation
+  - **Benchmarking:** Czech Republic performance expectations
+  - **Results:** See `docs/implementation/PR7_TEST_RESULTS.md`
+
 ## Running Integration Tests
 
 ```bash

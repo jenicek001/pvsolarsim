@@ -334,26 +334,30 @@ print(f"Realistic annual energy: {results_realistic.statistics.total_energy_kwh:
 
 - [Product Requirements Specification](PRODUCT_REQUIREMENTS.md)
 - [Development Planning](PLANNING.md)
-- [AI Development Instructions](copilot-instructions.md)
+- [Development Guide](DEVELOPMENT.md)
+- [Multi-Version Python Testing](docs/MULTI_VERSION_TESTING.md) - **NEW: Test across Python 3.9-3.12**
+- [AI Development Instructions](.github/copilot-instructions.md)
 - [API Reference](https://pvsolarsim.readthedocs.io) *(coming soon)*
-- [Examples](examples/) *(coming soon)*
+- [Examples](examples/)
 
 ## 🧪 Testing
 
-Run tests:
+Run tests locally:
 ```bash
-pytest
+# Quick check (current Python version)
+pytest --cov
+
+# Pre-commit validation (recommended before every commit)
+.github/scripts/pre-commit-checks.sh
+
+# Multi-version testing (Python 3.9-3.12 with Docker)
+.github/scripts/test-python-versions.sh
 ```
 
-With coverage:
-```bash
-pytest --cov=pvsolarsim --cov-report=html
-```
+**Important:** This project supports **Python 3.9+**. The CI tests on all versions (3.9, 3.10, 3.11, 3.12).  
+Use the multi-version testing script to catch compatibility issues before pushing.
 
-Validate against pvlib:
-```bash
-pytest tests/validation/
-```
+See [Multi-Version Testing Guide](docs/MULTI_VERSION_TESTING.md) for details.
 
 ## 🤝 Contributing
 

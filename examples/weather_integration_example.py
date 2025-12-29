@@ -5,11 +5,9 @@ with the annual simulation.
 """
 
 import tempfile
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-import pytz
 
 from pvsolarsim import Location, PVSystem, simulate_annual
 
@@ -72,7 +70,7 @@ def example_1_csv_weather_data():
             inverter_efficiency=0.96,
         )
 
-        print(f"Simulation completed!")
+        print("Simulation completed!")
         print(f"Total energy: {results.statistics.total_energy_kwh:.2f} kWh")
         print(f"Peak power: {results.statistics.peak_power_w:.2f} W")
         print(f"Capacity factor: {results.statistics.capacity_factor * 100:.2f}%\n")
@@ -87,7 +85,6 @@ def example_2_dataframe_weather_data():
 
     # Summer weather pattern
     hours = timestamps.hour.values
-    days = timestamps.dayofyear.values
 
     ghi_values = [max(0, 900 * abs(1 - abs(h - 12) / 12) ** 2.5) for h in hours]
 
@@ -122,7 +119,7 @@ def example_2_dataframe_weather_data():
         soiling_factor=0.99,
     )
 
-    print(f"Simulation completed!")
+    print("Simulation completed!")
     print(f"Total energy: {results.statistics.total_energy_kwh:.2f} kWh")
     print(f"Average power: {results.statistics.average_power_w:.2f} W")
     print(f"Performance ratio: {results.statistics.performance_ratio:.2f}\n")
@@ -161,11 +158,11 @@ def example_3_clear_sky_comparison():
         cloud_cover=40,  # 40% cloud cover
     )
 
-    print(f"\nClear Sky:")
+    print("\nClear Sky:")
     print(f"  Total energy: {results_clear.statistics.total_energy_kwh:.2f} kWh")
     print(f"  Capacity factor: {results_clear.statistics.capacity_factor * 100:.2f}%")
 
-    print(f"\nCloudy (40% cover):")
+    print("\nCloudy (40% cover):")
     print(f"  Total energy: {results_cloudy.statistics.total_energy_kwh:.2f} kWh")
     print(f"  Capacity factor: {results_cloudy.statistics.capacity_factor * 100:.2f}%")
 
@@ -220,7 +217,7 @@ def example_4_custom_column_mapping():
             },
         )
 
-        print(f"Simulation completed with custom column mapping!")
+        print("Simulation completed with custom column mapping!")
         print(f"Total energy: {results.statistics.total_energy_kwh:.2f} kWh\n")
 
 

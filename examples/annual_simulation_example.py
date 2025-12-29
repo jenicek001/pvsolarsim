@@ -5,10 +5,6 @@ This example demonstrates how to use PVSolarSim to simulate a full year
 of PV energy production with clear-sky conditions.
 """
 
-from datetime import datetime
-
-import pytz
-
 from pvsolarsim import Location, PVSystem, simulate_annual
 
 
@@ -39,7 +35,7 @@ def main():
     print("=" * 70)
     print(f"\nLocation: Boulder, Colorado ({location.latitude}°N, {location.longitude}°W)")
     print(f"Altitude: {location.altitude} m")
-    print(f"\nSystem Configuration:")
+    print("\nSystem Configuration:")
     print(f"  Panel area: {system.panel_area} m²")
     print(f"  Efficiency: {system.panel_efficiency * 100}%")
     print(f"  Tilt: {system.tilt}°")
@@ -59,7 +55,7 @@ def main():
         weather_source="clear_sky",
     )
 
-    print(f"\nAnnual Performance:")
+    print("\nAnnual Performance:")
     print(f"  Total energy: {results.statistics.total_energy_kwh:.2f} kWh")
     print(f"  Capacity factor: {results.statistics.capacity_factor * 100:.2f}%")
     print(f"  Peak power: {results.statistics.peak_power_w:.0f} W")
@@ -67,7 +63,7 @@ def main():
     print(f"  Performance ratio: {results.statistics.performance_ratio:.2%}")
     print(f"  Total daylight hours: {results.statistics.total_daylight_hours:.1f} h")
 
-    print(f"\nMonthly Energy Production:")
+    print("\nMonthly Energy Production:")
     for month, energy in results.statistics.monthly_energy_kwh.items():
         print(f"  {month}: {energy:.2f} kWh")
 
@@ -84,7 +80,7 @@ def main():
         cloud_cover=30,  # 30% cloud cover
     )
 
-    print(f"\nAnnual Performance:")
+    print("\nAnnual Performance:")
     print(f"  Total energy: {results_cloudy.statistics.total_energy_kwh:.2f} kWh")
     print(f"  Capacity factor: {results_cloudy.statistics.capacity_factor * 100:.2f}%")
     print(f"  Energy reduction vs clear: {(1 - results_cloudy.statistics.total_energy_kwh / results.statistics.total_energy_kwh) * 100:.1f}%")
@@ -103,7 +99,7 @@ def main():
         degradation_factor=0.99,  # 1% degradation (1 year old)
     )
 
-    print(f"\nAnnual Performance:")
+    print("\nAnnual Performance:")
     print(f"  Total energy: {results_real.statistics.total_energy_kwh:.2f} kWh")
     print(f"  Total losses: {(1 - results_real.statistics.total_energy_kwh / results.statistics.total_energy_kwh) * 100:.1f}%")
 
@@ -123,7 +119,7 @@ def main():
     dc_energy = results_ac.time_series["power_w"].sum() * 60 / 60000  # Convert to kWh
     ac_energy = results_ac.time_series["power_ac_w"].sum() * 60 / 60000
 
-    print(f"\nAnnual Performance:")
+    print("\nAnnual Performance:")
     print(f"  DC energy: {dc_energy:.2f} kWh")
     print(f"  AC energy: {ac_energy:.2f} kWh")
     print(f"  Inverter efficiency (actual): {(ac_energy / dc_energy) * 100:.2f}%")

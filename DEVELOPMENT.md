@@ -5,10 +5,15 @@
 To prevent CI/CD failures, **ALWAYS** run these checks locally before committing:
 
 ```bash
+# Quick check using script (RECOMMENDED)
+.github/scripts/pre-commit-checks.sh
+
+# OR manually run each check:
+
 # 1. Linting
 ruff check src/ tests/ --fix
 
-# 2. Type checking
+# 2. Type checking (CRITICAL for Python 3.9 compatibility)
 mypy src/
 
 # 3. Fast tests (excludes slow integration tests)
@@ -17,6 +22,11 @@ pytest --cov --cov-report=xml
 # 4. Optional: Run slow tests locally
 pytest -m slow -v
 ```
+
+**Why this is critical:**
+- CI tests on Python 3.9, 3.10, 3.11, and 3.12
+- Type hints that work on 3.10+ may fail on 3.9
+- Running checks locally catches these issues before CI
 
 ## Pre-commit Hooks (RECOMMENDED)
 
@@ -53,6 +63,32 @@ This will automatically run:
 - **NOT** included in pytest discovery (excluded via `--ignore=tests/integration`)
 
 ## Common Issues & Solutions
+
+### Issue 0: Python 3.9 Type Hint Compatibility (CRITICAL)
+
+**Symptom:** Mypy passes on Python 3.10+ but fails on Python 3.9  
+**Cause:** Using lowercase type hints (`list[]`, `dict[]`) not supported in Python 3.9  
+**Solution:** Always use capitalized types from `typing` module
+
+```python
+# ❌ BAD - Fails on Python 3.9
+from typing import Optional
+
+def func(data: list[str]) -> dict[str, int]:
+    pass
+
+# ✅ GOOD - Works on Python 3.9+
+from typing import Dict, List, Optional
+
+def func(data: List[str]) -> Dict[str, int]:
+    pass
+```
+
+**Always use:**
+- `List[T]` not `list[T]`
+- `Dict[K, V]` not `dict[K, V]`
+- `Tuple[T, ...]` not `tuple[T, ...]`
+- `Set[T]` not `set[T]`
 
 ### Issue 1: Tests Timing Out in CI
 
@@ -245,7 +281,17 @@ def test_expensive_operation():
     result = simulate_annual(...)  # Takes long time
 ```
 
+**Q: How do I test on Python 3.9 specifically?**  
+A: If you have Python 3.9 installed:
+```bash
+python3.9 -m venv .venv39
+source .venv39/bin/activate
+pip install -e ".[dev]"
+mypy src/
+pytest
+```
+
 ---
 
-**Last Updated:** 2025-12-27  
+**Last Updated:** 2025-12-28  
 **Maintainer:** Development Team

@@ -77,11 +77,11 @@ winter = datetime(2025, 12, 21, 12, 0, tzinfo=pytz.UTC)
 result_summer = calculate_power(location, system, summer, ambient_temp=25)
 result_winter = calculate_power(location, system, winter, ambient_temp=0)
 
-print(f"Summer Solstice:")
+print("Summer Solstice:")
 print(f"  Elevation: {result_summer.solar_elevation:.2f}°")
 print(f"  Power: {result_summer.power_w:.2f} W")
 
-print(f"Winter Solstice:")
+print("Winter Solstice:")
 print(f"  Elevation: {result_winter.solar_elevation:.2f}°")
 print(f"  Power: {result_winter.power_w:.2f} W")
 
@@ -130,7 +130,7 @@ result_with_inverter = calculate_power(
 
 print(f"DC Power: {result_with_inverter.power_w:.2f} W")
 print(f"AC Power: {result_with_inverter.power_ac_w:.2f} W")
-print(f"Inverter Efficiency: 96%")
+print("Inverter Efficiency: 96%")
 
 # Example 7: Daily power curve
 print("\n7. Daily Power Curve (Hourly)")
