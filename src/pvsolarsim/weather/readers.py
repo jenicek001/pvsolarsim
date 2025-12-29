@@ -126,14 +126,26 @@ class CSVWeatherReader(WeatherDataSource):
         if self.timestamp_format:
             df["timestamp"] = pd.to_datetime(df[timestamp_col], format=self.timestamp_format)
         else:
-            df["timestamp"] = pd.to_datetime(df[timestamp_col])
+            # Try parsing with mixed timezone support
+            df["timestamp"] = pd.to_datetime(df[timestamp_col], utc=True)
 
         # Apply timezone
-        if df["timestamp"].dt.tz is None:
-            df["timestamp"] = df["timestamp"].dt.tz_localize(self.timezone)
-        else:
-            # Convert to specified timezone
-            df["timestamp"] = df["timestamp"].dt.tz_convert(self.timezone)
+        try:
+            if df["timestamp"].dt.tz is None:
+                df["timestamp"] = df["timestamp"].dt.tz_localize(self.timezone)
+            else:
+                # Convert to specified timezone
+                df["timestamp"] = df["timestamp"].dt.tz_convert(self.timezone)
+        except AttributeError:
+            # If timestamps are objects (mixed timezones), convert each individually
+            df["timestamp"] = pd.to_datetime(df[timestamp_col])
+            if pd.api.types.is_object_dtype(df["timestamp"]):
+                # Convert to timezone-aware Series
+                df["timestamp"] = pd.DatetimeIndex(df["timestamp"]).tz_convert(self.timezone)
+            elif df["timestamp"].dt.tz is None:
+                df["timestamp"] = df["timestamp"].dt.tz_localize(self.timezone)
+            else:
+                df["timestamp"] = df["timestamp"].dt.tz_convert(self.timezone)
 
         # Set timestamp as index
         df.set_index("timestamp", inplace=True)
