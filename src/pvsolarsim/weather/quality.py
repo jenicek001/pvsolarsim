@@ -328,13 +328,13 @@ def create_quality_report(
         problematic = data[flags.any_issues].head(10)
         for idx, _row in problematic.iterrows():
             issues = []
-            if flags.nighttime_ghi[idx]:
+            if flags.nighttime_ghi[idx]:  # type: ignore[call-overload]
                 issues.append("nighttime_ghi")
-            if flags.negative_values[idx]:
+            if flags.negative_values[idx]:  # type: ignore[call-overload]
                 issues.append("negative")
-            if flags.out_of_range[idx]:
+            if flags.out_of_range[idx]:  # type: ignore[call-overload]
                 issues.append("out_of_range")
-            if flags.inconsistent[idx]:
+            if flags.inconsistent[idx]:  # type: ignore[call-overload]
                 issues.append("inconsistent")
 
             report_lines.append(f"{idx}: {', '.join(issues)}")

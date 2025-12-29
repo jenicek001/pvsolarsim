@@ -57,9 +57,9 @@ def interpolate_weather_data(
     for col in result.columns:
         if result[col].isna().any():
             result[col] = result[col].interpolate(
-                method=method,
+                method=method,  # type: ignore[arg-type]
                 limit=limit,
-                limit_direction=limit_direction,  # type: ignore[call-overload]
+                limit_direction=limit_direction,  # type: ignore[arg-type]
             )
 
     return result
@@ -188,7 +188,7 @@ def detect_gaps(data: pd.DataFrame, expected_freq: Optional[str] = None) -> pd.D
 
     # Generate complete time range
     full_range = pd.date_range(
-        start=data.index.min(), end=data.index.max(), freq=expected_freq, tz=data.index.tz
+        start=data.index.min(), end=data.index.max(), freq=expected_freq, tz=data.index.tz  # type: ignore[arg-type]
     )
 
     # Find missing timestamps
@@ -289,7 +289,7 @@ def fill_gaps(
 
     # Generate complete time range
     full_range = pd.date_range(
-        start=data.index.min(), end=data.index.max(), freq=expected_freq, tz=data.index.tz
+        start=data.index.min(), end=data.index.max(), freq=expected_freq, tz=data.index.tz  # type: ignore[arg-type]
     )
 
     # Reindex to include all timestamps (creates NaN for missing data)
