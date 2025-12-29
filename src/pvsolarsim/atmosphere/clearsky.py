@@ -134,10 +134,13 @@ def calculate_clearsky_irradiance(
 
     # For Ineichen model, use pvlib.clearsky.ineichen
     if model == ClearSkyModel.INEICHEN:
+        # Calculate pressure-corrected airmass
+        pressure = pvlib.atmosphere.alt2pres(altitude)
         result = pvlib.clearsky.ineichen(
             apparent_zenith=apparent_zenith,
             airmass_absolute=pvlib.atmosphere.get_absolute_airmass(
-                pvlib.atmosphere.get_relative_airmass(apparent_zenith)
+                pvlib.atmosphere.get_relative_airmass(apparent_zenith),
+                pressure=pressure
             ),
             linke_turbidity=linke_turbidity,
             altitude=altitude,
