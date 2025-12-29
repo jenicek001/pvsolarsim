@@ -80,7 +80,7 @@ class CSVWeatherReader(WeatherDataSource):
         if not self.filepath.exists():
             raise FileNotFoundError(f"Weather data file not found: {filepath}")
 
-    def read(
+    def read(  # noqa: C901 - Complex timezone handling for pandas compatibility
         self,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None,
