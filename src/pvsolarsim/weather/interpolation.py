@@ -57,10 +57,10 @@ def interpolate_weather_data(
     for col in result.columns:
         if result[col].isna().any():
             # Pandas API varies across Python versions - suppress type errors
-            result[col] = result[col].interpolate(  # type: ignore
-                method=method,
+            result[col] = result[col].interpolate(
+                method=method,  # type: ignore
                 limit=limit,
-                limit_direction=limit_direction,
+                limit_direction=limit_direction,  # type: ignore
             )
 
     return result
