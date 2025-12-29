@@ -4,9 +4,7 @@ These tests focus on testing individual functions and edge cases
 without running full slow annual simulations.
 """
 
-import tempfile
 from datetime import datetime
-from pathlib import Path
 
 import pandas as pd
 import pytest

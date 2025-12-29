@@ -16,7 +16,6 @@ import requests
 
 from pvsolarsim.weather.api_clients import OpenWeatherMapClient, PVGISClient
 
-
 # Skip all tests in this file - they're testing mocks, not functionality
 pytestmark = pytest.mark.skip(reason="Mock tests need refactoring to match actual implementation")
 
@@ -263,7 +262,7 @@ class TestWeatherAPIIntegration:
         # First call fails with 503, second succeeds
         mock_response_fail = Mock()
         mock_response_fail.raise_for_status.side_effect = requests.HTTPError("503 Service Unavailable")
-        
+
         mock_response_success = Mock()
         mock_response_success.status_code = 200
         mock_response_success.json.return_value = {
@@ -296,16 +295,16 @@ class TestWeatherAPIIntegration:
     def test_cache_key_generation(self):
         """Test that cache keys are generated correctly."""
         client = OpenWeatherMapClient(api_key="test_key")
-        
+
         # Generate cache keys for same parameters - should be identical
         start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
         end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
-        
+
         key1 = client._get_cache_key(40.0, -105.0, start, end)
         key2 = client._get_cache_key(40.0, -105.0, start, end)
-        
+
         assert key1 == key2
-        
+
         # Different parameters should give different keys
         key3 = client._get_cache_key(41.0, -105.0, start, end)
         assert key1 != key3
