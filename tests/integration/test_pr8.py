@@ -266,7 +266,7 @@ def test_power_calculation_sample_day(prague_location, prague_system, prague_wea
               f"{row['cloud_cover']:>7.1f} | {result.power_w:>8.0f}")
 
     print("-" * 78)
-    print(f"\nDaily Summary (Jan 1, 2025):")
+    print("\nDaily Summary (Jan 1, 2025):")
     print(f"  Total Energy: {total_energy_wh/1000:.2f} kWh")
     print(f"  Peak Power: {max_power_w/1000:.2f} kW")
     print(f"  Peak Power / Rated: {max_power_w/TOTAL_POWER_WP*100:.1f}%")
@@ -328,7 +328,7 @@ def test_pvlib_comparison_solar_position(prague_location, pvlib_location, prague
               f"{azim_diff:>6.3f}° {elev_diff:>5.3f}°")
 
     print("-" * 85)
-    print(f"\nAccuracy Metrics:")
+    print("\nAccuracy Metrics:")
     print(f"  Azimuth MAE: {np.mean(azimuth_diffs):.4f}°")
     print(f"  Azimuth Max Error: {np.max(azimuth_diffs):.4f}°")
     print(f"  Elevation MAE: {np.mean(elevation_diffs):.4f}°")
@@ -393,10 +393,10 @@ def test_pvlib_comparison_poa_irradiance(prague_location, pvlib_location, prague
 
         # pvlib POA calculation
         pvlib_pos = pvlib_location.get_solarposition(timestamp)
-        
+
         # Calculate DNI extra (extraterrestrial irradiance)
         dni_extra = pvlib.irradiance.get_extra_radiation(timestamp)
-        
+
         pvlib_poa = pvlib.irradiance.get_total_irradiance(
             surface_tilt=TILT,
             surface_azimuth=AZIMUTH,
@@ -424,7 +424,7 @@ def test_pvlib_comparison_poa_irradiance(prague_location, pvlib_location, prague
               f"{diff:>10.2f} | {error_pct:>7.2f}%")
 
     print("-" * 75)
-    print(f"\nAccuracy Metrics:")
+    print("\nAccuracy Metrics:")
     print(f"  POA MAE: {np.mean(poa_diffs):.2f} W/m²")
     print(f"  POA MAPE: {np.mean(poa_errors):.2f}%")
     print(f"  POA Max Error: {np.max(poa_diffs):.2f} W/m²")
@@ -488,7 +488,7 @@ def test_pvlib_comparison_temperature(prague_weather_data):
               f"{pvsim_temp:>11.2f} | {pvlib_temp:>11.2f} | {diff:>7.2f}")
 
     print("-" * 85)
-    print(f"\nAccuracy Metrics:")
+    print("\nAccuracy Metrics:")
     print(f"  Temperature MAE: {np.mean(temp_diffs):.2f}°C")
     print(f"  Temperature Max Error: {np.max(temp_diffs):.2f}°C")
 
