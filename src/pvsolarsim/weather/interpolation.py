@@ -57,7 +57,8 @@ def interpolate_weather_data(
     for col in result.columns:
         if result[col].isna().any():
             # Use keyword arguments for pandas compatibility
-            result[col] = result[col].interpolate(  # type: ignore[call-overload]
+            # Ignore type errors due to pandas API differences across Python versions
+            result[col] = result[col].interpolate(  # type: ignore[arg-type,call-overload]
                 method=method,
                 limit=limit,
                 limit_direction=limit_direction,
