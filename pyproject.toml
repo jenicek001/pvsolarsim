@@ -5,26 +5,49 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pvsolarsim"
 version = "0.1.0"
-description = "Python library for photovoltaic solar energy simulation"
+description = "Comprehensive Python library for photovoltaic solar energy simulation with accurate physics-based models"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
     {name = "jenicek001", email = "jenicek001@users.noreply.github.com"}
 ]
-keywords = ["solar", "photovoltaic", "pv", "simulation", "energy", "renewable"]
+maintainers = [
+    {name = "jenicek001", email = "jenicek001@users.noreply.github.com"}
+]
+keywords = [
+    "solar",
+    "photovoltaic",
+    "pv",
+    "simulation",
+    "energy",
+    "renewable",
+    "irradiance",
+    "solar-position",
+    "clear-sky",
+    "weather",
+    "solar-energy",
+    "pv-system",
+    "solar-power"
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
+    "Intended Audience :: Education",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 
 dependencies = [
