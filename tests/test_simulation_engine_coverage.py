@@ -6,6 +6,7 @@ These are quick tests that don't run full annual simulations.
 import pandas as pd
 import pytest
 from datetime import datetime
+from unittest.mock import patch, Mock
 import pytz
 
 from pvsolarsim import Location, PVSystem
@@ -228,3 +229,122 @@ class TestLoadWeatherData:
                 start=start,
                 end=end,
             )
+
+    @patch('pvsolarsim.weather.api_clients.PVGISClient.read_tmy')
+    def test_load_weather_pvgis(self, mock_read_tmy, sample_location):
+        """Test loading weather data from PVGIS."""
+        # Mock the PVGIS response
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
+        mock_df = pd.DataFrame({
+            "ghi": [500] * 24,
+            "dni": [700] * 24,
+            "dhi": [100] * 24,
+            "temp_air": [25] * 24,
+            "wind_speed": [3] * 24,
+        }, index=timestamps)
+        mock_read_tmy.return_value = mock_df
+
+        start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
+        end = pytz.UTC.localize(datetime(2025, 1, 1, 23, 59))
+
+        df = _load_weather_data(
+            weather_source="pvgis",
+            weather_data=None,
+            location=sample_location,
+            start=start,
+            end=end,
+        )
+
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 24
+        mock_read_tmy.assert_called_once_with(
+            latitude=sample_location.latitude,
+            longitude=sample_location.longitude,
+        )
+
+    @patch('pvsolarsim.weather.api_clients.PVGISClient.read_tmy')
+    def test_load_weather_pvgis_custom_parameters(self, mock_read_tmy, sample_location):
+        """Test loading weather data from PVGIS with custom parameters."""
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
+        mock_df = pd.DataFrame({
+            "ghi": [500] * 24,
+            "temp_air": [25] * 24,
+        }, index=timestamps)
+        mock_read_tmy.return_value = mock_df
+
+        start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
+        end = pytz.UTC.localize(datetime(2025, 1, 1, 23, 59))
+
+        df = _load_weather_data(
+            weather_source="pvgis",
+            weather_data=None,
+            location=sample_location,
+            start=start,
+            end=end,
+            cache_ttl=3600,
+            timeout=120,
+        )
+
+        assert isinstance(df, pd.DataFrame)
+        mock_read_tmy.assert_called_once()
+
+    @patch('pvsolarsim.weather.api_clients.OpenWeatherMapClient.read')
+    def test_load_weather_openweathermap_with_api_key(self, mock_read, sample_location):
+        """Test loading weather data from OpenWeatherMap with API key."""
+        # Mock the OpenWeatherMap response
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
+        mock_df = pd.DataFrame({
+            "temp_air": [25] * 24,
+            "wind_speed": [3] * 24,
+            "cloud_cover": [20] * 24,
+        }, index=timestamps)
+        mock_read.return_value = mock_df
+
+        start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
+        end = pytz.UTC.localize(datetime(2025, 1, 1, 23, 59))
+
+        df = _load_weather_data(
+            weather_source="openweathermap",
+            weather_data=None,
+            location=sample_location,
+            start=start,
+            end=end,
+            api_key="test_api_key_123",
+        )
+
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 24
+        mock_read.assert_called_once_with(
+            latitude=sample_location.latitude,
+            longitude=sample_location.longitude,
+            start=start,
+            end=end,
+        )
+
+    @patch('pvsolarsim.weather.api_clients.OpenWeatherMapClient.read')
+    def test_load_weather_openweathermap_custom_parameters(self, mock_read, sample_location):
+        """Test loading weather data from OpenWeatherMap with custom cache/timeout."""
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
+        mock_df = pd.DataFrame({
+            "temp_air": [25] * 24,
+            "wind_speed": [3] * 24,
+        }, index=timestamps)
+        mock_read.return_value = mock_df
+
+        start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
+        end = pytz.UTC.localize(datetime(2025, 1, 1, 23, 59))
+
+        df = _load_weather_data(
+            weather_source="openweathermap",
+            weather_data=None,
+            location=sample_location,
+            start=start,
+            end=end,
+            api_key="test_key",
+            cache_ttl=7200,
+            timeout=60,
+        )
+
+        assert isinstance(df, pd.DataFrame)
+        mock_read.assert_called_once()
+
