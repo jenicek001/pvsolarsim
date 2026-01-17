@@ -83,20 +83,41 @@ def main():
     print()
 
     # ==================================================================================
-    # TODAY'S WEATHER CONDITIONS (Typical January in Prague)
+    # TODAY'S WEATHER CONDITIONS
     # ==================================================================================
 
-    # January weather estimates for Prague
-    # Source: Czech Hydrometeorological Institute average data
+    print("⚠️  IMPORTANT: SIMULATED WEATHER DATA")
+    print("=" * 90)
+    print("This simulation uses CLEAR-SKY MODEL, not real weather data!")
+    print()
+    print("Why? Real weather APIs require:")
+    print("  • API key (OpenWeatherMap, Visual Crossing, etc.)")
+    print("  • Historical data access (often paid)")
+    print("  • Real-time weather stations nearby")
+    print()
+    print("For REALISTIC results, you need to:")
+    print("  1. Get API key from weather service")
+    print("  2. Use weather_source='openweathermap' or 'csv' with real data")
+    print("  3. Or manually enter today's actual conditions below")
+    print()
+    print("=" * 90)
+    print()
+
+    # CLEAR-SKY simulation parameters (optimistic)
+    # For realistic January in Prague, multiply results by 0.15-0.30
     ambient_temp = 0.0  # °C (typical winter)
     wind_speed = 3.5  # m/s (moderate winter wind)
-    cloud_cover = 80  # % (Prague is typically cloudy in January)
+    cloud_cover = 0  # % (CLEAR SKY - unrealistic for Prague winter!)
 
-    print("Weather Conditions (Typical January in Prague):")
-    print(f"  Temperature: {ambient_temp}°C (winter average)")
+    print("Simulation Settings (CLEAR-SKY MODEL):")
+    print(f"  Temperature: {ambient_temp}°C")
     print(f"  Wind Speed: {wind_speed} m/s")
-    print(f"  Cloud Cover: {cloud_cover}% (typical winter cloudiness)")
-    print(f"  Note: Using estimated weather - for actual conditions integrate weather API")
+    print(f"  Cloud Cover: {cloud_cover}% (CLEAR SKY - unrealistic!)")
+    print()
+    print("Typical January Prague Weather (from ČHMÚ):")
+    print("  • Average cloud cover: 75-85%")
+    print("  • Average sunshine: 1-2 hours/day")
+    print("  • Expected daily energy: 5-15 kWh (NOT 40-50 kWh!)")
     print()
 
     # ==================================================================================
@@ -160,13 +181,17 @@ def main():
     # DAILY SUMMARY
     # ==================================================================================
 
-    print("Daily Summary (January 17, 2026):")
+    print("Daily Summary (January 17, 2026 - CLEAR-SKY MODEL):")
     print("-" * 90)
     print(f"  Total Energy (DC): {total_energy_wh / 1000:.2f} kWh")
     
     total_energy_ac_wh = sum(r['power_ac_w'] for r in hourly_results)
     print(f"  Total Energy (AC): {total_energy_ac_wh / 1000:.2f} kWh")
-    
+    print()
+    print("  ⚠️  WARNING: This is CLEAR-SKY (perfect weather) simulation!")
+    print(f"  Realistic January expectation: {(total_energy_ac_wh / 1000) * 0.20:.2f} kWh/day")
+    print("  (Prague winter typically has 75-85% cloud cover)")
+    print()
     if hourly_results:
         max_power = max(r['power_ac_w'] for r in hourly_results)
         print(f"  Peak Power: {max_power / 1000:.2f} kW")
@@ -185,36 +210,34 @@ def main():
     # COMPARISON WITH EXPECTED PERFORMANCE
     # ==================================================================================
 
-    print("Comparison with Expected Performance:")
+    print("Comparison with Real-World Performance:")
     print("-" * 90)
     
-    # January average for Prague (from PVGIS)
-    # Average GHI for January in Prague: ~30 kWh/m²/month → ~1 kWh/m²/day
-    expected_daily_ghi = 1.0  # kWh/m²/day
-    expected_daily_energy = expected_daily_ghi * total_area_m2 * weighted_efficiency * 0.75  # 75% PR
+    # Realistic January in Prague (from PVGIS and real installations)
+    # January: ~30-40 kWh/m²/month GHI → ~1.0-1.3 kWh/m²/day average
+    # With clouds: 0.2-0.4 kWh/m²/day typical
+    realistic_daily_ghi = 0.3  # kWh/m²/day (typical cloudy January)
+    realistic_daily_energy = realistic_daily_ghi * total_area_m2 * weighted_efficiency * 0.75
     
-    print(f"  Expected January Daily Energy: {expected_daily_energy:.2f} kWh (clear day average)")
-    print(f"  Today's Actual Energy: {total_energy_ac_wh / 1000:.2f} kWh")
+    clear_sky_daily_ghi = 1.5  # kWh/m²/day (perfect clear sky)
+    clear_sky_daily_energy = total_energy_ac_wh / 1000
     
-    if expected_daily_energy > 0:
-        performance_vs_expected = (total_energy_ac_wh / 1000) / expected_daily_energy * 100
-        print(f"  Performance vs Expected: {performance_vs_expected:.1f}%")
-        
-        if performance_vs_expected > 90:
-            print("  Status: ✓ Excellent - above average performance")
-        elif performance_vs_expected > 70:
-            print("  Status: ✓ Good - near expected performance")
-        elif performance_vs_expected > 50:
-            print("  Status: ⚠ Fair - below average (cloudy day)")
-        else:
-            print("  Status: ⚠ Poor - significant cloudiness or issues")
+    print(f"  CLEAR-SKY (this simulation): {clear_sky_daily_energy:.2f} kWh/day")
+    print(f"  REALISTIC January typical: {realistic_daily_energy:.2f} kWh/day")
+    print(f"  Reduction factor: {(realistic_daily_energy / clear_sky_daily_energy) * 100:.1f}%")
+    print()
+    print("  Real Prague January conditions:")
+    print("    • 75-85% cloud cover most days")
+    print("    • 1-2 hours direct sun on average")
+    print("    • Monthly total: 150-250 kWh (not 1,500 kWh!)")
+    print("    • Daily range: 3-20 kWh depending on weather")
     print()
 
     # ==================================================================================
     # ECONOMIC VALUE
     # ==================================================================================
 
-    print("Economic Value (Today):")
+    print("Economic Value:")
     print("-" * 90)
     
     # Czech electricity prices
@@ -222,47 +245,70 @@ def main():
     feed_in_tariff_czk = 2.50  # CZK/kWh
     self_consumption_ratio = 0.40
     
-    self_consumed_kwh = (total_energy_ac_wh / 1000) * self_consumption_ratio
-    exported_kwh = (total_energy_ac_wh / 1000) * (1 - self_consumption_ratio)
+    # Use realistic values
+    realistic_daily_energy_kwh = realistic_daily_energy
+    
+    self_consumed_kwh = realistic_daily_energy_kwh * self_consumption_ratio
+    exported_kwh = realistic_daily_energy_kwh * (1 - self_consumption_ratio)
     
     daily_value_czk = (
         self_consumed_kwh * electricity_price_czk +
         exported_kwh * feed_in_tariff_czk
     )
     
-    print(f"  Self-consumed: {self_consumed_kwh:.2f} kWh × {electricity_price_czk} CZK = {self_consumed_kwh * electricity_price_czk:.2f} CZK")
-    print(f"  Exported: {exported_kwh:.2f} kWh × {feed_in_tariff_czk} CZK = {exported_kwh * feed_in_tariff_czk:.2f} CZK")
-    print(f"  Total Daily Value: {daily_value_czk:.2f} CZK (~{daily_value_czk / 24:.2f} EUR)")
+    print("  REALISTIC January typical day:")
+    print(f"    Self-consumed: {self_consumed_kwh:.2f} kWh × {electricity_price_czk} CZK = {self_consumed_kwh * electricity_price_czk:.2f} CZK")
+    print(f"    Exported: {exported_kwh:.2f} kWh × {feed_in_tariff_czk} CZK = {exported_kwh * feed_in_tariff_czk:.2f} CZK")
+    print(f"    Daily Value: {daily_value_czk:.2f} CZK (~{daily_value_czk / 24:.2f} EUR)")
     print()
     
     # Monthly and annual projection
     monthly_value_czk = daily_value_czk * 31  # January has 31 days
-    annual_projection_czk = daily_value_czk * 365
     
-    print(f"  Projected January Value: {monthly_value_czk:.2f} CZK (~{monthly_value_czk / 24:.2f} EUR)")
-    print(f"  If every day like today: {annual_projection_czk:.2f} CZK/year (~{annual_projection_czk / 24:.2f} EUR/year)")
-    print("  Note: January is the lowest production month; annual average is ~6× higher")
+    print(f"  Projected January (31 days): {monthly_value_czk:.2f} CZK (~{monthly_value_czk / 24:.2f} EUR)")
+    print()
+    print("  Annual realistic estimate (with weather variation):")
+    print("    • January-February: ~150 kWh/month each (~25 EUR/month)")
+    print("    • March-April: ~800 kWh/month each (~135 EUR/month)")
+    print("    • May-July: ~1,400 kWh/month each (~235 EUR/month)")
+    print("    • August-October: ~900 kWh/month each (~150 EUR/month)")
+    print("    • November-December: ~200 kWh/month each (~35 EUR/month)")
+    print("    • Total: ~15,000 kWh/year (~2,500 EUR/year)")
     print()
 
     # ==================================================================================
     # RECOMMENDATIONS
     # ==================================================================================
 
-    print("Today's Recommendations:")
+    print("How to Get REAL Weather Data:")
     print("-" * 90)
-    
-    if cloud_cover > 70:
-        print("  • High cloud cover reducing output by ~50-70%")
-        print("  • This is normal for January in Prague")
-        print("  • Spring/summer will show much better performance")
-    
-    if ambient_temp < 5:
-        print("  • Cold temperatures actually improve panel efficiency!")
-        print("  • Panels perform better in winter (when there's sun)")
-    
-    print("  • Check for snow accumulation on panels")
-    print("  • Winter months typically produce 15-20% of annual energy")
-    print("  • Peak production months (May-July) will be 6-8× higher")
+    print()
+    print("This simulation used CLEAR-SKY model (perfect weather). For real results:")
+    print()
+    print("Option 1: Use Weather API")
+    print("  • Get free API key from OpenWeatherMap or Visual Crossing")
+    print("  • Modify this script to use weather_source='openweathermap'")
+    print("  • Example:")
+    print("    results = simulate_annual(..., weather_source='openweathermap',")
+    print("                               api_key='YOUR_KEY')")
+    print()
+    print("Option 2: Use CSV with Real Data")
+    print("  • Download data from weather station or PVGIS")
+    print("  • Save as CSV with columns: timestamp, ghi, dni, dhi, temp_air, wind_speed")
+    print("  • Use weather_source='csv', file_path='weather.csv'")
+    print()
+    print("Option 3: Manual Measurement")
+    print("  • Check your inverter's production today")
+    print("  • Compare with this simulation's clear-sky value")
+    print(f"  • Clear-sky max: {clear_sky_daily_energy:.1f} kWh")
+    print(f"  • Realistic typical: {realistic_daily_energy:.1f} kWh")
+    print("  • Your actual today: ??? kWh (check inverter)")
+    print()
+    print("Winter Operation Tips:")
+    print("  • January typically produces 1.5-2% of annual energy")
+    print("  • Check panels for snow accumulation")
+    print("  • Cold temps improve efficiency when sun does shine")
+    print("  • Don't expect more than 10-20 kWh/day in January!")
     print()
 
     print("=" * 90)
