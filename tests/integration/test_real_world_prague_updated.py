@@ -8,7 +8,7 @@ SYSTEM SPECIFICATIONS (Real Installation):
 ==========================================
 Location: Prague, Czech Republic
 - Latitude: 50.0807494°N
-- Longitude: 14.8594164°E  
+- Longitude: 14.8594164°E
 - Altitude: 220 m
 - Timezone: Europe/Prague
 
@@ -18,7 +18,7 @@ PV System: Two-string configuration
   * Efficiency: 20.37%
   * Temp coefficient: -0.35%/°C
   * Area per panel: 2.209 m²
-  
+
 - String 2: 18× Canadian Solar HiKu CS3L-380MS (6.84 kWp)
   * Panel power: 380 Wp
   * Efficiency: 20.50%
@@ -52,7 +52,7 @@ import pytz
 from pvsolarsim import Location, PVSystem, calculate_power, simulate_annual
 
 
-def main():
+def main():  # noqa: C901 - complexity acceptable for integration test
     print("=" * 90)
     print("REAL-WORLD PV SYSTEM ANALYSIS: 14.04 kWp in Prague, Czech Republic")
     print("=" * 90)
