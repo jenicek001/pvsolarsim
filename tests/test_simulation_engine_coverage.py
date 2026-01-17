@@ -3,13 +3,14 @@
 These are quick tests that don't run full annual simulations.
 """
 
+from datetime import datetime
+from unittest.mock import patch
+
 import pandas as pd
 import pytest
-from datetime import datetime
-from unittest.mock import patch, Mock
 import pytz
 
-from pvsolarsim import Location, PVSystem
+from pvsolarsim import Location
 from pvsolarsim.simulation.engine import _load_weather_data
 from pvsolarsim.weather import CSVWeatherReader
 
@@ -162,7 +163,7 @@ class TestLoadWeatherData:
 
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
-    
+
     def test_load_weather_dataframe_directly(self, sample_location):
         """Test loading weather data from DataFrame directly."""
         # Create DataFrame
@@ -187,7 +188,7 @@ class TestLoadWeatherData:
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
         pd.testing.assert_frame_equal(df, weather_df)
-    
+
     def test_load_weather_data_missing_dataframe(self, sample_location):
         """Test that weather_data source requires data to be provided."""
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
