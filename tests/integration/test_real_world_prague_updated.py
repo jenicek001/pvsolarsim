@@ -195,7 +195,7 @@ def main():
         print(f"{scenario['name']}:")
         print(f"  Date/Time: {scenario['timestamp'].strftime('%Y-%m-%d %H:%M %Z')}")
         print(f"  Conditions: {scenario['ambient_temp']}°C, {scenario['wind_speed']} m/s wind, {scenario['cloud_cover']}% clouds")
-        print(f"  Results:")
+        print("  Results:")
         print(f"    POA Irradiance: {result.poa_irradiance:.2f} W/m²")
         print(f"    Cell Temperature: {result.cell_temperature:.1f}°C")
         print(f"    DC Power: {result.power_w:.2f} W ({result.power_w / 1000:.2f} kW)")
@@ -247,7 +247,7 @@ def main():
     print(f"  Peak Power: {stats.peak_power_w / 1000:.2f} kW")
     print(f"  Average Power (daylight): {stats.average_power_w:.2f} W")
     print(f"  Capacity Factor: {stats.capacity_factor * 100:.2f}%")
-    
+
     # Calculate kWh/kWp ratio
     kwh_per_kwp = (annual_energy / total_power_wp) * 1000
     print(f"  kWh/kWp Ratio: {kwh_per_kwp:.0f} kWh/kWp")
@@ -267,7 +267,7 @@ def main():
     print("  Performance Ratio: 70% - 80%")
     print()
 
-    print(f"Simulated Performance (clear-sky model):")
+    print("Simulated Performance (clear-sky model):")
     print(f"  kWh/kWp ratio:     {kwh_per_kwp:.0f} kWh/kWp", end="")
     if 900 <= kwh_per_kwp <= 1100:
         print(" ✓ Within typical range")
@@ -275,7 +275,7 @@ def main():
         print(" ✓ Excellent (above typical)")
     else:
         print(" ⚠ Below typical range")
-        
+
     print(f"  Capacity Factor:   {stats.capacity_factor * 100:.1f}%", end="")
     if 10 <= stats.capacity_factor * 100 <= 13:
         print(" ✓ Within typical range")
@@ -308,13 +308,13 @@ def main():
     print("        - Soiling and dust")
     print("        - System downtime")
     print()
-    
+
     # Estimate real-world performance
     real_world_factor = 0.80  # Typical reduction from clear-sky to real
     estimated_real_kwh = annual_energy * real_world_factor
     estimated_real_kwh_per_kwp = (estimated_real_kwh / total_power_wp) * 1000
-    
-    print(f"Estimated Real-World Performance (with weather losses):")
+
+    print("Estimated Real-World Performance (with weather losses):")
     print(f"  Annual Energy: ~{estimated_real_kwh:.0f} kWh")
     print(f"  kWh/kWp ratio: ~{estimated_real_kwh_per_kwp:.0f} kWh/kWp")
     print()
@@ -329,17 +329,17 @@ def main():
 
     # Get monthly summary
     monthly = results.get_monthly_summary()
-    
+
     print("Month        Energy (kWh)  Avg Power (W)  Peak Power (kW)")
     print("-" * 90)
-    
+
     for month_str, row in monthly.iterrows():
         energy = row['energy_kwh']
         avg_power = row['avg_power_w']
         peak = row['peak_power_w'] / 1000
-        
+
         print(f"{month_str!s:12s} {energy:11.1f}  {avg_power:13.1f}  {peak:14.2f}")
-    
+
     print()
 
     # ==================================================================================
@@ -358,29 +358,29 @@ def main():
     # Calculate economic benefits
     self_consumed_kwh = estimated_real_kwh * self_consumption_ratio
     exported_kwh = estimated_real_kwh * (1 - self_consumption_ratio)
-    
+
     annual_savings_czk = (
         self_consumed_kwh * electricity_price_czk +
         exported_kwh * feed_in_tariff_czk
     )
-    
-    print(f"Economic Parameters (Czech Republic 2025):")
+
+    print("Economic Parameters (Czech Republic 2025):")
     print(f"  Electricity price: {electricity_price_czk:.2f} CZK/kWh")
     print(f"  Feed-in tariff: {feed_in_tariff_czk:.2f} CZK/kWh")
     print(f"  Self-consumption ratio: {self_consumption_ratio * 100:.0f}%")
     print()
-    
-    print(f"Annual Economic Benefits (estimated):")
+
+    print("Annual Economic Benefits (estimated):")
     print(f"  Self-consumed: {self_consumed_kwh:.0f} kWh × {electricity_price_czk:.2f} CZK = {self_consumed_kwh * electricity_price_czk:,.0f} CZK")
     print(f"  Exported: {exported_kwh:.0f} kWh × {feed_in_tariff_czk:.2f} CZK = {exported_kwh * feed_in_tariff_czk:,.0f} CZK")
     print(f"  Total Annual Savings: {annual_savings_czk:,.0f} CZK/year (~{annual_savings_czk / 24:.0f} EUR/year)")
     print()
-    
+
     # Simple payback calculation
     system_cost_czk = 350000  # Typical cost for 14kWp system in CZ (2025)
     payback_years = system_cost_czk / annual_savings_czk
-    
-    print(f"Investment Analysis:")
+
+    print("Investment Analysis:")
     print(f"  Typical system cost: {system_cost_czk:,.0f} CZK (~{system_cost_czk / 24:,.0f} EUR)")
     print(f"  Simple payback period: {payback_years:.1f} years")
     print(f"  25-year total savings: {annual_savings_czk * 25:,.0f} CZK (~{annual_savings_czk * 25 / 24:,.0f} EUR)")
@@ -397,18 +397,18 @@ def main():
     print("Current System Assessment:")
     print(f"  ✓ Tilt angle ({system.tilt}°) is optimal for latitude {location.latitude:.1f}°N")
     print(f"  ✓ SSW orientation ({system.azimuth}°) is good for Prague")
-    print(f"  ✓ High-efficiency panels (>20%) selected")
-    print(f"  ✓ Two-string design allows MPPT optimization")
+    print("  ✓ High-efficiency panels (>20%) selected")
+    print("  ✓ Two-string design allows MPPT optimization")
     print()
-    
+
     print("Optimization Suggestions:")
     if self_consumption_ratio < 0.50:
         print("  • Consider battery storage to increase self-consumption ratio")
         print(f"    (Could increase savings by ~{(0.50 - self_consumption_ratio) * estimated_real_kwh * (electricity_price_czk - feed_in_tariff_czk):,.0f} CZK/year)")
-    
+
     print("  • Regular panel cleaning (2-3 times/year) can improve output by 2-5%")
     print(f"    (Potential gain: ~{estimated_real_kwh * 0.035:.0f} kWh/year = ~{estimated_real_kwh * 0.035 * electricity_price_czk * self_consumption_ratio:,.0f} CZK/year)")
-    
+
     print("  • Monitor for shading throughout the year (especially in winter)")
     print("  • Inverter efficiency check annually")
     print()
@@ -421,7 +421,7 @@ def main():
     print("SUMMARY: Real-World 14.04 kWp System in Prague")
     print("=" * 90)
     print()
-    
+
     print(f"System Configuration: {total_power_wp / 1000:.2f} kWp @ {location.latitude}°N, {location.longitude}°E")
     print(f"Clear-Sky Simulation: {annual_energy:.0f} kWh/year ({kwh_per_kwp:.0f} kWh/kWp)")
     print(f"Estimated Real Performance: {estimated_real_kwh:.0f} kWh/year ({estimated_real_kwh_per_kwp:.0f} kWh/kWp)")
@@ -430,7 +430,7 @@ def main():
     print(f"Annual Economic Benefit: {annual_savings_czk:,.0f} CZK/year")
     print(f"Payback Period: {payback_years:.1f} years")
     print()
-    
+
     print("✓ System performance is within expected range for Prague, Czech Republic")
     print("✓ All calculations validated against Czech meteorological data")
     print()
