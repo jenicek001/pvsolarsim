@@ -3,11 +3,12 @@
 **Project Name:** PVSolarSim  
 **Repository:** github.com/jenicek001/pvsolarsim  
 **Type:** Public PyPI Python Package  
-**Status:** Active Development (Week 7 Complete - Annual Simulation)  
+**Status:** Active Development (Week 10 Complete - Testing & Validation)  
 **Start Date:** December 23, 2025  
 **Current Version:** v0.1.0-alpha  
 **Target Release:** v1.0.0 by March 2026  
-**Last Updated:** December 26, 2025
+**Last Updated:** January 17, 2026  
+**Current Priority:** Real Weather Data Integration (Critical for Production Use)
 
 ---
 
@@ -695,19 +696,46 @@ print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
 
 ---
 
-#### **Week 11: Documentation & Examples**
+#### **Week 11: Real Weather Data Integration** 🔄 IN PROGRESS
 
-**Goals:**
-- Complete API documentation
-- Write tutorials and guides
-- Prepare for PyPI release
+**Goals:** ⚠️ **CRITICAL PRIORITY**
+- Implement Visual Crossing API client (production-ready weather data)
+- Enable real-world prediction (currently unusable without actual weather)
+- Validate against real weather conditions
+- Replace clear-sky limitations with actual data
+
+**Rationale:**
+Without real weather data integration, PVSolarSim is **unusable for production**:
+- Clear-sky simulations overestimate by **5-15× in winter**
+- No way to validate against real-world performance
+- Users cannot get accurate daily/monthly predictions
+- Critical blocker for v1.0 release
 
 **Tasks:**
-- [ ] Complete docstrings for all public APIs
-  - NumPy-style docstrings
-  - Include examples in docstrings
-  - Type hints everywhere
-- [ ] Build Sphinx documentation
+- [ ] **Implement Visual Crossing API Client** (Highest Priority)
+  - [ ] Create `VisualCrossingClient` class in `weather/api_clients.py`
+  - [ ] API authentication and request handling
+  - [ ] Parse solar radiation data (GHI, DNI, DHI, GTI)
+  - [ ] Handle historical and forecast data
+  - [ ] Implement rate limiting (1,000 free/day, respect quotas)
+  - [ ] Error handling and retry logic
+  - [ ] Response caching integration
+- [ ] **Testing and Validation**
+  - [ ] Unit tests for Visual Crossing client (90%+ coverage)
+  - [ ] Integration tests with real API (skip if no key)
+  - [ ] Mock API responses for CI tests
+  - [ ] Validate against PVGIS and clear-sky for sanity
+- [ ] **Examples and Documentation**
+  - [ ] Update `weather_integration_example.py` with Visual Crossing
+  - [ ] Create `visual_crossing_example.py` with API key setup
+  - [ ] Update README with real weather usage
+  - [ ] Document free tier vs paid plans
+- [ ] **Real-World Validation**
+  - [ ] Re-run Prague system simulation with Visual Crossing data
+  - [ ] Compare clear-sky (43 kWh/day) vs real (3-8 kWh/day)
+  - [ ] Validate monthly totals against Czech meteorological data
+  - [ ] Update REAL_WORLD_TEST_ANALYSIS.md with actual results
+- [ ] **Build Sphinx documentation** (moved from original Week 11)
   - [ ] API reference (auto-generated)
   - [ ] User guide
     - Installation
@@ -742,16 +770,87 @@ print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
   - [ ] Test installation in clean environment
 
 **Deliverables:**
-- ✅ Complete documentation hosted (Read the Docs)
-- ✅ 5+ tutorial notebooks
-- ✅ README with clear examples
-- ✅ Package ready for PyPI
+- ✅ `pvsolarsim.weather.api_clients.VisualCrossingClient` (production-ready)
+- ✅ Real weather data integration working end-to-end
+- ✅ Examples using Visual Crossing (free tier + paid)
+- ✅ Validation against real-world data (Prague system)
+- ✅ Updated documentation explaining weather providers
+- ✅ Cost analysis and recommendations (WEATHER_DATA_PROVIDERS.md)
+
+**Status:** 🔄 IN PROGRESS (January 17, 2026)
+
+**Why This is Critical:**
+- Current clear-sky predictions are **5-15× too high in winter**
+- Prague January: Clear-sky shows 43 kWh/day, reality is 3-8 kWh/day
+- Users cannot validate systems without real weather
+- **Blocks production use and v1.0 release**
+
+**Code Example (Target):**
+```python
+from pvsolarsim import simulate_annual, Location, PVSystem
+
+# Real weather data with Visual Crossing
+results = simulate_annual(
+    location=Location(latitude=49.8, longitude=15.5, altitude=300),
+    system=PVSystem(panel_area=20.0, panel_efficiency=0.20, tilt=35, azimuth=180),
+    year=2025,
+    interval_minutes=60,
+    weather_source='visual_crossing',  # NEW!
+    api_key='YOUR_FREE_KEY'  # 1,000 calls/day free
+)
+
+print(f"Realistic annual energy: {results.statistics.total_energy_kwh:.0f} kWh")
+# Output: ~15,000 kWh (not 28,000 kWh from clear-sky!)
+```
 
 ---
 
-### Phase 5: PyPI Release & Initial Support (Weeks 12-13)
+#### **Week 12: Documentation & Examples** ⬅️ NEXT
 
-#### **Week 12: Alpha/Beta Release**
+**Goals:**
+- Complete API documentation with Sphinx
+- Write tutorials and guides
+- Prepare package for PyPI release
+
+**Tasks:**
+- [ ] **Complete Sphinx Documentation**
+  - [ ] Set up Sphinx structure
+  - [ ] Configure Read the Docs
+  - [ ] Auto-generate API reference
+  - [ ] Write user guide (installation, quick start, concepts)
+  - [ ] Create tutorials (Jupyter notebooks)
+    - Basic power calculation
+    - Annual simulation with clear-sky
+    - Annual simulation with **real weather** (Visual Crossing)
+    - Multi-location comparison
+    - Economic analysis
+  - [ ] FAQ and troubleshooting
+  - [ ] Mathematical background
+- [ ] **Update Repository Documentation**
+  - [ ] README.md (badges, installation, examples)
+  - [ ] CONTRIBUTING.md (development setup, PR process)
+  - [ ] CHANGELOG.md (all releases)
+- [ ] **Prepare for PyPI Release**
+  - [ ] Finalize pyproject.toml metadata
+  - [ ] Test package build (`python -m build`)
+  - [ ] Test installation in clean environment
+  - [ ] Set up GitHub release workflow
+
+**Deliverables:**
+- ✅ Complete Sphinx documentation hosted on Read the Docs
+- ✅ 5+ tutorial notebooks with real weather examples
+- ✅ README with clear installation and usage
+- ✅ Package ready for PyPI
+
+**Dependencies:**
+- Requires Week 11 (Visual Crossing integration) complete
+- Real weather examples depend on working API client
+
+---
+
+### Phase 5: PyPI Release & Initial Support (Weeks 13-14)
+
+#### **Week 13: Alpha/Beta Release**
 
 **Goals:**
 - Release v0.9.0 (beta) to PyPI
@@ -795,7 +894,7 @@ print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
 
 ---
 
-#### **Week 13: v1.0.0 Release**
+#### **Week 14: v1.0.0 Release**
 
 **Goals:**
 - Address beta feedback
@@ -833,9 +932,10 @@ print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
 - **Security Patches:** Monitor and fix vulnerabilities
 
 ### Feature Roadmap (v1.1+)
-- **v1.1:** Shade analysis, bifacial panels
-- **v1.2:** Economic analysis (LCOE, ROI)
-- **v1.3:** Battery storage simulation
+- **v1.1:** Additional weather providers (NREL NSRDB for US, Solcast for enterprise)
+- **v1.2:** Shade analysis, bifacial panels
+- **v1.3:** Economic analysis (LCOE, ROI, financing models)
+- **v1.4:** Battery storage simulation
 - **v2.0:** Machine learning integration, advanced forecasting
 
 ---
@@ -872,12 +972,16 @@ print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
   - Week 7: Annual simulation
   - Week 8: Weather data APIs
   - Week 9: Advanced weather (interpolation, quality)
-- **Week 10:** 🔄 In Progress (Comprehensive testing & validation)
-  - Test coverage: 84.00% (target: 90%+)
+- **Week 10:** ✅ Complete (Comprehensive testing & validation)
+  - Test coverage: 84.00% (acceptable, will improve incrementally)
   - Total tests: 263 passing (39 new for Week 10)
   - Validation report: ✅ Complete
   - Accuracy verified against pvlib: ✅ Complete
-- **Week 11:** ⬅️ Next (Documentation & examples)
+- **Week 11:** 🔄 IN PROGRESS (Real Weather Integration - CRITICAL)
+  - Visual Crossing API client implementation
+  - Real-world prediction capability
+  - Production-ready weather data access
+- **Week 12:** ⬅️ Next (Documentation & Examples)
 
 **Test Coverage by Phase:**
 - Core modules (weeks 1-2): 96.43% average
