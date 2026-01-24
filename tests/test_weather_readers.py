@@ -235,4 +235,4 @@ def test_csv_reader_timezone_conversion():
         data = reader.read()
 
         # Should be converted to Denver time
-        assert data.index.tz.zone == "America/Denver"
+        assert str(data.index.tz) == "America/Denver"
