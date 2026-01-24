@@ -58,6 +58,7 @@ dependencies = [
     "pydantic>=2.5.0",
     "python-dateutil>=2.8.0",
     "pytz>=2023.3",
+    "pvlib>=0.10.0",
 ]
 
 [project.optional-dependencies]
@@ -69,7 +70,6 @@ dev = [
     "mypy>=1.7.0",
     "isort>=5.12.0",
     "pre-commit>=3.5.0",
-    "pvlib>=0.10.0",  # For validation
     "pandas-stubs>=2.0.0",  # Type stubs for pandas
     "types-pytz>=2024.0.0",  # Type stubs for pytz
 ]
