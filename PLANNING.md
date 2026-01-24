@@ -3,11 +3,11 @@
 **Project Name:** PVSolarSim  
 **Repository:** github.com/jenicek001/pvsolarsim  
 **Type:** Public PyPI Python Package  
-**Status:** Active Development (Week 11 Complete - Documentation & Examples)  
+**Status:** 🔄 Preparing Week 12 - Beta Release (v0.9.0)  
 **Start Date:** December 23, 2025  
 **Current Version:** v0.1.0-alpha  
 **Target Release:** v1.0.0 by March 2026  
-**Last Updated:** December 30, 2025
+**Last Updated:** January 24, 2026
 
 ---
 
