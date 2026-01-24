@@ -18,7 +18,7 @@ class MockWeatherDataSource(WeatherDataSource):
 
 def test_validate_valid_data():
     """Test validation with valid weather data."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
     data = pd.DataFrame(
         {
             "ghi": [100.0] * 24,
@@ -38,7 +38,7 @@ def test_validate_valid_data():
 
 def test_validate_missing_timezone():
     """Test validation fails with naive datetime index."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H")  # No timezone
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h")  # No timezone
     data = pd.DataFrame(
         {
             "ghi": [100.0] * 24,
@@ -54,7 +54,7 @@ def test_validate_missing_timezone():
 
 def test_validate_missing_required_column():
     """Test validation fails when required column is missing."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
     data = pd.DataFrame(
         {
             "ghi": [100.0] * 24,
@@ -70,7 +70,7 @@ def test_validate_missing_required_column():
 
 def test_validate_no_irradiance():
     """Test validation fails when no irradiance columns present."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
     data = pd.DataFrame(
         {
             "temp_air": [25.0] * 24,
@@ -86,7 +86,7 @@ def test_validate_no_irradiance():
 
 def test_validate_ghi_out_of_range():
     """Test validation fails with GHI out of valid range."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
 
     # Test negative GHI
     data = pd.DataFrame(
@@ -115,7 +115,7 @@ def test_validate_ghi_out_of_range():
 
 def test_validate_temperature_out_of_range():
     """Test validation fails with temperature out of valid range."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
 
     # Test too cold
     data = pd.DataFrame(
@@ -144,7 +144,7 @@ def test_validate_temperature_out_of_range():
 
 def test_validate_wind_speed_out_of_range():
     """Test validation fails with wind speed out of valid range."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
 
     # Test negative wind
     data = pd.DataFrame(
@@ -162,7 +162,7 @@ def test_validate_wind_speed_out_of_range():
 
 def test_validate_cloud_cover_out_of_range():
     """Test validation fails with cloud cover out of valid range."""
-    timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+    timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
 
     # Test negative cloud cover
     data = pd.DataFrame(

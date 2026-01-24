@@ -495,22 +495,32 @@ results.export_csv('annual_production.csv')
 - Support PVGIS TMY data
 - Implement data caching
 
-**Status:** ✅ COMPLETED (PR #6)
+**Status:** ✅ COMPLETED (PR #6) + ✅ ENHANCED (Current PR)
 
-**Actual Implementation:** Full weather integration with CSV/JSON readers, API clients, and caching
+**Actual Implementation:** Full weather integration with CSV/JSON readers, API clients, caching, and comprehensive testing
+
+**Recent Enhancements (January 17, 2026):**
+- ✅ Fixed all skipped tests (20 tests now passing, was 0 before)
+- ✅ Achieved 96.58% coverage for api_clients.py (up from 20.19%)
+- ✅ Added custom validation for OpenWeatherMap (free tier doesn't have irradiance)
+- ✅ Implemented proper test isolation with cache clearing
+- ✅ Created comprehensive weather API example script
 
 **Tasks:**
 - [x] Create `WeatherDataSource` abstract base class
 - [x] Implement OpenWeatherMap client
   - [x] API authentication
   - [x] Fetch weather data (simplified for free tier)
-  - [x] Parse GHI, DNI, DHI, temperature, wind, cloud cover
+  - [x] Parse temperature, wind, cloud cover (no GHI/DNI/DHI in free tier)
   - [x] Rate limiting handling with retry logic
   - [x] Error handling (network, API errors)
+  - [x] Custom validation without irradiance requirement
+  - [x] Comprehensive testing (8 tests, 96.58% coverage)
 - [x] Implement PVGIS client
   - [x] TMY data download
   - [x] Hourly radiation data
   - [x] Parse PVGIS JSON format
+  - [x] Comprehensive testing (8 tests, caching verified)
 - [x] Implement file readers
   - [x] CSV reader (generic format with column mapping)
   - [x] JSON reader
@@ -519,8 +529,11 @@ results.export_csv('annual_production.csv')
   - [x] Cache weather data to local files (pickle)
   - [x] TTL-based expiration
   - [x] Cache invalidation and cleanup
-- [x] Write integration tests with mock API responses
+  - [x] Test cache isolation and cleanup
+- [x] Write integration tests with mock API responses (20 tests passing)
 - [x] Create example scripts with weather data
+  - [x] weather_integration_example.py (existing)
+  - [x] weather_api_example.py (new - comprehensive API usage)
 
 **Deliverables:**
 - ✅ `pvsolarsim.weather.api_clients` module (OpenWeatherMap, PVGIS)
@@ -528,10 +541,19 @@ results.export_csv('annual_production.csv')
 - ✅ `pvsolarsim.weather.cache` module
 - ✅ `pvsolarsim.weather.base` module (validation, base class)
 - ✅ Weather integration working with simulation engine
-- ✅ 27 tests passing (91.55% coverage for readers, 94.44% for base, 77.59% for cache)
+- ✅ 20 API client tests (96.58% coverage for api_clients.py)
+- ✅ 4 integration tests passing
+- ✅ Comprehensive weather API example script
 
-**Test Coverage:** 27 new tests, 85%+ average coverage
-**Tests:** 226 total tests passing (27 new for Week 8)
+**Test Coverage:** 
+- api_clients.py: **96.58%** (up from 20.19%)
+- base.py: 83.87%
+- cache.py: 56.90%
+- Overall weather module: ~75% average
+
+**Tests:** 
+- 20 new API client tests (all passing)
+- 246 total tests passing across project (20 new for weather API enhancement)
 
 **Code Example:**
 ```python
