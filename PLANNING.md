@@ -3,11 +3,12 @@
 **Project Name:** PVSolarSim  
 **Repository:** github.com/jenicek001/pvsolarsim  
 **Type:** Public PyPI Python Package  
-**Status:** Active Development (Week 11 Complete - Documentation & Examples)  
+**Status:** Active Development (Week 10 Complete - Testing & Validation)  
 **Start Date:** December 23, 2025  
 **Current Version:** v0.1.0-alpha  
 **Target Release:** v1.0.0 by March 2026  
-**Last Updated:** December 30, 2025
+**Last Updated:** January 17, 2026  
+**Current Priority:** Real Weather Data Integration (Critical for Production Use)
 
 ---
 
@@ -495,32 +496,22 @@ results.export_csv('annual_production.csv')
 - Support PVGIS TMY data
 - Implement data caching
 
-**Status:** ✅ COMPLETED (PR #6) + ✅ ENHANCED (Current PR)
+**Status:** ✅ COMPLETED (PR #6)
 
-**Actual Implementation:** Full weather integration with CSV/JSON readers, API clients, caching, and comprehensive testing
-
-**Recent Enhancements (January 17, 2026):**
-- ✅ Fixed all skipped tests (20 tests now passing, was 0 before)
-- ✅ Achieved 96.58% coverage for api_clients.py (up from 20.19%)
-- ✅ Added custom validation for OpenWeatherMap (free tier doesn't have irradiance)
-- ✅ Implemented proper test isolation with cache clearing
-- ✅ Created comprehensive weather API example script
+**Actual Implementation:** Full weather integration with CSV/JSON readers, API clients, and caching
 
 **Tasks:**
 - [x] Create `WeatherDataSource` abstract base class
 - [x] Implement OpenWeatherMap client
   - [x] API authentication
   - [x] Fetch weather data (simplified for free tier)
-  - [x] Parse temperature, wind, cloud cover (no GHI/DNI/DHI in free tier)
+  - [x] Parse GHI, DNI, DHI, temperature, wind, cloud cover
   - [x] Rate limiting handling with retry logic
   - [x] Error handling (network, API errors)
-  - [x] Custom validation without irradiance requirement
-  - [x] Comprehensive testing (8 tests, 96.58% coverage)
 - [x] Implement PVGIS client
   - [x] TMY data download
   - [x] Hourly radiation data
   - [x] Parse PVGIS JSON format
-  - [x] Comprehensive testing (8 tests, caching verified)
 - [x] Implement file readers
   - [x] CSV reader (generic format with column mapping)
   - [x] JSON reader
@@ -529,11 +520,8 @@ results.export_csv('annual_production.csv')
   - [x] Cache weather data to local files (pickle)
   - [x] TTL-based expiration
   - [x] Cache invalidation and cleanup
-  - [x] Test cache isolation and cleanup
-- [x] Write integration tests with mock API responses (20 tests passing)
+- [x] Write integration tests with mock API responses
 - [x] Create example scripts with weather data
-  - [x] weather_integration_example.py (existing)
-  - [x] weather_api_example.py (new - comprehensive API usage)
 
 **Deliverables:**
 - ✅ `pvsolarsim.weather.api_clients` module (OpenWeatherMap, PVGIS)
@@ -541,19 +529,10 @@ results.export_csv('annual_production.csv')
 - ✅ `pvsolarsim.weather.cache` module
 - ✅ `pvsolarsim.weather.base` module (validation, base class)
 - ✅ Weather integration working with simulation engine
-- ✅ 20 API client tests (96.58% coverage for api_clients.py)
-- ✅ 4 integration tests passing
-- ✅ Comprehensive weather API example script
+- ✅ 27 tests passing (91.55% coverage for readers, 94.44% for base, 77.59% for cache)
 
-**Test Coverage:** 
-- api_clients.py: **96.58%** (up from 20.19%)
-- base.py: 83.87%
-- cache.py: 56.90%
-- Overall weather module: ~75% average
-
-**Tests:** 
-- 20 new API client tests (all passing)
-- 246 total tests passing across project (20 new for weather API enhancement)
+**Test Coverage:** 27 new tests, 85%+ average coverage
+**Tests:** 226 total tests passing (27 new for Week 8)
 
 **Code Example:**
 ```python
@@ -717,114 +696,161 @@ print(f"Annual energy: {results.statistics.total_energy_kwh:.2f} kWh")
 
 ---
 
-#### **Week 11: Documentation & Examples** ✅ COMPLETED
+#### **Week 11: Real Weather Data Integration** 🔄 IN PROGRESS
 
-**Goals:**
-- Complete API documentation
-- Write tutorials and guides
-- Prepare for PyPI release
+**Goals:** ⚠️ **CRITICAL PRIORITY**
+- Implement Visual Crossing API client (production-ready weather data)
+- Enable real-world prediction (currently unusable without actual weather)
+- Validate against real weather conditions
+- Replace clear-sky limitations with actual data
 
-**Status:** ✅ COMPLETED (December 30, 2025)
-
-**Actual Implementation:** Comprehensive documentation created with Sphinx
+**Rationale:**
+Without real weather data integration, PVSolarSim is **unusable for production**:
+- Clear-sky simulations overestimate by **5-15× in winter**
+- No way to validate against real-world performance
+- Users cannot get accurate daily/monthly predictions
+- Critical blocker for v1.0 release
 
 **Tasks:**
-- [x] Complete docstrings for all public APIs
-  - ✅ NumPy-style docstrings throughout codebase
-  - ✅ Examples included in docstrings
-  - ✅ Type hints everywhere (verified with mypy)
-- [x] Build Sphinx documentation
-  - [x] API reference (auto-generated from docstrings)
-  - [x] User guide
-    - ✅ Installation
-    - ✅ Quick start
-    - ✅ Core concepts
-    - ✅ Advanced usage
-  - [x] Tutorials (documentation structure ready)
-    - ✅ Tutorial documentation created
-    - ⏭️ Jupyter notebooks (deferred to future - examples directory has comprehensive scripts)
-  - [x] FAQ and troubleshooting
-  - [x] Mathematical background (models explained with equations)
-- [x] Update README.md
-  - ✅ Installation instructions
-  - ✅ Quick examples
-  - ✅ Features list
-  - ✅ Links to documentation
-  - ✅ Badges (CI status, coverage, PyPI version placeholders)
-- [x] Write CONTRIBUTING.md
-  - ✅ Development setup
-  - ✅ Code style guidelines
-  - ✅ Testing guidelines
-  - ✅ PR process
-  - ✅ Code of conduct
-- [x] Create CHANGELOG.md
-  - ✅ Version history
-  - ✅ Release notes for v0.1.0
-  - ✅ Roadmap for future versions
-- [x] Prepare for PyPI release
-  - [x] Finalize pyproject.toml metadata
-  - [x] Long description from README (automatic)
-  - [x] Set comprehensive classifiers
-  - [x] Test package build (`python -m build`)
-  - ⏭️ Test installation in clean environment (deferred to actual release)
+- [ ] **Implement Visual Crossing API Client** (Highest Priority)
+  - [ ] Create `VisualCrossingClient` class in `weather/api_clients.py`
+  - [ ] API authentication and request handling
+  - [ ] Parse solar radiation data (GHI, DNI, DHI, GTI)
+  - [ ] Handle historical and forecast data
+  - [ ] Implement rate limiting (1,000 free/day, respect quotas)
+  - [ ] Error handling and retry logic
+  - [ ] Response caching integration
+- [ ] **Testing and Validation**
+  - [ ] Unit tests for Visual Crossing client (90%+ coverage)
+  - [ ] Integration tests with real API (skip if no key)
+  - [ ] Mock API responses for CI tests
+  - [ ] Validate against PVGIS and clear-sky for sanity
+- [ ] **Examples and Documentation**
+  - [ ] Update `weather_integration_example.py` with Visual Crossing
+  - [ ] Create `visual_crossing_example.py` with API key setup
+  - [ ] Update README with real weather usage
+  - [ ] Document free tier vs paid plans
+- [ ] **Real-World Validation**
+  - [ ] Re-run Prague system simulation with Visual Crossing data
+  - [ ] Compare clear-sky (43 kWh/day) vs real (3-8 kWh/day)
+  - [ ] Validate monthly totals against Czech meteorological data
+  - [ ] Update REAL_WORLD_TEST_ANALYSIS.md with actual results
+- [ ] **Build Sphinx documentation** (moved from original Week 11)
+  - [ ] API reference (auto-generated)
+  - [ ] User guide
+    - Installation
+    - Quick start
+    - Core concepts
+    - Advanced usage
+  - [ ] Tutorials (Jupyter notebooks)
+    - Basic instantaneous calculation
+    - Annual simulation with clear-sky
+    - Annual simulation with real weather
+    - Multi-location comparison
+    - Custom panel parameters
+  - [ ] FAQ and troubleshooting
+  - [ ] Mathematical background (models explained)
+- [ ] Update README.md
+  - Installation instructions
+  - Quick example
+  - Features list
+  - Links to documentation
+  - Badges (CI status, coverage, PyPI version)
+- [ ] Write CONTRIBUTING.md
+  - Development setup
+  - Code style
+  - Testing guidelines
+  - PR process
+- [ ] Create CHANGELOG.md
+- [ ] Prepare for PyPI release
+  - [ ] Finalize setup.py / pyproject.toml
+  - [ ] Write long_description from README
+  - [ ] Set classifiers
+  - [ ] Test package build (`python -m build`)
+  - [ ] Test installation in clean environment
 
 **Deliverables:**
-- ✅ Complete Sphinx documentation (18 .rst files created)
-  - Installation guide
-  - Quick start guide
-  - Core concepts (7,600+ words)
-  - Advanced usage guide (10,000+ words)
-  - API reference for all modules
-  - FAQ (9,000+ words)
-  - Mathematical background with equations
-  - Contributing guide
-  - Changelog
-- ✅ Documentation builds successfully (81 warnings - mostly cross-references)
-- ✅ README.md updated with comprehensive documentation links
-- ✅ CONTRIBUTING.md and CHANGELOG.md created
-- ✅ Package builds successfully (wheel and tarball)
-- ⏭️ Jupyter notebooks (deferred - comprehensive Python examples exist)
-- ⏭️ Read the Docs hosting (deferred to v0.9.0 beta release)
+- ✅ `pvsolarsim.weather.api_clients.VisualCrossingClient` (production-ready)
+- ✅ Real weather data integration working end-to-end
+- ✅ Examples using Visual Crossing (free tier + paid)
+- ✅ Validation against real-world data (Prague system)
+- ✅ Updated documentation explaining weather providers
+- ✅ Cost analysis and recommendations (WEATHER_DATA_PROVIDERS.md)
 
-**Documentation Structure Created:**
-```
-docs/
-├── source/
-│   ├── index.rst (main page)
-│   ├── installation.rst
-│   ├── quickstart.rst
-│   ├── core_concepts.rst
-│   ├── advanced_usage.rst
-│   ├── tutorials.rst
-│   ├── faq.rst
-│   ├── mathematical_background.rst
-│   ├── contributing.rst
-│   ├── changelog.rst
-│   ├── api/
-│   │   ├── modules.rst
-│   │   ├── solar.rst
-│   │   ├── atmosphere.rst
-│   │   ├── irradiance.rst
-│   │   ├── temperature.rst
-│   │   ├── power.rst
-│   │   ├── simulation.rst
-│   │   └── weather.rst
-│   ├── conf.py (Sphinx configuration)
-│   ├── _static/
-│   └── _templates/
-├── Makefile
-└── build/ (generated HTML)
-```
+**Status:** 🔄 IN PROGRESS (January 17, 2026)
 
-**Build Status:** ✅ Package builds successfully
-**Documentation:** ✅ Builds with Sphinx
-**Test Coverage:** 81.61% (270 tests passing)
+**Why This is Critical:**
+- Current clear-sky predictions are **5-15× too high in winter**
+- Prague January: Clear-sky shows 43 kWh/day, reality is 3-8 kWh/day
+- Users cannot validate systems without real weather
+- **Blocks production use and v1.0 release**
+
+**Code Example (Target):**
+```python
+from pvsolarsim import simulate_annual, Location, PVSystem
+
+# Real weather data with Visual Crossing
+results = simulate_annual(
+    location=Location(latitude=49.8, longitude=15.5, altitude=300),
+    system=PVSystem(panel_area=20.0, panel_efficiency=0.20, tilt=35, azimuth=180),
+    year=2025,
+    interval_minutes=60,
+    weather_source='visual_crossing',  # NEW!
+    api_key='YOUR_FREE_KEY'  # 1,000 calls/day free
+)
+
+print(f"Realistic annual energy: {results.statistics.total_energy_kwh:.0f} kWh")
+# Output: ~15,000 kWh (not 28,000 kWh from clear-sky!)
+```
 
 ---
 
-### Phase 5: PyPI Release & Initial Support (Weeks 12-13)
+#### **Week 12: Documentation & Examples** ⬅️ NEXT
 
-#### **Week 12: Alpha/Beta Release**
+**Goals:**
+- Complete API documentation with Sphinx
+- Write tutorials and guides
+- Prepare package for PyPI release
+
+**Tasks:**
+- [ ] **Complete Sphinx Documentation**
+  - [ ] Set up Sphinx structure
+  - [ ] Configure Read the Docs
+  - [ ] Auto-generate API reference
+  - [ ] Write user guide (installation, quick start, concepts)
+  - [ ] Create tutorials (Jupyter notebooks)
+    - Basic power calculation
+    - Annual simulation with clear-sky
+    - Annual simulation with **real weather** (Visual Crossing)
+    - Multi-location comparison
+    - Economic analysis
+  - [ ] FAQ and troubleshooting
+  - [ ] Mathematical background
+- [ ] **Update Repository Documentation**
+  - [ ] README.md (badges, installation, examples)
+  - [ ] CONTRIBUTING.md (development setup, PR process)
+  - [ ] CHANGELOG.md (all releases)
+- [ ] **Prepare for PyPI Release**
+  - [ ] Finalize pyproject.toml metadata
+  - [ ] Test package build (`python -m build`)
+  - [ ] Test installation in clean environment
+  - [ ] Set up GitHub release workflow
+
+**Deliverables:**
+- ✅ Complete Sphinx documentation hosted on Read the Docs
+- ✅ 5+ tutorial notebooks with real weather examples
+- ✅ README with clear installation and usage
+- ✅ Package ready for PyPI
+
+**Dependencies:**
+- Requires Week 11 (Visual Crossing integration) complete
+- Real weather examples depend on working API client
+
+---
+
+### Phase 5: PyPI Release & Initial Support (Weeks 13-14)
+
+#### **Week 13: Alpha/Beta Release**
 
 **Goals:**
 - Release v0.9.0 (beta) to PyPI
@@ -868,7 +894,7 @@ docs/
 
 ---
 
-#### **Week 13: v1.0.0 Release**
+#### **Week 14: v1.0.0 Release**
 
 **Goals:**
 - Address beta feedback
@@ -906,9 +932,10 @@ docs/
 - **Security Patches:** Monitor and fix vulnerabilities
 
 ### Feature Roadmap (v1.1+)
-- **v1.1:** Shade analysis, bifacial panels
-- **v1.2:** Economic analysis (LCOE, ROI)
-- **v1.3:** Battery storage simulation
+- **v1.1:** Additional weather providers (NREL NSRDB for US, Solcast for enterprise)
+- **v1.2:** Shade analysis, bifacial panels
+- **v1.3:** Economic analysis (LCOE, ROI, financing models)
+- **v1.4:** Battery storage simulation
 - **v2.0:** Machine learning integration, advanced forecasting
 
 ---
@@ -929,12 +956,12 @@ docs/
 
 ### Technical Metrics
 - [x] Core functional requirements implemented (Weeks 1-9 complete: 100% of planned features)
-- [ ] >90% test coverage achieved (Currently 81.61%, 8.39% to go)
-- [x] Documentation complete (Sphinx docs with user guides, API reference, tutorials)
+- [ ] >90% test coverage achieved (Currently 84%, 6% to go)
+- [ ] Documentation score >95% (interrogate) - partial (API docs complete, Sphinx deferred to Week 11)
 - [x] Zero critical bugs in v0.1.0-alpha
 - [x] Performance benchmarks met (hourly: ~30s, 5-min: ~13min - acceptable for current use)
 
-**Current Progress (as of December 30, 2025):**
+**Current Progress (as of December 29, 2025):**
 - **Weeks 1-9:** ✅ Complete
   - Week 1: Project setup & architecture
   - Week 2: Solar position calculations
@@ -946,28 +973,22 @@ docs/
   - Week 8: Weather data APIs
   - Week 9: Advanced weather (interpolation, quality)
 - **Week 10:** ✅ Complete (Comprehensive testing & validation)
-  - Test coverage: 81.61% (target: 90%+, 8.39% to go)
-  - Total tests: 270 passing
+  - Test coverage: 84.00% (acceptable, will improve incrementally)
+  - Total tests: 263 passing (39 new for Week 10)
   - Validation report: ✅ Complete
   - Accuracy verified against pvlib: ✅ Complete
-- **Week 11:** ✅ Complete (Documentation & examples)
-  - Sphinx documentation: ✅ Built successfully (18 .rst files)
-  - User guides: ✅ Installation, Quick Start, Core Concepts, Advanced Usage
-  - API reference: ✅ Complete autodoc for all modules
-  - FAQ and troubleshooting: ✅ Complete
-  - Mathematical background: ✅ Complete with equations
-  - CONTRIBUTING.md: ✅ Complete
-  - CHANGELOG.md: ✅ Complete
-  - Package builds: ✅ Successfully builds wheel and tarball
-- **Week 12:** ⬅️ Next (Beta release preparation)
+- **Week 11:** 🔄 IN PROGRESS (Real Weather Integration - CRITICAL)
+  - Visual Crossing API client implementation
+  - Real-world prediction capability
+  - Production-ready weather data access
+- **Week 12:** ⬅️ Next (Documentation & Examples)
 
 **Test Coverage by Phase:**
 - Core modules (weeks 1-2): 96.43% average
 - Atmosphere & Irradiance (weeks 3-4): 97.89% average
 - Temperature (week 5): 98.67%
-- Power & Simulation (weeks 6-7): 84.37% average
-- Weather (weeks 8-9): 78.95% average
-- **Overall:** 81.61%
+- Power & Simulation (weeks 6-7): 84.37% average (needs improvement)
+- Weather (weeks 8-9): 78.95% average (much improved)
 
 **Validation Results:**
 - Solar position accuracy: <0.01° ✅ (verified against pvlib)
