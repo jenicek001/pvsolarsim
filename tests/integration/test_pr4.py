@@ -34,33 +34,40 @@ def main():
     # Panel specifications
     # 16x München Energieprodukte MSMD450M6-72 M6
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'efficiency': 0.2037,  # 20.37%
-        'temp_coeff_pmax': -0.0035,  # -0.35%/°C
-        'noct': 42,  # °C (±2°C)
-        'area_m2': 2.108 * 1.048,  # 2.209 m²
+        "count": 16,
+        "power_wp": 450,
+        "efficiency": 0.2037,  # 20.37%
+        "temp_coeff_pmax": -0.0035,  # -0.35%/°C
+        "noct": 42,  # °C (±2°C)
+        "area_m2": 2.108 * 1.048,  # 2.209 m²
     }
 
     # 18x Canadian Solar HiKu CS3L-380MS
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'efficiency': 0.205,  # ~20.5%
-        'temp_coeff_pmax': -0.0037,  # -0.37%/°C
-        'noct': 42,  # °C (±3°C)
-        'area_m2': 1.765 * 1.048,  # 1.850 m²
+        "count": 18,
+        "power_wp": 380,
+        "efficiency": 0.205,  # ~20.5%
+        "temp_coeff_pmax": -0.0037,  # -0.37%/°C
+        "noct": 42,  # °C (±3°C)
+        "area_m2": 1.765 * 1.048,  # 1.850 m²
     }
 
     # Total system
-    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
-                      canadian_panels['count'] * canadian_panels['power_wp'])
-    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
-                     canadian_panels['count'] * canadian_panels['area_m2'])
+    total_power_wp = (
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
+    )
+    total_area_m2 = (
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
+    )
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
-    weighted_temp_coeff = ((munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff_pmax'] +
-                           canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff_pmax']) /
-                          total_power_wp)
+    weighted_temp_coeff = (
+        munchen_panels["count"] * munchen_panels["power_wp"] * munchen_panels["temp_coeff_pmax"]
+        + canadian_panels["count"]
+        * canadian_panels["power_wp"]
+        * canadian_panels["temp_coeff_pmax"]
+    ) / total_power_wp
 
     print(f"Location: {latitude}°N, {longitude}°E")
     print(f"Altitude: {altitude}m")
@@ -76,10 +83,7 @@ def main():
 
     # Create Location and PVSystem objects
     location = Location(
-        latitude=latitude,
-        longitude=longitude,
-        altitude=altitude,
-        timezone=timezone
+        latitude=latitude, longitude=longitude, altitude=altitude, timezone=timezone
     )
 
     system = PVSystem(
@@ -87,7 +91,7 @@ def main():
         panel_efficiency=weighted_efficiency,
         tilt=tilt,
         azimuth=azimuth,
-        temp_coefficient=weighted_temp_coeff
+        temp_coefficient=weighted_temp_coeff,
     )
 
     # Test scenarios: Winter (Dec 25) and Summer (Jun 21)
@@ -116,17 +120,21 @@ def main():
         print("-" * 80)
         print(f"{scenario['name']}")
         print("-" * 80)
-        print(f"{'Time':>6} | {'Cloud':>6} | {'Sol El':>6} | {'POA':>8} | {'T_cell':>7} | "
-              f"{'DC Power':>9} | {'AC Power':>9}")
-        print(f"{'':>6} | {'(%)':>6} | {'(deg)':>6} | {'(W/m²)':>8} | {'(°C)':>7} | "
-              f"{'(kW)':>9} | {'(kW)':>9}")
+        print(
+            f"{'Time':>6} | {'Cloud':>6} | {'Sol El':>6} | {'POA':>8} | {'T_cell':>7} | "
+            f"{'DC Power':>9} | {'AC Power':>9}"
+        )
+        print(
+            f"{'':>6} | {'(%)':>6} | {'(deg)':>6} | {'(W/m²)':>8} | {'(°C)':>7} | "
+            f"{'(kW)':>9} | {'(kW)':>9}"
+        )
         print("-" * 80)
 
-        for i, hour in enumerate(scenario['hours']):
-            timestamp = scenario['date'].replace(hour=hour, minute=0, second=0)
-            ambient_temp = scenario['ambient_temps'][i]
-            wind_speed = scenario['wind_speeds'][i]
-            cloud_cover = scenario['cloud_covers'][i]
+        for i, hour in enumerate(scenario["hours"]):
+            timestamp = scenario["date"].replace(hour=hour, minute=0, second=0)
+            ambient_temp = scenario["ambient_temps"][i]
+            wind_speed = scenario["wind_speeds"][i]
+            cloud_cover = scenario["cloud_covers"][i]
 
             # Calculate power using the new unified function!
             result = calculate_power(
@@ -136,12 +144,14 @@ def main():
                 ambient_temp=ambient_temp,
                 wind_speed=wind_speed,
                 cloud_cover=cloud_cover,
-                inverter_efficiency=0.96  # Typical inverter efficiency
+                inverter_efficiency=0.96,  # Typical inverter efficiency
             )
 
             # Skip if sun is below horizon
             if result.solar_elevation <= 0:
-                print(f"{hour:02d}:00 | {cloud_cover:6.0f} | {result.solar_elevation:6.2f} | Sun below horizon")
+                print(
+                    f"{hour:02d}:00 | {cloud_cover:6.0f} | {result.solar_elevation:6.2f} | Sun below horizon"
+                )
                 continue
 
             print(
@@ -164,7 +174,9 @@ def main():
     print()
     print(f"Conditions: T_ambient={ambient_temp}°C, Wind={wind_speed} m/s")
     print()
-    print(f"{'Cloud Cover':>12} | {'GHI':>8} | {'POA':>8} | {'DC Power':>9} | {'AC Power':>9} | {'Loss':>6}")
+    print(
+        f"{'Cloud Cover':>12} | {'GHI':>8} | {'POA':>8} | {'DC Power':>9} | {'AC Power':>9} | {'Loss':>6}"
+    )
     print(f"{'(%)':>12} | {'(W/m²)':>8} | {'(W/m²)':>8} | {'(kW)':>9} | {'(kW)':>9} | {'(%)':>6}")
     print("-" * 80)
 
@@ -177,7 +189,7 @@ def main():
             ambient_temp=ambient_temp,
             wind_speed=wind_speed,
             cloud_cover=cloud_pct,
-            inverter_efficiency=0.96
+            inverter_efficiency=0.96,
         )
 
         if cloud_pct == 0:
@@ -198,7 +210,9 @@ def main():
     print("=" * 80)
 
     print()
-    print(f"{'Condition':>25} | {'Soiling':>8} | {'Degrad.':>8} | {'DC Power':>9} | {'AC Power':>9} | {'Loss':>6}")
+    print(
+        f"{'Condition':>25} | {'Soiling':>8} | {'Degrad.':>8} | {'DC Power':>9} | {'AC Power':>9} | {'Loss':>6}"
+    )
     print(f"{'':>25} | {'Factor':>8} | {'Factor':>8} | {'(kW)':>9} | {'(kW)':>9} | {'(%)':>6}")
     print("-" * 80)
 
@@ -223,7 +237,7 @@ def main():
             cloud_cover=0,
             soiling_factor=soiling,
             degradation_factor=degradation,
-            inverter_efficiency=0.96
+            inverter_efficiency=0.96,
         )
 
         if baseline_power is None:
@@ -244,7 +258,9 @@ def main():
     print("=" * 80)
 
     print()
-    print(f"{'Time':>6} | {'Solar El':>8} | {'Solar Az':>8} | {'POA':>8} | {'DC Power':>9} | {'AC Power':>9}")
+    print(
+        f"{'Time':>6} | {'Solar El':>8} | {'Solar Az':>8} | {'POA':>8} | {'DC Power':>9} | {'AC Power':>9}"
+    )
     print(f"{'(UTC)':>6} | {'(deg)':>8} | {'(deg)':>8} | {'(W/m²)':>8} | {'(kW)':>9} | {'(kW)':>9}")
     print("-" * 80)
 
@@ -260,7 +276,7 @@ def main():
             cloud_cover=0,
             soiling_factor=0.98,
             degradation_factor=0.95,
-            inverter_efficiency=0.96
+            inverter_efficiency=0.96,
         )
 
         if result.solar_elevation > 0:

@@ -147,7 +147,9 @@ def _campbell_norman_attenuation(
     return attenuation
 
 
-def _simple_linear_attenuation(cloud_fraction: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+def _simple_linear_attenuation(
+    cloud_fraction: Union[float, np.ndarray],
+) -> Union[float, np.ndarray]:
     """Simple linear cloud attenuation model.
 
     Very simple model: attenuation = 1 - 0.75 * cloud_fraction

@@ -126,8 +126,7 @@ def main():
     print("=" * 80)
 
     print(
-        f"\n{'Time':>8s} {'Solar Elev':>11s} {'GHI':>8s} "
-        f"{'POA Global':>11s} {'DC Power':>10s}"
+        f"\n{'Time':>8s} {'Solar Elev':>11s} {'GHI':>8s} " f"{'POA Global':>11s} {'DC Power':>10s}"
     )
     print("-" * 60)
 
@@ -209,17 +208,13 @@ def main():
         )
 
         power_config = poa_config.poa_global * system.panel_area * system.panel_efficiency
-        print(
-            f"{name:>30s} {poa_config.poa_global:11.1f} W/m²  "
-            f"{power_config:9.1f} W"
-        )
+        print(f"{name:>30s} {poa_config.poa_global:11.1f} W/m²  " f"{power_config:9.1f} W")
 
     # Summary
     print("\n" + "=" * 80)
     print("Summary & Key Takeaways")
     print("=" * 80)
-    print(
-        """
+    print("""
 1. POA Global can exceed GHI for properly oriented panels
    - South-facing panels capture more irradiance than horizontal at solar noon
    - Tilt angle optimization is location and season dependent
@@ -240,8 +235,7 @@ def main():
    - Panel temperature typically 20-30°C above ambient
    - Reduces efficiency by 8-12% on hot days
    - Coming in Week 5 implementation!
-"""
-    )
+""")
 
     print("=" * 80)
     print("Example Complete!")

@@ -101,7 +101,7 @@ class TestOpenWeatherMapClient:
         client = OpenWeatherMapClient(api_key="test_key")
 
         # Mock the session.get method directly on the client instance
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock the API response
             mock_response = Mock()
             mock_response.status_code = 200
@@ -138,7 +138,7 @@ class TestOpenWeatherMapClient:
         """Test handling of HTTP errors."""
         client = OpenWeatherMapClient(api_key="test_key")
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock HTTP error
             mock_response = Mock()
             mock_response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
@@ -154,7 +154,7 @@ class TestOpenWeatherMapClient:
         """Test handling of network errors."""
         client = OpenWeatherMapClient(api_key="test_key")
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock network error
             mock_get.side_effect = requests.ConnectionError("Network error")
 
@@ -172,14 +172,18 @@ class TestOpenWeatherMapClient:
             client.read(latitude=40.0, longitude=-105.0, start=None, end=None)
 
         with pytest.raises(ValueError, match="Both start and end times must be specified"):
-            client.read(latitude=40.0, longitude=-105.0,
-                       start=datetime(2024, 1, 1, tzinfo=pytz.UTC), end=None)
+            client.read(
+                latitude=40.0,
+                longitude=-105.0,
+                start=datetime(2024, 1, 1, tzinfo=pytz.UTC),
+                end=None,
+            )
 
     def test_read_no_data_in_range(self):
         """Test handling when no data is in the specified time range."""
         client = OpenWeatherMapClient(api_key="test_key")
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock API response with data outside the requested range
             api_response = {
                 "hourly": [
@@ -208,7 +212,7 @@ class TestOpenWeatherMapClient:
         """Test that caching works correctly."""
         client = OpenWeatherMapClient(api_key="test_key", cache_ttl=3600)
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = sample_api_response
@@ -237,9 +241,7 @@ class TestPVGISClient:
     def sample_tmy_response(self):
         """Create sample PVGIS TMY response."""
         return {
-            "inputs": {
-                "location": {"latitude": 40.0, "longitude": -105.0}
-            },
+            "inputs": {"location": {"latitude": 40.0, "longitude": -105.0}},
             "outputs": {
                 "tmy_hourly": [
                     {
@@ -278,7 +280,7 @@ class TestPVGISClient:
         """Test successful TMY data read."""
         client = PVGISClient()
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock the API response
             mock_response = Mock()
             mock_response.status_code = 200
@@ -309,7 +311,7 @@ class TestPVGISClient:
         """Test handling of HTTP errors in TMY read."""
         client = PVGISClient()
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock HTTP error - it gets wrapped in ValueError by the client
             mock_response = Mock()
             mock_response.raise_for_status.side_effect = requests.HTTPError("500 Server Error")
@@ -323,7 +325,7 @@ class TestPVGISClient:
         """Test handling of invalid JSON response."""
         client = PVGISClient()
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock invalid JSON response
             mock_response = Mock()
             mock_response.status_code = 200
@@ -339,12 +341,9 @@ class TestPVGISClient:
         """Test handling of response with invalid format."""
         client = PVGISClient()
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock response without required fields
-            invalid_response = {
-                "inputs": {},
-                "outputs": {}  # Missing 'tmy_hourly'
-            }
+            invalid_response = {"inputs": {}, "outputs": {}}  # Missing 'tmy_hourly'
 
             mock_response = Mock()
             mock_response.status_code = 200
@@ -360,7 +359,7 @@ class TestPVGISClient:
         """Test that read() method delegates to read_tmy() for PVGIS."""
         client = PVGISClient()
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = sample_tmy_response
@@ -376,7 +375,7 @@ class TestPVGISClient:
         """Test that PVGIS caching works correctly."""
         client = PVGISClient(cache_ttl=3600)
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = sample_tmy_response
@@ -404,17 +403,17 @@ class TestWeatherAPIIntegration:
         client = OpenWeatherMapClient(api_key="test_key")
 
         # Verify that the session has retry adapters configured
-        assert hasattr(client.session, 'adapters')
+        assert hasattr(client.session, "adapters")
 
         # Check HTTP and HTTPS adapters exist
-        http_adapter = client.session.get_adapter('http://test.com')
-        https_adapter = client.session.get_adapter('https://test.com')
+        http_adapter = client.session.get_adapter("http://test.com")
+        https_adapter = client.session.get_adapter("https://test.com")
 
         assert http_adapter is not None
         assert https_adapter is not None
 
         # Verify max_retries is configured (should be Retry object)
-        assert hasattr(http_adapter, 'max_retries')
+        assert hasattr(http_adapter, "max_retries")
         assert http_adapter.max_retries.total == 3  # As configured in _create_session
 
     def test_session_creation(self):
@@ -422,35 +421,37 @@ class TestWeatherAPIIntegration:
         client = OpenWeatherMapClient(api_key="test_key")
 
         # Verify session exists
-        assert hasattr(client, 'session')
+        assert hasattr(client, "session")
         assert isinstance(client.session, requests.Session)
 
         # Verify adapters are mounted
-        assert 'http://' in client.session.adapters
-        assert 'https://' in client.session.adapters
+        assert "http://" in client.session.adapters
+        assert "https://" in client.session.adapters
 
     def test_pvgis_session_creation(self):
         """Test that PVGIS client also has proper session setup."""
         client = PVGISClient()
 
         # Verify session exists
-        assert hasattr(client, 'session')
+        assert hasattr(client, "session")
         assert isinstance(client.session, requests.Session)
 
     def test_parameter_validation(self):
         """Test that proper parameters are sent to the API."""
         client = OpenWeatherMapClient(api_key="test_api_key_123")
 
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
-                "hourly": [{
-                    "dt": 1704067200,
-                    "temp": 273.15,
-                    "wind_speed": 3.0,
-                    "clouds": 0,
-                }]
+                "hourly": [
+                    {
+                        "dt": 1704067200,
+                        "temp": 273.15,
+                        "wind_speed": 3.0,
+                        "clouds": 0,
+                    }
+                ]
             }
             mock_response.raise_for_status = Mock()
             mock_get.return_value = mock_response
@@ -465,8 +466,8 @@ class TestWeatherAPIIntegration:
             call_args = mock_get.call_args
 
             # Check that params include API key and lat/lon
-            params = call_args[1].get('params', {})
-            assert 'appid' in params
-            assert params['appid'] == "test_api_key_123"
-            assert 'lat' in params
-            assert 'lon' in params
+            params = call_args[1].get("params", {})
+            assert "appid" in params
+            assert params["appid"] == "test_api_key_123"
+            assert "lat" in params
+            assert "lon" in params

@@ -8,8 +8,9 @@ System: 14.04 kWp residential installation
 """
 
 from datetime import datetime, timedelta
-import pytz
+
 import pandas as pd
+import pytz
 
 from pvsolarsim import Location, PVSystem, calculate_power
 
@@ -81,36 +82,35 @@ def main():
 
     # Real system parameters
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'efficiency': 0.2037,
-        'temp_coeff': -0.0035,
-        'area_m2': 2.108 * 1.048,
+        "count": 16,
+        "power_wp": 450,
+        "efficiency": 0.2037,
+        "temp_coeff": -0.0035,
+        "area_m2": 2.108 * 1.048,
     }
 
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'efficiency': 0.205,
-        'temp_coeff': -0.0037,
-        'area_m2': 1.765 * 1.048,
+        "count": 18,
+        "power_wp": 380,
+        "efficiency": 0.205,
+        "temp_coeff": -0.0037,
+        "area_m2": 1.765 * 1.048,
     }
 
     # Calculate totals
     total_power_wp = (
-        munchen_panels['count'] * munchen_panels['power_wp'] +
-        canadian_panels['count'] * canadian_panels['power_wp']
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
     )
     total_area_m2 = (
-        munchen_panels['count'] * munchen_panels['area_m2'] +
-        canadian_panels['count'] * canadian_panels['area_m2']
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
     )
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)
     weighted_temp_coeff = (
-        (munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff'] +
-         canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff']) /
-        total_power_wp
-    )
+        munchen_panels["count"] * munchen_panels["power_wp"] * munchen_panels["temp_coeff"]
+        + canadian_panels["count"] * canadian_panels["power_wp"] * canadian_panels["temp_coeff"]
+    ) / total_power_wp
 
     system = PVSystem(
         panel_area=total_area_m2,
@@ -122,8 +122,8 @@ def main():
 
     print(f"Location: {location.latitude:.6f}°N, {location.longitude:.6f}°E, {location.altitude}m")
     print(f"System Capacity: {total_power_wp / 1000:.2f} kWp")
-    print(f"  - 16× München Solar 450W (7.20 kWp)")
-    print(f"  - 18× Canadian Solar 380W (6.84 kWp)")
+    print("  - 16× München Solar 450W (7.20 kWp)")
+    print("  - 18× Canadian Solar 380W (6.84 kWp)")
     print(f"Panel Area: {total_area_m2:.2f} m²")
     print(f"Weighted Efficiency: {weighted_efficiency * 100:.2f}%")
     print(f"Temperature Coefficient: {weighted_temp_coeff * 100:.3f}%/°C")
@@ -145,30 +145,30 @@ def main():
     # Evening: -2°C, overcast
     hourly_weather = [
         # Hour  Temp  Cloud  Wind  Description
-        (0,     -5,   100,   1.1,  "Night - overcast"),
-        (1,     -5,   100,   1.1,  "Night - overcast"),
-        (2,     -5,   100,   1.1,  "Night - overcast"),
-        (3,     -5,   100,   1.1,  "Night - overcast"),
-        (4,     -4,   100,   1.1,  "Night - overcast"),
-        (5,     -4,   100,   1.1,  "Night - overcast"),
-        (6,     -4,   100,   1.1,  "Pre-dawn - overcast, ice fog"),
-        (7,     -4,   100,   1.1,  "Dawn - overcast, ice fog"),
-        (8,     -3,   100,   1.1,  "Morning - overcast, fog clearing"),
-        (9,     -3,   100,   1.4,  "Morning - overcast"),
-        (10,    -2,   100,   1.4,  "Late morning - overcast"),
-        (11,    -2,   100,   1.4,  "Noon - overcast"),
-        (12,    -1,   100,   1.4,  "Noon - overcast"),
-        (13,    -1,   100,   1.4,  "Early afternoon - overcast"),
-        (14,    -1,   100,   1.4,  "Afternoon - overcast"),
-        (15,    -1,   100,   1.4,  "Afternoon - overcast"),
-        (16,    -2,   100,   1.1,  "Late afternoon - overcast"),
-        (17,    -2,   100,   1.1,  "Dusk - overcast"),
-        (18,    -2,   100,   1.1,  "Evening - overcast"),
-        (19,    -2,   100,   1.1,  "Evening - overcast"),
-        (20,    -2,   100,   1.1,  "Night - overcast"),
-        (21,    -2,   100,   1.1,  "Night - overcast"),
-        (22,    -2,   100,   1.1,  "Night - overcast"),
-        (23,    -2,   100,   1.1,  "Night - overcast"),
+        (0, -5, 100, 1.1, "Night - overcast"),
+        (1, -5, 100, 1.1, "Night - overcast"),
+        (2, -5, 100, 1.1, "Night - overcast"),
+        (3, -5, 100, 1.1, "Night - overcast"),
+        (4, -4, 100, 1.1, "Night - overcast"),
+        (5, -4, 100, 1.1, "Night - overcast"),
+        (6, -4, 100, 1.1, "Pre-dawn - overcast, ice fog"),
+        (7, -4, 100, 1.1, "Dawn - overcast, ice fog"),
+        (8, -3, 100, 1.1, "Morning - overcast, fog clearing"),
+        (9, -3, 100, 1.4, "Morning - overcast"),
+        (10, -2, 100, 1.4, "Late morning - overcast"),
+        (11, -2, 100, 1.4, "Noon - overcast"),
+        (12, -1, 100, 1.4, "Noon - overcast"),
+        (13, -1, 100, 1.4, "Early afternoon - overcast"),
+        (14, -1, 100, 1.4, "Afternoon - overcast"),
+        (15, -1, 100, 1.4, "Afternoon - overcast"),
+        (16, -2, 100, 1.1, "Late afternoon - overcast"),
+        (17, -2, 100, 1.1, "Dusk - overcast"),
+        (18, -2, 100, 1.1, "Evening - overcast"),
+        (19, -2, 100, 1.1, "Evening - overcast"),
+        (20, -2, 100, 1.1, "Night - overcast"),
+        (21, -2, 100, 1.1, "Night - overcast"),
+        (22, -2, 100, 1.1, "Night - overcast"),
+        (23, -2, 100, 1.1, "Night - overcast"),
     ]
 
     print("Calculating power for each hour using actual weather...")
@@ -177,10 +177,10 @@ def main():
     results = []
     for hour, temp, cloud, wind, desc in hourly_weather:
         timestamp = today_start + timedelta(hours=hour)
-        
+
         # Add ice fog reduction factor for early morning
         soiling = 0.90 if hour < 8 else 0.95  # Ice fog effect
-        
+
         result = calculate_power(
             location=location,
             system=system,
@@ -191,57 +191,67 @@ def main():
             soiling_factor=soiling,
             inverter_efficiency=0.97,
         )
-        
-        results.append({
-            'hour': hour,
-            'timestamp': timestamp,
-            'temp_c': temp,
-            'cloud_pct': cloud,
-            'wind_ms': wind,
-            'description': desc,
-            'power_dc_kw': result.power_w / 1000,
-            'power_ac_kw': result.power_ac_w / 1000,
-            'solar_elev': result.solar_elevation,
-            'poa_irrad': result.poa_irradiance,
-            'cell_temp': result.cell_temperature,
-        })
+
+        results.append(
+            {
+                "hour": hour,
+                "timestamp": timestamp,
+                "temp_c": temp,
+                "cloud_pct": cloud,
+                "wind_ms": wind,
+                "description": desc,
+                "power_dc_kw": result.power_w / 1000,
+                "power_ac_kw": result.power_ac_w / 1000,
+                "solar_elev": result.solar_elevation,
+                "poa_irrad": result.poa_irradiance,
+                "cell_temp": result.cell_temperature,
+            }
+        )
 
     df = pd.DataFrame(results)
 
     # Calculate daily totals
-    daily_energy_dc_kwh = df['power_dc_kw'].sum() * 1.0  # 1 hour intervals
-    daily_energy_ac_kwh = df['power_ac_kw'].sum() * 1.0
-    peak_power_dc_kw = df['power_dc_kw'].max()
-    peak_power_ac_kw = df['power_ac_kw'].max()
-    peak_hour = df.loc[df['power_dc_kw'].idxmax(), 'hour']
+    daily_energy_dc_kwh = df["power_dc_kw"].sum() * 1.0  # 1 hour intervals
+    daily_energy_ac_kwh = df["power_ac_kw"].sum() * 1.0
+    peak_power_dc_kw = df["power_dc_kw"].max()
+    peak_power_ac_kw = df["power_ac_kw"].max()
+    peak_hour = df.loc[df["power_dc_kw"].idxmax(), "hour"]
 
     # ==================================================================================
     # RESULTS ANALYSIS
     # ==================================================================================
 
     print_separator("PRODUCTION ANALYSIS", "=")
-    
+
     print("DAILY TOTALS:")
     print(f"  DC Energy: {daily_energy_dc_kwh:.2f} kWh")
     print(f"  AC Energy: {daily_energy_ac_kwh:.2f} kWh")
-    print(f"  Peak Power: {peak_power_dc_kw:.2f} kW DC ({peak_power_ac_kw:.2f} kW AC) at {peak_hour:02d}:00")
+    print(
+        f"  Peak Power: {peak_power_dc_kw:.2f} kW DC ({peak_power_ac_kw:.2f} kW AC) at {peak_hour:02d}:00"
+    )
     print(f"  Capacity Factor: {(daily_energy_dc_kwh / (total_power_wp/1000 * 24)) * 100:.2f}%")
     print()
 
     # Show production hours
-    production_df = df[df['power_dc_kw'] > 0.01]
+    production_df = df[df["power_dc_kw"] > 0.01]
     if len(production_df) > 0:
-        print(f"PRODUCTION HOURS: {len(production_df)} hours ({production_df['hour'].min():02d}:00 - {production_df['hour'].max():02d}:00)")
+        print(
+            f"PRODUCTION HOURS: {len(production_df)} hours ({production_df['hour'].min():02d}:00 - {production_df['hour'].max():02d}:00)"
+        )
         print()
-        print(f"{'Time':<8} {'Temp':<8} {'Power DC':<12} {'Power AC':<12} {'POA':<10} {'Solar El':<10}")
+        print(
+            f"{'Time':<8} {'Temp':<8} {'Power DC':<12} {'Power AC':<12} {'POA':<10} {'Solar El':<10}"
+        )
         print(f"{'(CET)':<8} {'(°C)':<8} {'(kW)':<12} {'(kW)':<12} {'(W/m²)':<10} {'(deg)':<10}")
         print("-" * 70)
         for _, row in production_df.iterrows():
-            print(f"{row['hour']:02d}:00    {row['temp_c']:>4.0f}     "
-                  f"{row['power_dc_kw']:>6.3f}       "
-                  f"{row['power_ac_kw']:>6.3f}       "
-                  f"{row['poa_irrad']:>6.1f}     "
-                  f"{row['solar_elev']:>5.1f}°")
+            print(
+                f"{row['hour']:02d}:00    {row['temp_c']:>4.0f}     "
+                f"{row['power_dc_kw']:>6.3f}       "
+                f"{row['power_ac_kw']:>6.3f}       "
+                f"{row['poa_irrad']:>6.1f}     "
+                f"{row['solar_elev']:>5.1f}°"
+            )
         print()
     else:
         print("⚠️  NO PRODUCTION - conditions too poor")
@@ -279,11 +289,13 @@ def main():
     print(f"  Weather reduction: {((1 - daily_energy_ac_kwh/clear_day_kwh) * 100):.1f}%")
     print()
     print("FACTORS AFFECTING PRODUCTION:")
-    print(f"  ⚠️  Overcast (100% cloud): ~{100 - (daily_energy_ac_kwh/clear_day_kwh * 100):.0f}% reduction")
-    print(f"  ⚠️  Ice fog (morning): Additional 5-10% loss")
-    print(f"  ✓  Cold temps (-5 to -1°C): ~+6% efficiency gain vs. 25°C")
-    print(f"  ✓  Low wind: Minimal convective cooling")
-    print(f"  ⚠️  Winter solstice: Short day (~8h daylight)")
+    print(
+        f"  ⚠️  Overcast (100% cloud): ~{100 - (daily_energy_ac_kwh/clear_day_kwh * 100):.0f}% reduction"
+    )
+    print("  ⚠️  Ice fog (morning): Additional 5-10% loss")
+    print("  ✓  Cold temps (-5 to -1°C): ~+6% efficiency gain vs. 25°C")
+    print("  ✓  Low wind: Minimal convective cooling")
+    print("  ⚠️  Winter solstice: Short day (~8h daylight)")
     print()
 
     # Context for January in Prague
@@ -291,7 +303,9 @@ def main():
     print("  Typical daily production: 3-8 kWh/day (heavily weather dependent)")
     print("  Monthly average: 120-200 kWh/month")
     print("  Annual production: ~15,000-17,000 kWh")
-    print(f"  Today's weather: {('WORSE' if daily_energy_ac_kwh < 5 else 'AVERAGE' if daily_energy_ac_kwh < 8 else 'BETTER')} than typical")
+    print(
+        f"  Today's weather: {('WORSE' if daily_energy_ac_kwh < 5 else 'AVERAGE' if daily_energy_ac_kwh < 8 else 'BETTER')} than typical"
+    )
     print()
 
     print_separator("CONCLUSION", "=")

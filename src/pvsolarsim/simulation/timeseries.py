@@ -73,9 +73,7 @@ def generate_time_series(
     # Handle timezone
     if start.tzinfo is None or end.tzinfo is None:
         if timezone is None:
-            raise ValueError(
-                "Timezone parameter required when start or end is timezone-naive"
-            )
+            raise ValueError("Timezone parameter required when start or end is timezone-naive")
         tz = pytz.timezone(timezone)
         if start.tzinfo is None:
             start = tz.localize(start)

@@ -113,9 +113,7 @@ class TestCalculatePower:
         result_new = calculate_power(location, system, timestamp, degradation_factor=1.0)
 
         # Degraded panels (5% loss)
-        result_degraded = calculate_power(
-            location, system, timestamp, degradation_factor=0.95
-        )
+        result_degraded = calculate_power(location, system, timestamp, degradation_factor=0.95)
 
         assert result_degraded.power_w == pytest.approx(result_new.power_w * 0.95, rel=0.01)
 
@@ -229,9 +227,7 @@ class TestPowerCalculationEdgeCases:
         system = PVSystem(20.0, 0.20, 0.0, 180.0)
         timestamp = datetime(2025, 6, 21, 12, 0, tzinfo=pytz.UTC)
 
-        result = calculate_power(
-            location, system, timestamp, ghi=1500, dni=1400, dhi=100
-        )
+        result = calculate_power(location, system, timestamp, ghi=1500, dni=1400, dhi=100)
 
         assert result.power_w > 0
         assert result.power_w < 10000  # Reasonable upper limit

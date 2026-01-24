@@ -35,9 +35,7 @@ class QualityFlags:
     @property
     def any_issues(self) -> pd.Series:
         """Return True where any quality issue exists."""
-        return (
-            self.nighttime_ghi | self.negative_values | self.out_of_range | self.inconsistent
-        )
+        return self.nighttime_ghi | self.negative_values | self.out_of_range | self.inconsistent
 
     def summary(self) -> dict:
         """Return summary of quality issues."""
@@ -231,9 +229,7 @@ def check_irradiance_consistency(
     return is_daytime & (difference > tolerance)
 
 
-def perform_quality_checks(
-    data: pd.DataFrame, latitude: float, longitude: float
-) -> QualityFlags:
+def perform_quality_checks(data: pd.DataFrame, latitude: float, longitude: float) -> QualityFlags:
     """Perform comprehensive quality checks on weather data.
 
     Parameters

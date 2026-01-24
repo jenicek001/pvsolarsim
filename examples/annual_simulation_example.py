@@ -83,7 +83,9 @@ def main():
     print("\nAnnual Performance:")
     print(f"  Total energy: {results_cloudy.statistics.total_energy_kwh:.2f} kWh")
     print(f"  Capacity factor: {results_cloudy.statistics.capacity_factor * 100:.2f}%")
-    print(f"  Energy reduction vs clear: {(1 - results_cloudy.statistics.total_energy_kwh / results.statistics.total_energy_kwh) * 100:.1f}%")
+    print(
+        f"  Energy reduction vs clear: {(1 - results_cloudy.statistics.total_energy_kwh / results.statistics.total_energy_kwh) * 100:.1f}%"
+    )
 
     # Example 3: With soiling and degradation
     print("\n" + "-" * 70)
@@ -101,7 +103,9 @@ def main():
 
     print("\nAnnual Performance:")
     print(f"  Total energy: {results_real.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Total losses: {(1 - results_real.statistics.total_energy_kwh / results.statistics.total_energy_kwh) * 100:.1f}%")
+    print(
+        f"  Total losses: {(1 - results_real.statistics.total_energy_kwh / results.statistics.total_energy_kwh) * 100:.1f}%"
+    )
 
     # Example 4: With inverter efficiency (AC power)
     print("\n" + "-" * 70)

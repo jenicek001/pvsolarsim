@@ -10,9 +10,7 @@ class TestPVSystem:
 
     def test_pvsystem_valid(self):
         """Test valid PVSystem creation."""
-        system = PVSystem(
-            panel_area=20.0, panel_efficiency=0.20, tilt=35.0, azimuth=180.0
-        )
+        system = PVSystem(panel_area=20.0, panel_efficiency=0.20, tilt=35.0, azimuth=180.0)
         assert system.panel_area == 20.0
         assert system.panel_efficiency == 0.20
         assert system.tilt == 35.0

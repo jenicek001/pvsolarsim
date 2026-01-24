@@ -14,8 +14,6 @@ Real-world system:
 - Temperature coefficient: -0.36%/°C
 """
 
-
-
 from pvsolarsim import Location, PVSystem, simulate_annual
 
 
@@ -42,35 +40,40 @@ def main():
 
     # Panel specifications
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'efficiency': 0.2037,  # 20.37%
-        'temp_coeff_pmax': -0.0035,  # -0.35%/°C
-        'area_m2': 2.108 * 1.048,  # 2.209 m²
+        "count": 16,
+        "power_wp": 450,
+        "efficiency": 0.2037,  # 20.37%
+        "temp_coeff_pmax": -0.0035,  # -0.35%/°C
+        "area_m2": 2.108 * 1.048,  # 2.209 m²
     }
 
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'efficiency': 0.205,  # ~20.5%
-        'temp_coeff_pmax': -0.0037,  # -0.37%/°C
-        'area_m2': 1.765 * 1.048,  # 1.850 m²
+        "count": 18,
+        "power_wp": 380,
+        "efficiency": 0.205,  # ~20.5%
+        "temp_coeff_pmax": -0.0037,  # -0.37%/°C
+        "area_m2": 1.765 * 1.048,  # 1.850 m²
     }
 
     # Calculate total system parameters
-    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
-                      canadian_panels['count'] * canadian_panels['power_wp'])
+    total_power_wp = (
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
+    )
 
-    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
-                     canadian_panels['count'] * canadian_panels['area_m2'])
+    total_area_m2 = (
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
+    )
 
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
 
     weighted_temp_coeff = (
-        (munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff_pmax'] +
-         canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff_pmax']) /
-        total_power_wp
-    )
+        munchen_panels["count"] * munchen_panels["power_wp"] * munchen_panels["temp_coeff_pmax"]
+        + canadian_panels["count"]
+        * canadian_panels["power_wp"]
+        * canadian_panels["temp_coeff_pmax"]
+    ) / total_power_wp
 
     print("Location Configuration:")
     print(f"  Latitude: {latitude}°N")
@@ -89,10 +92,7 @@ def main():
 
     # Create Location and PVSystem objects
     location = Location(
-        latitude=latitude,
-        longitude=longitude,
-        altitude=altitude,
-        timezone=timezone
+        latitude=latitude, longitude=longitude, altitude=altitude, timezone=timezone
     )
 
     system = PVSystem(
@@ -100,7 +100,7 @@ def main():
         panel_efficiency=weighted_efficiency,
         tilt=tilt,
         azimuth=azimuth,
-        temp_coefficient=weighted_temp_coeff
+        temp_coefficient=weighted_temp_coeff,
     )
 
     # ==================================================================================
@@ -120,13 +120,15 @@ def main():
         interval_minutes=60,  # Hourly for speed
         weather_source="clear_sky",
         ambient_temp=15.0,  # Average annual temp in Prague
-        wind_speed=2.0,     # Moderate wind
-        cloud_cover=0,      # Clear sky
+        wind_speed=2.0,  # Moderate wind
+        cloud_cover=0,  # Clear sky
     )
 
     print("RESULTS - Ideal Conditions:")
     print(f"  Annual Energy Production: {result_ideal.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_ideal.statistics.total_energy_kwh / (total_power_wp/1000):.2f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_ideal.statistics.total_energy_kwh / (total_power_wp/1000):.2f} kWh/kWp"
+    )
     print(f"  Capacity Factor: {result_ideal.statistics.capacity_factor * 100:.2f}%")
     print(f"  Peak Power: {result_ideal.statistics.peak_power_w / 1000:.2f} kW")
     print(f"  Average Power (daylight): {result_ideal.statistics.average_power_w / 1000:.2f} kW")
@@ -148,11 +150,13 @@ def main():
     # Prague at 50°N with clear sky can achieve very high values
     # With optimal tilt (~35°) and good orientation, clear-sky models can produce
     # 1800-2500 kWh/kWp theoretically (this is maximum possible, not realistic)
-    specific_yield = result_ideal.statistics.total_energy_kwh / (total_power_wp/1000)
+    specific_yield = result_ideal.statistics.total_energy_kwh / (total_power_wp / 1000)
     print(f"  ✓ Specific yield: {specific_yield:.0f} kWh/kWp")
     print("    Note: This is THEORETICAL clear-sky maximum (no clouds, no weather losses)")
     # Clear sky theoretical maximum can be very high - we'll validate realistic scenario later
-    assert 1500 < specific_yield < 3000, f"Specific yield {specific_yield:.0f} kWh/kWp out of theoretical clear-sky range"
+    assert (
+        1500 < specific_yield < 3000
+    ), f"Specific yield {specific_yield:.0f} kWh/kWp out of theoretical clear-sky range"
 
     # Check 2: Capacity factor should be 12-28% for Central Europe (clear sky can be higher)
     print(f"  ✓ Capacity factor: {result_ideal.statistics.capacity_factor*100:.1f}%")
@@ -160,14 +164,18 @@ def main():
     assert 0.15 < result_ideal.statistics.capacity_factor < 0.35
 
     # Check 3: Peak power should be close to rated power (accounting for temp losses)
-    print(f"  ✓ Peak power: {result_ideal.statistics.peak_power_w/1000:.1f} kW (rated: {total_power_wp/1000:.1f} kW)")
+    print(
+        f"  ✓ Peak power: {result_ideal.statistics.peak_power_w/1000:.1f} kW (rated: {total_power_wp/1000:.1f} kW)"
+    )
     assert 0.70 * total_power_wp < result_ideal.statistics.peak_power_w < 1.05 * total_power_wp
 
     # Check 4: Summer months should produce more than winter
     june_energy = result_ideal.statistics.monthly_energy_kwh.iloc[5]
     december_energy = result_ideal.statistics.monthly_energy_kwh.iloc[11]
     ratio = june_energy / december_energy
-    print(f"  ✓ Summer/winter ratio: {ratio:.1f}x (Jun: {june_energy:.0f} kWh, Dec: {december_energy:.0f} kWh)")
+    print(
+        f"  ✓ Summer/winter ratio: {ratio:.1f}x (Jun: {june_energy:.0f} kWh, Dec: {december_energy:.0f} kWh)"
+    )
     assert ratio > 2.0, "June should produce >2x December energy"
 
     print()
@@ -197,16 +205,21 @@ def main():
 
     print("RESULTS - Realistic Conditions:")
     print(f"  Annual Energy Production: {result_realistic.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_realistic.statistics.total_energy_kwh / (total_power_wp/1000):.2f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_realistic.statistics.total_energy_kwh / (total_power_wp/1000):.2f} kWh/kWp"
+    )
     print(f"  Capacity Factor: {result_realistic.statistics.capacity_factor * 100:.2f}%")
     print(f"  Performance Ratio: {result_realistic.statistics.performance_ratio:.2%}")
     print()
 
     # Compare with ideal
-    energy_reduction = (1 - result_realistic.statistics.total_energy_kwh /
-                       result_ideal.statistics.total_energy_kwh) * 100
+    energy_reduction = (
+        1 - result_realistic.statistics.total_energy_kwh / result_ideal.statistics.total_energy_kwh
+    ) * 100
     print(f"Energy Reduction vs Ideal: {energy_reduction:.1f}%")
-    print(f"  (This shows the impact of {result_realistic.statistics.total_energy_kwh / result_ideal.statistics.total_energy_kwh * 100 - 100:.1f}% from cloud cover)")
+    print(
+        f"  (This shows the impact of {result_realistic.statistics.total_energy_kwh / result_ideal.statistics.total_energy_kwh * 100 - 100:.1f}% from cloud cover)"
+    )
     print()
 
     # Validation
@@ -217,11 +230,13 @@ def main():
     # Some models may have less impact than expected - this validates the implementation works
     print(f"  ✓ Cloud impact: {energy_reduction:.1f}% reduction")
     print(f"    Note: Cloud cover model shows {energy_reduction:.1f}% impact for 40% cloud cover")
-    assert 0 < energy_reduction < 70, f"Cloud cover impact {energy_reduction:.1f}% seems unrealistic"
+    assert (
+        0 < energy_reduction < 70
+    ), f"Cloud cover impact {energy_reduction:.1f}% seems unrealistic"
 
     # Check: Realistic scenario should still produce good energy
     # With the current cloud model, values will be close to clear-sky
-    realistic_yield = result_realistic.statistics.total_energy_kwh / (total_power_wp/1000)
+    realistic_yield = result_realistic.statistics.total_energy_kwh / (total_power_wp / 1000)
     print(f"  ✓ Realistic yield: {realistic_yield:.0f} kWh/kWp")
     print("    Note: Current cloud model implementation")
     assert 700 < realistic_yield < 2500
@@ -252,7 +267,7 @@ def main():
         ambient_temp=15.0,
         wind_speed=2.5,
         cloud_cover=40,
-        soiling_factor=0.975,      # 2.5% soiling loss
+        soiling_factor=0.975,  # 2.5% soiling loss
         degradation_factor=0.995,  # 0.5% degradation (new system)
         inverter_efficiency=0.96,  # 96% inverter efficiency
     )
@@ -260,7 +275,9 @@ def main():
     print("RESULTS - With All Losses:")
     # Calculate energies from time series
     dc_energy = result_losses.time_series["power_w"].sum() * 60 / 60000  # Convert Wh to kWh
-    ac_energy = result_losses.time_series["power_ac_w"].sum() * 60 / 60000  # AC energy from time series
+    ac_energy = (
+        result_losses.time_series["power_ac_w"].sum() * 60 / 60000
+    )  # AC energy from time series
 
     print(f"  DC Energy: {dc_energy:.2f} kWh")
     print(f"  AC Energy: {ac_energy:.2f} kWh")
@@ -319,19 +336,24 @@ def main():
         ambient_temp=15.0,
         wind_speed=2.5,
         cloud_cover=0,  # Clear sky for comparison
-        progress_callback=lambda p: print(f"  Progress: {p*100:.1f}%") if p % 0.1 < 0.01 else None
+        progress_callback=lambda p: print(f"  Progress: {p*100:.1f}%") if p % 0.1 < 0.01 else None,
     )
 
     print()
     print("RESULTS - High Resolution:")
     print(f"  Data points: {len(result_high_res.time_series):,}")
     print(f"  Annual Energy: {result_high_res.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_high_res.statistics.total_energy_kwh / (total_power_wp/1000):.2f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_high_res.statistics.total_energy_kwh / (total_power_wp/1000):.2f} kWh/kWp"
+    )
     print()
 
     # Compare with hourly simulation
-    energy_diff = abs(result_high_res.statistics.total_energy_kwh -
-                     result_ideal.statistics.total_energy_kwh) / result_ideal.statistics.total_energy_kwh * 100
+    energy_diff = (
+        abs(result_high_res.statistics.total_energy_kwh - result_ideal.statistics.total_energy_kwh)
+        / result_ideal.statistics.total_energy_kwh
+        * 100
+    )
 
     print(f"Difference from hourly simulation: {energy_diff:.2f}%")
     print()
@@ -382,6 +404,7 @@ def main():
 
     # Check: CSV file should exist
     import os
+
     print(f"  ✓ CSV file created: {os.path.exists(csv_path)}")
     assert os.path.exists(csv_path)
 
@@ -406,19 +429,29 @@ def main():
     print(f"System Capacity: {total_power_wp/1000:.2f} kWp")
     print()
     print("Scenario Comparison:")
-    print(f"  1. Ideal (clear sky):        {result_ideal.statistics.total_energy_kwh:>8.0f} kWh  ({result_ideal.statistics.total_energy_kwh/(total_power_wp/1000):>6.0f} kWh/kWp)")
-    print(f"  2. Realistic (40% clouds):   {result_realistic.statistics.total_energy_kwh:>8.0f} kWh  ({result_realistic.statistics.total_energy_kwh/(total_power_wp/1000):>6.0f} kWh/kWp)")
-    print(f"  3. With system losses:       {ac_energy:>8.0f} kWh  ({ac_energy/(total_power_wp/1000):>6.0f} kWh/kWp)")
-    print(f"  4. High-res (5-min):         {result_high_res.statistics.total_energy_kwh:>8.0f} kWh  ({result_high_res.statistics.total_energy_kwh/(total_power_wp/1000):>6.0f} kWh/kWp)")
+    print(
+        f"  1. Ideal (clear sky):        {result_ideal.statistics.total_energy_kwh:>8.0f} kWh  ({result_ideal.statistics.total_energy_kwh/(total_power_wp/1000):>6.0f} kWh/kWp)"
+    )
+    print(
+        f"  2. Realistic (40% clouds):   {result_realistic.statistics.total_energy_kwh:>8.0f} kWh  ({result_realistic.statistics.total_energy_kwh/(total_power_wp/1000):>6.0f} kWh/kWp)"
+    )
+    print(
+        f"  3. With system losses:       {ac_energy:>8.0f} kWh  ({ac_energy/(total_power_wp/1000):>6.0f} kWh/kWp)"
+    )
+    print(
+        f"  4. High-res (5-min):         {result_high_res.statistics.total_energy_kwh:>8.0f} kWh  ({result_high_res.statistics.total_energy_kwh/(total_power_wp/1000):>6.0f} kWh/kWp)"
+    )
     print()
 
     # Expected vs Actual for Prague
     # Industry estimates for Prague: ~850-1000 kWh/kWp/year for south-facing systems
     # With SSW orientation and all losses, expect ~700-850 kWh/kWp/year
-    realistic_specific = ac_energy / (total_power_wp/1000)
+    realistic_specific = ac_energy / (total_power_wp / 1000)
 
     print("Real-World Comparison:")
-    print(f"  Clear-sky theoretical maximum: {result_ideal.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp")
+    print(
+        f"  Clear-sky theoretical maximum: {result_ideal.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp"
+    )
     print("  Industry estimate for Prague:  850-1100 kWh/kWp (typical real weather)")
     print(f"  Our realistic simulation:      {realistic_specific:.0f} kWh/kWp")
     print()
@@ -443,9 +476,15 @@ def main():
     print("=" * 80)
     print()
     print("Key Findings:")
-    print(f"  • Clear-sky theoretical: {result_ideal.statistics.total_energy_kwh:.0f} kWh/year ({result_ideal.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp)")
-    print(f"  • With cloud model:      {result_realistic.statistics.total_energy_kwh:.0f} kWh/year ({realistic_specific:.0f} kWh/kWp)")
-    print(f"  • With all losses:       {ac_energy:.0f} kWh/year ({ac_energy/(total_power_wp/1000):.0f} kWh/kWp)")
+    print(
+        f"  • Clear-sky theoretical: {result_ideal.statistics.total_energy_kwh:.0f} kWh/year ({result_ideal.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp)"
+    )
+    print(
+        f"  • With cloud model:      {result_realistic.statistics.total_energy_kwh:.0f} kWh/year ({realistic_specific:.0f} kWh/kWp)"
+    )
+    print(
+        f"  • With all losses:       {ac_energy:.0f} kWh/year ({ac_energy/(total_power_wp/1000):.0f} kWh/kWp)"
+    )
     print(f"  • High-resolution match: {energy_diff:.1f}% difference")
     print()
     print("The simulation successfully demonstrates:")

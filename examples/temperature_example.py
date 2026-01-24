@@ -10,7 +10,6 @@ Temperature significantly affects PV performance - typically reducing power by
 0.3-0.5% per degree Celsius above 25°C (STC conditions).
 """
 
-
 import numpy as np
 
 from pvsolarsim import (
