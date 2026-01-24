@@ -15,7 +15,7 @@ def test_cache_set_and_get():
         cache = WeatherCache(cache_dir=Path(tmpdir), ttl=3600)
 
         # Create test data
-        timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
         data = pd.DataFrame(
             {
                 "ghi": [100.0] * 24,
@@ -41,7 +41,7 @@ def test_cache_expiration():
     with tempfile.TemporaryDirectory() as tmpdir:
         cache = WeatherCache(cache_dir=Path(tmpdir), ttl=1)  # 1 second TTL
 
-        timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
         data = pd.DataFrame(
             {
                 "ghi": [100.0] * 24,
@@ -76,7 +76,7 @@ def test_cache_clear():
     with tempfile.TemporaryDirectory() as tmpdir:
         cache = WeatherCache(cache_dir=Path(tmpdir), ttl=3600)
 
-        timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
         data = pd.DataFrame(
             {
                 "ghi": [100.0] * 24,
@@ -106,7 +106,7 @@ def test_cache_clear_expired():
     with tempfile.TemporaryDirectory() as tmpdir:
         cache = WeatherCache(cache_dir=Path(tmpdir), ttl=1)
 
-        timestamps = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+        timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
         data = pd.DataFrame(
             {
                 "ghi": [100.0] * 24,

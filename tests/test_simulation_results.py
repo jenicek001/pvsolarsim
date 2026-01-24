@@ -65,7 +65,7 @@ class TestSimulationResult:
     def sample_result(self):
         """Create a sample simulation result for testing."""
         # Create time series
-        times = pd.date_range("2025-01-01", periods=24, freq="H", tz="UTC")
+        times = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
         df = pd.DataFrame(
             {
                 "power_w": [0, 0, 0, 100, 500, 1000, 1500, 2000, 2500, 3000, 2800, 2600,
