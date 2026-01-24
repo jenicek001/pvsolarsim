@@ -153,29 +153,29 @@ class OpenWeatherMapClient(WeatherDataSource):
         self.cache.set(cache_key, df)
 
         return df
-    
+
     def _validate_openweathermap_data(self, data: pd.DataFrame) -> None:
         """Validate OpenWeatherMap data (without irradiance requirement).
-        
+
         OpenWeatherMap's free tier doesn't provide GHI/DNI/DHI, so we
         only validate basic structure and temperature/wind data.
         """
         # Validate index
         self._validate_index(data)
-        
+
         # Check for required columns (temp_air is mandatory)
         if "temp_air" not in data.columns:
             raise ValueError("Missing required column: temp_air")
-        
+
         # Validate value ranges (only for columns that exist)
         if "temp_air" in data.columns:
             if (data["temp_air"] < -60).any() or (data["temp_air"] > 60).any():
                 raise ValueError("Air temperature must be between -60 and 60 °C")
-        
+
         if "wind_speed" in data.columns:
             if (data["wind_speed"] < 0).any() or (data["wind_speed"] > 50).any():
                 raise ValueError("Wind speed must be between 0 and 50 m/s")
-        
+
         if "cloud_cover" in data.columns:
             if (data["cloud_cover"] < 0).any() or (data["cloud_cover"] > 100).any():
                 raise ValueError("Cloud cover must be between 0 and 100 %")
