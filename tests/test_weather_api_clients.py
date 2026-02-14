@@ -1,6 +1,6 @@
 """Tests for weather API clients with mocked responses.
 
-This module tests the weather API clients (OpenWeatherMap and PVGIS)
+This module tests the weather API clients (OpenWeatherMap, PVGIS, and Visual Crossing)
 using mocked HTTP responses to avoid requiring actual API keys and
 network connectivity during testing.
 """
@@ -14,7 +14,11 @@ import pytest
 import pytz
 import requests
 
-from pvsolarsim.weather.api_clients import OpenWeatherMapClient, PVGISClient
+from pvsolarsim.weather.api_clients import (
+    OpenWeatherMapClient,
+    PVGISClient,
+    VisualCrossingClient,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -471,3 +475,299 @@ class TestWeatherAPIIntegration:
             assert params["appid"] == "test_api_key_123"
             assert "lat" in params
             assert "lon" in params
+
+
+class TestVisualCrossingClient:
+    """Test Visual Crossing Weather API client."""
+
+    @pytest.fixture
+    def sample_api_response(self):
+        """Create sample API response matching Visual Crossing Timeline API format."""
+        return {
+            "queryCost": 1,
+            "latitude": 40.0,
+            "longitude": -105.0,
+            "resolvedAddress": "Boulder, CO",
+            "timezone": "America/Denver",
+            "days": [
+                {
+                    "datetime": "2024-01-01",
+                    "temp": 5.0,
+                    "tempmax": 10.0,
+                    "tempmin": 0.0,
+                    "hours": [
+                        {
+                            "datetime": "00:00:00",
+                            "temp": 2.0,
+                            "windspeed": 10.8,  # km/h
+                            "cloudcover": 20.0,
+                            "solarradiation": 0.0,
+                            "solarenergy": 0.0,
+                            "uvindex": 0,
+                        },
+                        {
+                            "datetime": "12:00:00",
+                            "temp": 8.0,
+                            "windspeed": 14.4,  # km/h
+                            "cloudcover": 30.0,
+                            "solarradiation": 600.0,  # W/m²
+                            "solarenergy": 2.16,
+                            "uvindex": 5,
+                        },
+                        {
+                            "datetime": "18:00:00",
+                            "temp": 4.0,
+                            "windspeed": 7.2,  # km/h
+                            "cloudcover": 50.0,
+                            "solarradiation": 100.0,  # W/m²
+                            "solarenergy": 0.36,
+                            "uvindex": 1,
+                        },
+                    ],
+                },
+            ],
+        }
+
+    def test_client_initialization(self):
+        """Test client initialization."""
+        client = VisualCrossingClient(api_key="test_key")
+        assert client.api_key == "test_key"
+        assert client.cache_ttl == 86400  # default
+        assert client.timeout == 60  # default
+
+    def test_client_custom_parameters(self):
+        """Test client with custom parameters."""
+        client = VisualCrossingClient(api_key="test_key", cache_ttl=3600, timeout=120)
+        assert client.cache_ttl == 3600
+        assert client.timeout == 120
+
+    def test_read_success(self, sample_api_response):
+        """Test successful data read from Visual Crossing API."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with patch.object(client.session, "get") as mock_get:
+            # Mock the API response
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = sample_api_response
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+            result = client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+
+            # Verify result is a DataFrame
+            assert isinstance(result, pd.DataFrame)
+            assert len(result) == 3  # 3 hourly records
+
+            # Verify required columns exist
+            assert "ghi" in result.columns
+            assert "dni" in result.columns
+            assert "dhi" in result.columns
+            assert "temp_air" in result.columns
+            assert "wind_speed" in result.columns
+            assert "cloud_cover" in result.columns
+
+            # Verify values are correctly parsed
+            assert result.iloc[0]["ghi"] == 0.0  # Nighttime
+            assert result.iloc[1]["ghi"] == 600.0  # Daytime
+            assert result.iloc[1]["temp_air"] == 8.0
+            assert result.iloc[1]["cloud_cover"] == 30.0
+
+            # Verify wind speed conversion from km/h to m/s
+            assert result.iloc[1]["wind_speed"] == pytest.approx(14.4 / 3.6, abs=0.01)
+
+            # Check that API was called
+            assert mock_get.called
+
+    def test_read_invalid_coordinates(self):
+        """Test that invalid coordinates raise ValueError."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+        end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+        # Invalid latitude
+        with pytest.raises(ValueError, match="Latitude must be between -90 and 90"):
+            client.read(latitude=95.0, longitude=-105.0, start=start, end=end)
+
+        # Invalid longitude
+        with pytest.raises(ValueError, match="Longitude must be between -180 and 180"):
+            client.read(latitude=40.0, longitude=-185.0, start=start, end=end)
+
+    def test_read_missing_start_end(self):
+        """Test that ValueError is raised when start or end is None."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with pytest.raises(ValueError, match="Both start and end times must be specified"):
+            client.read(latitude=40.0, longitude=-105.0, start=None, end=None)
+
+    def test_read_http_error(self):
+        """Test handling of HTTP errors."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with patch.object(client.session, "get") as mock_get:
+            # Mock HTTP error
+            mock_response = Mock()
+            mock_response.raise_for_status.side_effect = requests.HTTPError("401 Unauthorized")
+            mock_get.return_value = mock_response
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+            with pytest.raises(ValueError, match="Failed to fetch data from Visual Crossing"):
+                client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+
+    def test_read_network_error(self):
+        """Test handling of network errors."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with patch.object(client.session, "get") as mock_get:
+            # Mock network error
+            mock_get.side_effect = requests.ConnectionError("Network error")
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+            with pytest.raises(ValueError, match="Failed to fetch data from Visual Crossing"):
+                client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+
+    def test_read_invalid_response_format(self):
+        """Test handling of invalid API response format."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with patch.object(client.session, "get") as mock_get:
+            # Mock invalid response (missing 'days' field)
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {"error": "No data"}
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+            with pytest.raises(ValueError, match="Invalid Visual Crossing response format"):
+                client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+
+    def test_read_no_hourly_data(self):
+        """Test handling when response has no hourly data."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with patch.object(client.session, "get") as mock_get:
+            # Mock response with no hourly data
+            api_response = {
+                "days": [
+                    {
+                        "datetime": "2024-01-01",
+                        "temp": 5.0,
+                        # No 'hours' field
+                    }
+                ]
+            }
+
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = api_response
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+            with pytest.raises(ValueError, match="No hourly data available"):
+                client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+
+    def test_read_forecast_success(self, sample_api_response):
+        """Test successful forecast data read."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        with patch.object(client.session, "get") as mock_get:
+            # Mock forecast response
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = sample_api_response
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            result = client.read_forecast(latitude=40.0, longitude=-105.0, days=7)
+
+            # Verify result
+            assert isinstance(result, pd.DataFrame)
+            assert len(result) == 3  # 3 hourly records in mock
+            assert "ghi" in result.columns
+            assert "temp_air" in result.columns
+
+            # Check API was called
+            assert mock_get.called
+
+    def test_read_forecast_invalid_days(self):
+        """Test that invalid forecast days raise ValueError."""
+        client = VisualCrossingClient(api_key="test_key")
+
+        # Days too low
+        with pytest.raises(ValueError, match="Forecast days must be between 1 and 15"):
+            client.read_forecast(latitude=40.0, longitude=-105.0, days=0)
+
+        # Days too high
+        with pytest.raises(ValueError, match="Forecast days must be between 1 and 15"):
+            client.read_forecast(latitude=40.0, longitude=-105.0, days=16)
+
+    def test_caching(self, sample_api_response):
+        """Test that caching works correctly."""
+        client = VisualCrossingClient(api_key="test_key", cache_ttl=3600)
+
+        with patch.object(client.session, "get") as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = sample_api_response
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 1, 23, 59, 59, tzinfo=pytz.UTC)
+
+            # First call - should hit API
+            result1 = client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+            assert mock_get.call_count == 1
+
+            # Second call with same parameters - should use cache
+            result2 = client.read(latitude=40.0, longitude=-105.0, start=start, end=end)
+            assert mock_get.call_count == 1  # Should not call API again
+
+            # Results should be identical
+            pd.testing.assert_frame_equal(result1, result2)
+
+    def test_api_url_construction(self, sample_api_response):
+        """Test that API URL is constructed correctly."""
+        client = VisualCrossingClient(api_key="test_api_key_123")
+
+        with patch.object(client.session, "get") as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = sample_api_response
+            mock_response.raise_for_status = Mock()
+            mock_get.return_value = mock_response
+
+            start = datetime(2024, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)
+            end = datetime(2024, 1, 5, 23, 59, 59, tzinfo=pytz.UTC)
+
+            client.read(latitude=40.5, longitude=-105.3, start=start, end=end)
+
+            # Verify the API was called
+            assert mock_get.called
+            call_args = mock_get.call_args
+
+            # Check URL construction
+            url = call_args[0][0]
+            assert "40.5,-105.3" in url
+            assert "2024-01-01" in url
+            assert "2024-01-05" in url
+
+            # Check params
+            params = call_args[1].get("params", {})
+            assert params["key"] == "test_api_key_123"
+            assert params["unitGroup"] == "metric"
+            assert "solarradiation" in params["elements"]
