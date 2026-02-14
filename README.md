@@ -21,7 +21,7 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 - ✅ **Cell temperature modeling** with 4 validated models (Faiman, SAPM, PVsyst, Generic Linear)
 - ✅ **Instantaneous power calculation** integrating all PV modeling components
 - ✅ **Annual energy simulation** with time series and statistical analysis
-- ✅ **Weather data integration** with CSV, JSON, OpenWeatherMap, and PVGIS support
+- ✅ **Weather data integration** with CSV, JSON, OpenWeatherMap, PVGIS, and Visual Crossing support
 - ✅ **Weather data quality checks** with interpolation and gap filling
 - ✅ **Location and PV system** data models with validation
 - ✅ **High accuracy**: Solar position <0.01° error, all models validated against pvlib
@@ -43,7 +43,7 @@ PVSolarSim is a comprehensive Python library for simulating photovoltaic solar e
 - ✅ **Multiple Diffuse Models**: Isotropic, Perez (industry standard), Hay-Davies
 - ✅ **Temperature Models**: Faiman, SAPM, PVsyst, Generic Linear (all validated against pvlib)
 - ✅ **IAM Support**: ASHRAE, Physical (Fresnel), Martin-Ruiz models
-- ✅ **Weather Integration**: CSV, JSON, PVGIS, OpenWeatherMap with quality checks
+- ✅ **Weather Integration**: CSV, JSON, PVGIS, OpenWeatherMap, Visual Crossing with quality checks
 - ✅ **Vectorized Operations**: NumPy-based calculations for performance
 - ✅ **Type-Safe**: Full type hints and runtime validation
 - ✅ **Well-Tested**: 81%+ code coverage, validated against pvlib-python

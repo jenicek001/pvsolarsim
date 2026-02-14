@@ -2,6 +2,19 @@
 
 This example demonstrates how to use various weather data sources
 with the annual simulation.
+
+Supported weather data sources:
+- CSV files (custom format with column mapping)
+- JSON files
+- pandas DataFrame
+- Clear-sky models (theoretical)
+- OpenWeatherMap API (requires API key)
+- PVGIS TMY data (free, no API key)
+- Visual Crossing API (requires API key, 1000 free calls/day)
+
+For API usage examples, see:
+- weather_api_example.py (OpenWeatherMap, PVGIS)
+- visual_crossing_example.py (Visual Crossing)
 """
 
 import tempfile

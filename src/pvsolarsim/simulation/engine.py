@@ -53,7 +53,8 @@ def simulate_annual(
     interval_minutes : int, default 5
         Time interval in minutes (1-60 recommended)
     weather_source : str, default 'clear_sky'
-        Weather data source ('clear_sky', 'weather_data', 'csv', 'pvgis', 'openweathermap')
+        Weather data source ('clear_sky', 'weather_data', 'csv', 'pvgis', 
+        'openweathermap', 'visual_crossing')
     weather_data : pd.DataFrame or WeatherDataSource, optional
         Pre-loaded weather data or data source instance.
         Required if weather_source is not 'clear_sky'.
@@ -240,7 +241,8 @@ def _load_weather_data(
     Parameters
     ----------
     weather_source : str
-        Type of weather source ('weather_data', 'csv', 'pvgis', 'openweathermap')
+        Type of weather source ('weather_data', 'csv', 'pvgis', 'openweathermap', 
+        'visual_crossing')
     weather_data : pd.DataFrame or WeatherDataSource, optional
         Pre-loaded data or data source instance
     location : Location
@@ -323,10 +325,31 @@ def _load_weather_data(
             end=end,
         )
 
+    elif weather_source == "visual_crossing" or weather_source == "visualcrossing":
+        # Load from Visual Crossing API
+        from pvsolarsim.weather import VisualCrossingClient
+
+        api_key = kwargs.get("api_key")
+        if not api_key:
+            raise ValueError("api_key must be provided when weather_source='visual_crossing'")
+
+        vc_client = VisualCrossingClient(
+            api_key=api_key,
+            cache_ttl=kwargs.get("cache_ttl", 86400),
+            timeout=kwargs.get("timeout", 60),
+        )
+        return vc_client.read(
+            latitude=location.latitude,
+            longitude=location.longitude,
+            start=start,
+            end=end,
+        )
+
     else:
         raise ValueError(
             f"Unknown weather_source: '{weather_source}'. "
-            "Supported sources: 'clear_sky', 'weather_data', 'csv', 'pvgis', 'openweathermap'"
+            "Supported sources: 'clear_sky', 'weather_data', 'csv', 'pvgis', "
+            "'openweathermap', 'visual_crossing'"
         )
 
 
