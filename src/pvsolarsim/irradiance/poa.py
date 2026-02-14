@@ -199,8 +199,7 @@ class POAIrradiance:
                 iam_model = IAMModel(iam_model.lower())
             except ValueError as e:
                 raise ValueError(
-                    f"Invalid IAM model: {iam_model}. "
-                    f"Available: {[m.value for m in IAMModel]}"
+                    f"Invalid IAM model: {iam_model}. " f"Available: {[m.value for m in IAMModel]}"
                 ) from e
         self.iam_model = iam_model
 
@@ -403,9 +402,7 @@ def calculate_poa_irradiance(
     --------
     POAIrradiance : Class-based interface for repeated calculations
     """
-    calculator = POAIrradiance(
-        diffuse_model=diffuse_model, iam_model=iam_model, albedo=albedo
-    )
+    calculator = POAIrradiance(diffuse_model=diffuse_model, iam_model=iam_model, albedo=albedo)
     return calculator.calculate(
         surface_tilt=surface_tilt,
         surface_azimuth=surface_azimuth,

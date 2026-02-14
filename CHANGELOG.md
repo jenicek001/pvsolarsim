@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-01-24
+
+**Beta Release - Ready for Testing**
+
+This is the first beta release of PVSolarSim, ready for early adopters and testers.
+
+### New Features
+
+**Documentation & Examples**
+- Complete API documentation with Sphinx
+- Comprehensive user guide with installation, quick start, and core concepts
+- Advanced usage examples and tutorials
+- Mathematical background documentation
+- FAQ and troubleshooting guide
+- Contributing guidelines
+
+**Weather Integration Enhancements**
+- Improved weather data caching
+- Enhanced data interpolation and gap filling
+- Quality checks and validation
+- Better error handling for API clients
+
+**Testing & Validation**
+- Expanded test coverage to 90.62%
+- 314 comprehensive tests passing
+- Validation against pvlib-python
+- Performance benchmarks
+
+**Development Tools**
+- Pre-commit hooks configuration
+- Code quality checks (Black, Ruff, mypy)
+- GitHub Actions CI/CD improvements
+- Multi-version Python testing support
+
+### Bug Fixes
+- Fixed timezone handling in simulation results
+- Improved error messages for invalid inputs
+- Fixed edge cases in weather data interpolation
+
+### Documentation
+- Added WEATHER_DATA_GUIDE.md
+- Added WEATHER_DATA_PROVIDERS.md
+- Added MULTI_VERSION_TESTING.md
+- Updated README with badges and installation instructions
+
+### Known Issues
+- Sphinx documentation build generates some warnings (non-blocking)
+- Weather API rate limiting not yet implemented
+- Some pandas deprecation warnings in time series operations
+
 ## [0.1.0] - 2025-12-30
 
 First alpha release of PVSolarSim.

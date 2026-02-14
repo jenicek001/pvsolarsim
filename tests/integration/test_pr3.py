@@ -41,33 +41,40 @@ def main():  # noqa: C901 - Integration test demo script
     # Panel specifications
     # 16x München Energieprodukte MSMD450M6-72 M6
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'efficiency': 0.2037,  # 20.37%
-        'temp_coeff_pmax': -0.0035,  # -0.35%/°C
-        'noct': 42,  # °C (±2°C)
-        'area_m2': 2.108 * 1.048,  # 2.209 m²
+        "count": 16,
+        "power_wp": 450,
+        "efficiency": 0.2037,  # 20.37%
+        "temp_coeff_pmax": -0.0035,  # -0.35%/°C
+        "noct": 42,  # °C (±2°C)
+        "area_m2": 2.108 * 1.048,  # 2.209 m²
     }
 
     # 18x Canadian Solar HiKu CS3L-380MS
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'efficiency': 0.205,  # ~20.5%
-        'temp_coeff_pmax': -0.0037,  # -0.37%/°C
-        'noct': 42,  # °C (±3°C)
-        'area_m2': 1.765 * 1.048,  # 1.850 m²
+        "count": 18,
+        "power_wp": 380,
+        "efficiency": 0.205,  # ~20.5%
+        "temp_coeff_pmax": -0.0037,  # -0.37%/°C
+        "noct": 42,  # °C (±3°C)
+        "area_m2": 1.765 * 1.048,  # 1.850 m²
     }
 
     # Total system
-    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
-                      canadian_panels['count'] * canadian_panels['power_wp'])
-    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
-                     canadian_panels['count'] * canadian_panels['area_m2'])
+    total_power_wp = (
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
+    )
+    total_area_m2 = (
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
+    )
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
-    weighted_temp_coeff = ((munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff_pmax'] +
-                           canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff_pmax']) /
-                          total_power_wp)
+    weighted_temp_coeff = (
+        munchen_panels["count"] * munchen_panels["power_wp"] * munchen_panels["temp_coeff_pmax"]
+        + canadian_panels["count"]
+        * canadian_panels["power_wp"]
+        * canadian_panels["temp_coeff_pmax"]
+    ) / total_power_wp
 
     print(f"Location: {latitude}°N, {longitude}°E")
     print(f"Altitude: {altitude}m")
@@ -104,16 +111,20 @@ def main():  # noqa: C901 - Integration test demo script
         print("-" * 80)
         print(f"{scenario['name']}")
         print("-" * 80)
-        print(f"{'Time':>6} | {'Sol El':>6} | {'POA':>8} | {'T_amb':>6} | {'Wind':>6} | "
-              f"{'T_cell':>7} | {'Temp':>6} | {'DC Power':>9}")
-        print(f"{'':>6} | {'(deg)':>6} | {'(W/m²)':>8} | {'(°C)':>6} | {'(m/s)':>6} | "
-              f"{'(°C)':>7} | {'Factor':>6} | {'(kW)':>9}")
+        print(
+            f"{'Time':>6} | {'Sol El':>6} | {'POA':>8} | {'T_amb':>6} | {'Wind':>6} | "
+            f"{'T_cell':>7} | {'Temp':>6} | {'DC Power':>9}"
+        )
+        print(
+            f"{'':>6} | {'(deg)':>6} | {'(W/m²)':>8} | {'(°C)':>6} | {'(m/s)':>6} | "
+            f"{'(°C)':>7} | {'Factor':>6} | {'(kW)':>9}"
+        )
         print("-" * 80)
 
-        for i, hour in enumerate(scenario['hours']):
-            timestamp = scenario['date'].replace(hour=hour, minute=0, second=0)
-            ambient_temp = scenario['ambient_temps'][i]
-            wind_speed = scenario['wind_speeds'][i]
+        for i, hour in enumerate(scenario["hours"]):
+            timestamp = scenario["date"].replace(hour=hour, minute=0, second=0)
+            ambient_temp = scenario["ambient_temps"][i]
+            wind_speed = scenario["wind_speeds"][i]
 
             # Calculate solar position
             position = calculate_solar_position(
@@ -186,18 +197,18 @@ def main():  # noqa: C901 - Integration test demo script
 
     for scenario in scenarios:
         noon_hour = 12
-        noon = scenario['date'].replace(hour=noon_hour, minute=0, second=0)
+        noon = scenario["date"].replace(hour=noon_hour, minute=0, second=0)
 
         # Find index for noon hour
         try:
-            noon_idx = scenario['hours'].index(noon_hour)
-            ambient_temp = scenario['ambient_temps'][noon_idx]
-            wind_speed = scenario['wind_speeds'][noon_idx]
+            noon_idx = scenario["hours"].index(noon_hour)
+            ambient_temp = scenario["ambient_temps"][noon_idx]
+            wind_speed = scenario["wind_speeds"][noon_idx]
         except ValueError:
             # Use closest hour for summer
-            noon_idx = len(scenario['hours']) // 2
-            ambient_temp = scenario['ambient_temps'][noon_idx]
-            wind_speed = scenario['wind_speeds'][noon_idx]
+            noon_idx = len(scenario["hours"]) // 2
+            ambient_temp = scenario["ambient_temps"][noon_idx]
+            wind_speed = scenario["wind_speeds"][noon_idx]
 
         # Calculate conditions
         position = calculate_solar_position(
@@ -246,8 +257,10 @@ def main():  # noqa: C901 - Integration test demo script
             ("PVsyst", "pvsyst"),
         ]
 
-        print(f"{'Model':>15} | {'Cell Temp':>10} | {'Temp Rise':>10} | "
-              f"{'Correction':>11} | {'DC Power':>9}")
+        print(
+            f"{'Model':>15} | {'Cell Temp':>10} | {'Temp Rise':>10} | "
+            f"{'Correction':>11} | {'DC Power':>9}"
+        )
         print(f"{'':>15} | {'(°C)':>10} | {'(°C)':>10} | {'Factor':>11} | {'(kW)':>9}")
         print("-" * 80)
 
@@ -324,8 +337,10 @@ def main():  # noqa: C901 - Integration test demo script
     print()
     print(f"Conditions: POA={poa.poa_global:.0f} W/m², T_ambient=30°C")
     print()
-    print(f"{'Wind Speed':>11} | {'Cell Temp':>10} | {'Cooling':>8} | "
-          f"{'Temp Factor':>12} | {'DC Power':>9} | {'Power Gain':>11}")
+    print(
+        f"{'Wind Speed':>11} | {'Cell Temp':>10} | {'Cooling':>8} | "
+        f"{'Temp Factor':>12} | {'DC Power':>9} | {'Power Gain':>11}"
+    )
     print(f"{'(m/s)':>11} | {'(°C)':>10} | {'(°C)':>8} | {'':>12} | {'(kW)':>9} | {'vs 0 m/s':>11}")
     print("-" * 80)
 
@@ -471,10 +486,14 @@ def main():  # noqa: C901 - Integration test demo script
     power_pr3_s = power_pr2_s * temp_correction_s
 
     print()
-    print(f"{'Scenario':>20} | {'POA':>8} | {'T_amb':>6} | {'T_cell':>7} | "
-          f"{'PR#2':>9} | {'PR#3':>9} | {'Difference':>11}")
-    print(f"{'':>20} | {'(W/m²)':>8} | {'(°C)':>6} | {'(°C)':>7} | "
-          f"{'Power':>9} | {'Power':>9} | {'':>11}")
+    print(
+        f"{'Scenario':>20} | {'POA':>8} | {'T_amb':>6} | {'T_cell':>7} | "
+        f"{'PR#2':>9} | {'PR#3':>9} | {'Difference':>11}"
+    )
+    print(
+        f"{'':>20} | {'(W/m²)':>8} | {'(°C)':>6} | {'(°C)':>7} | "
+        f"{'Power':>9} | {'Power':>9} | {'':>11}"
+    )
     print("-" * 80)
 
     print(

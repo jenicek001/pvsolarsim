@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 import pytz
 
 # Ensure pvsolarsim is in the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from pvsolarsim import Location, PVSystem, simulate_annual
 from pvsolarsim.weather import OpenWeatherMapClient, PVGISClient
@@ -38,9 +38,7 @@ def example_1_openweathermap_basic():
 
     # Create OpenWeatherMap client
     client = OpenWeatherMapClient(
-        api_key=api_key,
-        cache_ttl=3600,  # Cache for 1 hour
-        timeout=30  # 30 second timeout
+        api_key=api_key, cache_ttl=3600, timeout=30  # Cache for 1 hour  # 30 second timeout
     )
 
     # Define location
@@ -52,24 +50,19 @@ def example_1_openweathermap_basic():
     end = datetime.now(pytz.UTC)
     start = end - timedelta(hours=48)
 
-    print(f"Fetching weather data from OpenWeatherMap...")
+    print("Fetching weather data from OpenWeatherMap...")
     print(f"Location: {latitude}°N, {longitude}°W")
     print(f"Time range: {start} to {end}\n")
 
     try:
-        weather_data = client.read(
-            latitude=latitude,
-            longitude=longitude,
-            start=start,
-            end=end
-        )
+        weather_data = client.read(latitude=latitude, longitude=longitude, start=start, end=end)
 
         print("✅ Weather data fetched successfully!")
         print(f"Data points: {len(weather_data)}")
         print(f"Columns: {list(weather_data.columns)}")
-        print(f"\nSample data:")
+        print("\nSample data:")
         print(weather_data.head())
-        print(f"\nData summary:")
+        print("\nData summary:")
         print(weather_data.describe())
 
         # Note about limitations
@@ -95,16 +88,16 @@ def example_2_pvgis_tmy():
     # Create PVGIS client (no API key required - it's a free service!)
     client = PVGISClient(
         cache_ttl=604800,  # Cache for 7 days (TMY data doesn't change often)
-        timeout=60  # PVGIS can be slower, allow 60 seconds
+        timeout=60,  # PVGIS can be slower, allow 60 seconds
     )
 
     # Define location (Prague, Czech Republic)
     latitude = 50.0
     longitude = 14.4
 
-    print(f"Fetching TMY data from PVGIS...")
+    print("Fetching TMY data from PVGIS...")
     print(f"Location: {latitude}°N, {longitude}°E")
-    print(f"Data type: Typical Meteorological Year (synthesized from historical data)\n")
+    print("Data type: Typical Meteorological Year (synthesized from historical data)\n")
 
     try:
         tmy_data = client.read_tmy(latitude=latitude, longitude=longitude)
@@ -112,9 +105,9 @@ def example_2_pvgis_tmy():
         print("✅ TMY data fetched successfully!")
         print(f"Data points: {len(tmy_data)}")
         print(f"Columns: {list(tmy_data.columns)}")
-        print(f"\nSample data:")
+        print("\nSample data:")
         print(tmy_data.head())
-        print(f"\nData summary:")
+        print("\nData summary:")
         print(tmy_data.describe())
 
         # Analyze the data
@@ -126,8 +119,8 @@ def example_2_pvgis_tmy():
 
         # Monthly statistics
         print("\n📅 Monthly Average GHI:")
-        if hasattr(tmy_data.index, 'month'):
-            monthly_ghi = tmy_data.groupby(tmy_data.index.month)['ghi'].mean()
+        if hasattr(tmy_data.index, "month"):
+            monthly_ghi = tmy_data.groupby(tmy_data.index.month)["ghi"].mean()
             for month, ghi in monthly_ghi.items():
                 month_name = datetime(2000, month, 1).strftime("%B")
                 print(f"   {month_name:12s}: {ghi:6.2f} W/m²")
@@ -147,19 +140,14 @@ def example_3_simulation_with_pvgis():
     print("=" * 80 + "\n")
 
     # Define location and system
-    location = Location(
-        latitude=40.0,
-        longitude=-105.0,
-        altitude=1655,
-        timezone="America/Denver"
-    )
+    location = Location(latitude=40.0, longitude=-105.0, altitude=1655, timezone="America/Denver")
 
     system = PVSystem(
         panel_area=20.0,  # 20 m²
         panel_efficiency=0.20,  # 20%
         tilt=35,  # Tilted 35° from horizontal
         azimuth=180,  # South-facing
-        temp_coefficient=-0.004  # -0.4%/°C
+        temp_coefficient=-0.004,  # -0.4%/°C
     )
 
     print("Location: Boulder, CO (40°N, 105°W)")
@@ -177,7 +165,7 @@ def example_3_simulation_with_pvgis():
             interval_minutes=60,  # Hourly data
             weather_source="pvgis",  # Use PVGIS TMY data
             soiling_factor=0.98,  # 2% soiling losses
-            inverter_efficiency=0.96  # 96% inverter efficiency
+            inverter_efficiency=0.96,  # 96% inverter efficiency
         )
 
         print("✅ Simulation completed successfully!\n")
@@ -228,17 +216,13 @@ def example_4_compare_weather_sources():
             weather_source="clear_sky",
             ambient_temp=15,
             wind_speed=2,
-            cloud_cover=0  # Perfect clear sky
+            cloud_cover=0,  # Perfect clear sky
         )
 
         # Scenario 2: PVGIS TMY
         print("Running PVGIS TMY simulation...")
         results_pvgis = simulate_annual(
-            location=location,
-            system=system,
-            year=2025,
-            interval_minutes=60,
-            weather_source="pvgis"
+            location=location, system=system, year=2025, interval_minutes=60, weather_source="pvgis"
         )
 
         print("\n✅ Both simulations completed!\n")
@@ -248,15 +232,19 @@ def example_4_compare_weather_sources():
 
         energy_cs = results_clearsky.statistics.total_energy_kwh
         energy_pv = results_pvgis.statistics.total_energy_kwh
-        diff_energy = ((energy_pv - energy_cs) / energy_cs * 100)
+        diff_energy = (energy_pv - energy_cs) / energy_cs * 100
 
         cf_cs = results_clearsky.statistics.capacity_factor * 100
         cf_pv = results_pvgis.statistics.capacity_factor * 100
         diff_cf = cf_pv - cf_cs
 
-        print(f"{'Annual Energy (kWh)':<25} {energy_cs:>12.1f} {energy_pv:>12.1f} {diff_energy:>11.1f}%")
+        print(
+            f"{'Annual Energy (kWh)':<25} {energy_cs:>12.1f} {energy_pv:>12.1f} {diff_energy:>11.1f}%"
+        )
         print(f"{'Capacity Factor (%)':<25} {cf_cs:>12.2f} {cf_pv:>12.2f} {diff_cf:>11.2f}%")
-        print(f"{'Peak Power (W)':<25} {results_clearsky.statistics.peak_power_w:>12.1f} {results_pvgis.statistics.peak_power_w:>12.1f}")
+        print(
+            f"{'Peak Power (W)':<25} {results_clearsky.statistics.peak_power_w:>12.1f} {results_pvgis.statistics.peak_power_w:>12.1f}"
+        )
 
         print("\n💡 Interpretation:")
         if energy_pv < energy_cs:

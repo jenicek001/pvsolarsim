@@ -178,9 +178,7 @@ def detect_gaps(data: pd.DataFrame, expected_freq: Optional[str] = None) -> pd.D
     if expected_freq is None:
         inferred_freq = pd.infer_freq(data.index)
         if inferred_freq is None:
-            raise ValueError(
-                "Could not infer frequency. Please provide expected_freq parameter."
-            )
+            raise ValueError("Could not infer frequency. Please provide expected_freq parameter.")
         expected_freq = inferred_freq
 
     # Normalize frequency format (e.g., 'h' -> '1h')
@@ -216,8 +214,7 @@ def detect_gaps(data: pd.DataFrame, expected_freq: Optional[str] = None) -> pd.D
                     "gap_start": gap_start,
                     "gap_end": gap_end,
                     "gap_duration": gap_end - gap_start + pd.Timedelta(expected_freq),
-                    "missing_points": int((gap_end - gap_start) / pd.Timedelta(expected_freq))
-                    + 1,
+                    "missing_points": int((gap_end - gap_start) / pd.Timedelta(expected_freq)) + 1,
                 }
             )
             gap_start = missing_times[i]
@@ -280,9 +277,7 @@ def fill_gaps(
     if expected_freq is None:
         expected_freq = pd.infer_freq(data.index)
         if expected_freq is None:
-            raise ValueError(
-                "Could not infer frequency. Please provide expected_freq parameter."
-            )
+            raise ValueError("Could not infer frequency. Please provide expected_freq parameter.")
 
     # Normalize frequency format (e.g., 'h' -> '1h')
     if expected_freq and not any(char.isdigit() for char in expected_freq):

@@ -28,14 +28,64 @@ class TestLoadWeatherData:
         # Create a simple CSV file
         csv_file = tmp_path / "weather.csv"
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        weather_data = pd.DataFrame({
-            "timestamp": timestamps,
-            "ghi": [0, 0, 0, 100, 300, 500, 700, 800, 900, 950, 1000, 1000,
-                    1000, 950, 900, 800, 700, 500, 300, 100, 0, 0, 0, 0],
-            "temp_air": [15, 14, 13, 14, 16, 18, 20, 22, 24, 26, 28, 29,
-                         30, 29, 28, 26, 24, 22, 20, 18, 16, 15, 14, 14],
-            "wind_speed": [2] * 24,
-        })
+        weather_data = pd.DataFrame(
+            {
+                "timestamp": timestamps,
+                "ghi": [
+                    0,
+                    0,
+                    0,
+                    100,
+                    300,
+                    500,
+                    700,
+                    800,
+                    900,
+                    950,
+                    1000,
+                    1000,
+                    1000,
+                    950,
+                    900,
+                    800,
+                    700,
+                    500,
+                    300,
+                    100,
+                    0,
+                    0,
+                    0,
+                    0,
+                ],
+                "temp_air": [
+                    15,
+                    14,
+                    13,
+                    14,
+                    16,
+                    18,
+                    20,
+                    22,
+                    24,
+                    26,
+                    28,
+                    29,
+                    30,
+                    29,
+                    28,
+                    26,
+                    24,
+                    22,
+                    20,
+                    18,
+                    16,
+                    15,
+                    14,
+                    14,
+                ],
+                "wind_speed": [2] * 24,
+            }
+        )
         weather_data.to_csv(csv_file, index=False)
 
         # Load weather data
@@ -61,12 +111,14 @@ class TestLoadWeatherData:
         # Create a simple CSV file
         csv_file = tmp_path / "weather.csv"
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        weather_data = pd.DataFrame({
-            "timestamp": timestamps,
-            "ghi": [500] * 24,
-            "temp_air": [25] * 24,
-            "wind_speed": [3] * 24,
-        })
+        weather_data = pd.DataFrame(
+            {
+                "timestamp": timestamps,
+                "ghi": [500] * 24,
+                "temp_air": [25] * 24,
+                "wind_speed": [3] * 24,
+            }
+        )
         weather_data.to_csv(csv_file, index=False)
 
         # Load weather data using filepath instead of file_path
@@ -104,12 +156,14 @@ class TestLoadWeatherData:
         # Create CSV with different column names
         csv_file = tmp_path / "weather_custom.csv"
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        weather_data = pd.DataFrame({
-            "time": timestamps,
-            "irradiance": [500] * 24,
-            "temperature": [25] * 24,
-            "wind": [3] * 24,
-        })
+        weather_data = pd.DataFrame(
+            {
+                "time": timestamps,
+                "irradiance": [500] * 24,
+                "temperature": [25] * 24,
+                "wind": [3] * 24,
+            }
+        )
         weather_data.to_csv(csv_file, index=False)
 
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
@@ -140,11 +194,13 @@ class TestLoadWeatherData:
         # Create CSV file
         csv_file = tmp_path / "weather.csv"
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        weather_data_df = pd.DataFrame({
-            "timestamp": timestamps,
-            "ghi": [500] * 24,
-            "temp_air": [25] * 24,
-        })
+        weather_data_df = pd.DataFrame(
+            {
+                "timestamp": timestamps,
+                "ghi": [500] * 24,
+                "temp_air": [25] * 24,
+            }
+        )
         weather_data_df.to_csv(csv_file, index=False)
 
         # Create a WeatherDataSource instance
@@ -168,11 +224,14 @@ class TestLoadWeatherData:
         """Test loading weather data from DataFrame directly."""
         # Create DataFrame
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        weather_df = pd.DataFrame({
-            "ghi": [500] * 24,
-            "temp_air": [25] * 24,
-            "wind_speed": [3] * 24,
-        }, index=timestamps)
+        weather_df = pd.DataFrame(
+            {
+                "ghi": [500] * 24,
+                "temp_air": [25] * 24,
+                "wind_speed": [3] * 24,
+            },
+            index=timestamps,
+        )
 
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
         end = pytz.UTC.localize(datetime(2025, 1, 1, 23, 59))
@@ -231,18 +290,21 @@ class TestLoadWeatherData:
                 end=end,
             )
 
-    @patch('pvsolarsim.weather.api_clients.PVGISClient.read_tmy')
+    @patch("pvsolarsim.weather.api_clients.PVGISClient.read_tmy")
     def test_load_weather_pvgis(self, mock_read_tmy, sample_location):
         """Test loading weather data from PVGIS."""
         # Mock the PVGIS response
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        mock_df = pd.DataFrame({
-            "ghi": [500] * 24,
-            "dni": [700] * 24,
-            "dhi": [100] * 24,
-            "temp_air": [25] * 24,
-            "wind_speed": [3] * 24,
-        }, index=timestamps)
+        mock_df = pd.DataFrame(
+            {
+                "ghi": [500] * 24,
+                "dni": [700] * 24,
+                "dhi": [100] * 24,
+                "temp_air": [25] * 24,
+                "wind_speed": [3] * 24,
+            },
+            index=timestamps,
+        )
         mock_read_tmy.return_value = mock_df
 
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
@@ -263,14 +325,17 @@ class TestLoadWeatherData:
             longitude=sample_location.longitude,
         )
 
-    @patch('pvsolarsim.weather.api_clients.PVGISClient.read_tmy')
+    @patch("pvsolarsim.weather.api_clients.PVGISClient.read_tmy")
     def test_load_weather_pvgis_custom_parameters(self, mock_read_tmy, sample_location):
         """Test loading weather data from PVGIS with custom parameters."""
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        mock_df = pd.DataFrame({
-            "ghi": [500] * 24,
-            "temp_air": [25] * 24,
-        }, index=timestamps)
+        mock_df = pd.DataFrame(
+            {
+                "ghi": [500] * 24,
+                "temp_air": [25] * 24,
+            },
+            index=timestamps,
+        )
         mock_read_tmy.return_value = mock_df
 
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
@@ -289,16 +354,19 @@ class TestLoadWeatherData:
         assert isinstance(df, pd.DataFrame)
         mock_read_tmy.assert_called_once()
 
-    @patch('pvsolarsim.weather.api_clients.OpenWeatherMapClient.read')
+    @patch("pvsolarsim.weather.api_clients.OpenWeatherMapClient.read")
     def test_load_weather_openweathermap_with_api_key(self, mock_read, sample_location):
         """Test loading weather data from OpenWeatherMap with API key."""
         # Mock the OpenWeatherMap response
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        mock_df = pd.DataFrame({
-            "temp_air": [25] * 24,
-            "wind_speed": [3] * 24,
-            "cloud_cover": [20] * 24,
-        }, index=timestamps)
+        mock_df = pd.DataFrame(
+            {
+                "temp_air": [25] * 24,
+                "wind_speed": [3] * 24,
+                "cloud_cover": [20] * 24,
+            },
+            index=timestamps,
+        )
         mock_read.return_value = mock_df
 
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
@@ -322,14 +390,17 @@ class TestLoadWeatherData:
             end=end,
         )
 
-    @patch('pvsolarsim.weather.api_clients.OpenWeatherMapClient.read')
+    @patch("pvsolarsim.weather.api_clients.OpenWeatherMapClient.read")
     def test_load_weather_openweathermap_custom_parameters(self, mock_read, sample_location):
         """Test loading weather data from OpenWeatherMap with custom cache/timeout."""
         timestamps = pd.date_range("2025-01-01", periods=24, freq="h", tz="UTC")
-        mock_df = pd.DataFrame({
-            "temp_air": [25] * 24,
-            "wind_speed": [3] * 24,
-        }, index=timestamps)
+        mock_df = pd.DataFrame(
+            {
+                "temp_air": [25] * 24,
+                "wind_speed": [3] * 24,
+            },
+            index=timestamps,
+        )
         mock_read.return_value = mock_df
 
         start = pytz.UTC.localize(datetime(2025, 1, 1, 0, 0))
@@ -348,4 +419,3 @@ class TestLoadWeatherData:
 
         assert isinstance(df, pd.DataFrame)
         mock_read.assert_called_once()
-

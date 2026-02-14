@@ -190,7 +190,9 @@ def simulate_annual(
             {
                 "timestamp": timestamp,
                 "power_w": result.power_w,
-                "power_ac_w": result.power_ac_w if result.power_ac_w is not None else result.power_w,
+                "power_ac_w": (
+                    result.power_ac_w if result.power_ac_w is not None else result.power_w
+                ),
                 "poa_irradiance": result.poa_irradiance,
                 "cell_temperature": result.cell_temperature,
                 "ghi": result.ghi,
@@ -372,9 +374,7 @@ def _calculate_statistics(
     # PR = Actual Energy / Ideal Energy (at STC irradiance)
     # For clear sky, use total POA irradiance as reference
     total_poa_energy = (df["poa_irradiance"] * interval_hours).sum()
-    ideal_energy_kwh = (
-        total_poa_energy * system.panel_area * system.panel_efficiency / 1000.0
-    )
+    ideal_energy_kwh = total_poa_energy * system.panel_area * system.panel_efficiency / 1000.0
     performance_ratio = total_energy_kwh / ideal_energy_kwh if ideal_energy_kwh > 0 else 0.0
 
     # Monthly aggregation

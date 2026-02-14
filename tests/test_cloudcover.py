@@ -88,9 +88,7 @@ class TestCloudModels:
 
     def test_model_string_input(self):
         """Test that model can be specified as string."""
-        factor1 = calculate_cloud_attenuation(
-            50, 45.0, model=CloudCoverModel.CAMPBELL_NORMAN
-        )
+        factor1 = calculate_cloud_attenuation(50, 45.0, model=CloudCoverModel.CAMPBELL_NORMAN)
         factor2 = calculate_cloud_attenuation(50, 45.0, model="campbell_norman")
         assert factor1 == pytest.approx(factor2, abs=0.001)
 
@@ -127,9 +125,7 @@ class TestApplyCloudCover:
 
     def test_no_clouds_no_change(self):
         """Test that 0% cloud cover doesn't change irradiance much."""
-        result = apply_cloud_cover(
-            ghi=800, dni=700, dhi=150, cloud_cover=0, solar_elevation=45.0
-        )
+        result = apply_cloud_cover(ghi=800, dni=700, dhi=150, cloud_cover=0, solar_elevation=45.0)
 
         # With no clouds, DNI and DHI should be very close to input
         # GHI is recalculated from DNI*cos(zenith) + DHI so might differ slightly
@@ -139,9 +135,7 @@ class TestApplyCloudCover:
 
     def test_full_clouds_reduces_irradiance(self):
         """Test that 100% cloud cover significantly reduces irradiance."""
-        result = apply_cloud_cover(
-            ghi=800, dni=700, dhi=150, cloud_cover=100, solar_elevation=45.0
-        )
+        result = apply_cloud_cover(ghi=800, dni=700, dhi=150, cloud_cover=100, solar_elevation=45.0)
 
         # Should significantly reduce DNI and GHI
         assert result.dni < 700 * 0.5
@@ -151,9 +145,7 @@ class TestApplyCloudCover:
 
     def test_partial_clouds(self):
         """Test partial cloud cover."""
-        result = apply_cloud_cover(
-            ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0
-        )
+        result = apply_cloud_cover(ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0)
 
         assert 0 < result.dni < 700
         assert 0 < result.ghi < 800
@@ -176,9 +168,7 @@ class TestApplyCloudCover:
 
     def test_percentage_input(self):
         """Test that percentage cloud cover (0-100) works."""
-        result1 = apply_cloud_cover(
-            ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0
-        )
+        result1 = apply_cloud_cover(ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0)
         result2 = apply_cloud_cover(
             ghi=800, dni=700, dhi=150, cloud_cover=0.5, solar_elevation=45.0
         )
@@ -210,27 +200,21 @@ class TestApplyCloudCover:
 
     def test_low_elevation(self):
         """Test cloud cover at low solar elevation."""
-        result = apply_cloud_cover(
-            ghi=300, dni=250, dhi=100, cloud_cover=50, solar_elevation=15.0
-        )
+        result = apply_cloud_cover(ghi=300, dni=250, dhi=100, cloud_cover=50, solar_elevation=15.0)
 
         assert 0 < result.ghi < 300
         assert 0 < result.dni < 250
 
     def test_high_elevation(self):
         """Test cloud cover at high solar elevation."""
-        result = apply_cloud_cover(
-            ghi=900, dni=800, dhi=150, cloud_cover=50, solar_elevation=75.0
-        )
+        result = apply_cloud_cover(ghi=900, dni=800, dhi=150, cloud_cover=50, solar_elevation=75.0)
 
         assert 0 < result.ghi < 900
         assert 0 < result.dni < 800
 
     def test_dataclass_attributes(self):
         """Test CloudAdjustedIrradiance dataclass."""
-        result = apply_cloud_cover(
-            ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0
-        )
+        result = apply_cloud_cover(ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0)
 
         assert isinstance(result, CloudAdjustedIrradiance)
         assert hasattr(result, "ghi")
@@ -244,9 +228,7 @@ class TestEdgeCases:
 
     def test_zero_irradiance(self):
         """Test with zero irradiance (nighttime)."""
-        result = apply_cloud_cover(
-            ghi=0, dni=0, dhi=0, cloud_cover=50, solar_elevation=0
-        )
+        result = apply_cloud_cover(ghi=0, dni=0, dhi=0, cloud_cover=50, solar_elevation=0)
 
         assert result.ghi == 0
         assert result.dni == 0
@@ -263,9 +245,7 @@ class TestEdgeCases:
         ghi = np.array([800, 900, 1000])
         dni = np.array([700, 800, 900])
         dhi = np.array([150, 160, 170])
-        result = apply_cloud_cover(
-            ghi=ghi, dni=dni, dhi=dhi, cloud_cover=50, solar_elevation=45.0
-        )
+        result = apply_cloud_cover(ghi=ghi, dni=dni, dhi=dhi, cloud_cover=50, solar_elevation=45.0)
 
         assert isinstance(result.ghi, np.ndarray)
         assert len(result.ghi) == 3
@@ -274,9 +254,7 @@ class TestEdgeCases:
 
     def test_scalar_output(self):
         """Test that scalar inputs produce scalar outputs."""
-        result = apply_cloud_cover(
-            ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0
-        )
+        result = apply_cloud_cover(ghi=800, dni=700, dhi=150, cloud_cover=50, solar_elevation=45.0)
 
         assert isinstance(result.ghi, float)
         assert isinstance(result.dni, float)

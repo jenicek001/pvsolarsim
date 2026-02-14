@@ -180,9 +180,7 @@ class OpenWeatherMapClient(WeatherDataSource):
             if (data["cloud_cover"] < 0).any() or (data["cloud_cover"] > 100).any():
                 raise ValueError("Cloud cover must be between 0 and 100 %")
 
-    def _parse_response(
-        self, data: dict, start: datetime, end: datetime
-    ) -> pd.DataFrame:
+    def _parse_response(self, data: dict, start: datetime, end: datetime) -> pd.DataFrame:
         """Parse OpenWeatherMap API response.
 
         Parameters

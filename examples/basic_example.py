@@ -23,9 +23,7 @@ def main():
     print()
 
     # Define location (Prague, Czech Republic)
-    location = Location(
-        latitude=49.8, longitude=15.5, altitude=300, timezone="Europe/Prague"
-    )
+    location = Location(latitude=49.8, longitude=15.5, altitude=300, timezone="Europe/Prague")
 
     print(f"Location: {location.latitude}°N, {location.longitude}°E")
     print(f"Altitude: {location.altitude}m")
@@ -57,8 +55,7 @@ def main():
         f"{'GHI':>8} | {'DNI':>8} | {'DHI':>8}"
     )
     print(
-        f"{'':>6} | {'(deg)':>8} | {'(deg)':>9} | "
-        f"{'(W/m²)':>8} | {'(W/m²)':>8} | {'(W/m²)':>8}"
+        f"{'':>6} | {'(deg)':>8} | {'(deg)':>9} | " f"{'(W/m²)':>8} | {'(W/m²)':>8} | {'(W/m²)':>8}"
     )
     print("-" * 80)
 

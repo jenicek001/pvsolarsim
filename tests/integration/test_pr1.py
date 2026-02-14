@@ -30,56 +30,67 @@ def main():
     # Panel specifications
     # 16x München Energieprodukte MSMD450M6-72 M6
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'efficiency': 0.2037,  # 20.37%
-        'temp_coeff_pmax': -0.0035,  # -0.35%/°C
-        'temp_coeff_voc': -0.00304,  # -0.304%/°C
-        'temp_coeff_isc': 0.0005,  # 0.05%/°C
-        'area_m2': 2.108 * 1.048,  # 2.209 m²
-        'noct': 42,  # °C (±2°C)
-        'cell_type': 'Monocrystalline half-cut',
-        'cells': 144
+        "count": 16,
+        "power_wp": 450,
+        "efficiency": 0.2037,  # 20.37%
+        "temp_coeff_pmax": -0.0035,  # -0.35%/°C
+        "temp_coeff_voc": -0.00304,  # -0.304%/°C
+        "temp_coeff_isc": 0.0005,  # 0.05%/°C
+        "area_m2": 2.108 * 1.048,  # 2.209 m²
+        "noct": 42,  # °C (±2°C)
+        "cell_type": "Monocrystalline half-cut",
+        "cells": 144,
     }
 
     # 18x Canadian Solar HiKu CS3L-380MS
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'efficiency': 0.205,  # ~20.5% (estimated from power/area)
-        'temp_coeff_pmax': -0.0037,  # -0.37%/°C (typical for PERC)
-        'temp_coeff_voc': -0.0028,  # -0.28%/°C (typical)
-        'temp_coeff_isc': 0.0005,  # 0.05%/°C (typical)
-        'area_m2': 1.765 * 1.048,  # 1.850 m²
-        'noct': 42,  # °C (±3°C, typical for HiKu series)
-        'vmp': 34.5,  # V
-        'imp': 11.02,  # A
-        'voc': 41.2,  # V
-        'isc': 11.68,  # A
-        'cell_type': 'Monocrystalline PERC',
-        'cells': 120
+        "count": 18,
+        "power_wp": 380,
+        "efficiency": 0.205,  # ~20.5% (estimated from power/area)
+        "temp_coeff_pmax": -0.0037,  # -0.37%/°C (typical for PERC)
+        "temp_coeff_voc": -0.0028,  # -0.28%/°C (typical)
+        "temp_coeff_isc": 0.0005,  # 0.05%/°C (typical)
+        "area_m2": 1.765 * 1.048,  # 1.850 m²
+        "noct": 42,  # °C (±3°C, typical for HiKu series)
+        "vmp": 34.5,  # V
+        "imp": 11.02,  # A
+        "voc": 41.2,  # V
+        "isc": 11.68,  # A
+        "cell_type": "Monocrystalline PERC",
+        "cells": 120,
     }
 
     # Total system
-    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
-                      canadian_panels['count'] * canadian_panels['power_wp'])
-    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
-                     canadian_panels['count'] * canadian_panels['area_m2'])
+    total_power_wp = (
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
+    )
+    total_area_m2 = (
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
+    )
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
-    weighted_temp_coeff = ((munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff_pmax'] +
-                           canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff_pmax']) /
-                          total_power_wp)
+    weighted_temp_coeff = (
+        munchen_panels["count"] * munchen_panels["power_wp"] * munchen_panels["temp_coeff_pmax"]
+        + canadian_panels["count"]
+        * canadian_panels["power_wp"]
+        * canadian_panels["temp_coeff_pmax"]
+    ) / total_power_wp
 
     print(f"Location: {latitude}°N, {longitude}°E")
     print(f"Altitude: {altitude}m")
     print()
     print("PV System Configuration:")
     print(f"  Orientation: Tilt {tilt}°, Azimuth {azimuth}° (SSW)")
-    print(f"  Panel Type 1: {munchen_panels['count']}x München MSMD450M6-72 @ {munchen_panels['power_wp']}W")
+    print(
+        f"  Panel Type 1: {munchen_panels['count']}x München MSMD450M6-72 @ {munchen_panels['power_wp']}W"
+    )
     print(f"    - Total: {munchen_panels['count'] * munchen_panels['power_wp']/1000:.1f} kWp")
     print(f"    - Efficiency: {munchen_panels['efficiency']*100:.2f}%")
     print(f"    - Temp coeff: {munchen_panels['temp_coeff_pmax']*100:.2f}%/°C")
-    print(f"  Panel Type 2: {canadian_panels['count']}x Canadian Solar CS3L-380MS @ {canadian_panels['power_wp']}W")
+    print(
+        f"  Panel Type 2: {canadian_panels['count']}x Canadian Solar CS3L-380MS @ {canadian_panels['power_wp']}W"
+    )
     print(f"    - Total: {canadian_panels['count'] * canadian_panels['power_wp']/1000:.1f} kWp")
     print(f"    - Efficiency: {canadian_panels['efficiency']*100:.2f}%")
     print(f"    - Temp coeff: {canadian_panels['temp_coeff_pmax']*100:.2f}%/°C")
@@ -98,10 +109,13 @@ def main():
     print("-" * 80)
     print("Solar Position and Irradiance - December 25, 2025 (Prague timezone)")
     print("-" * 80)
-    print(f"{'Time':>6} | {'Azimuth':>8} | {'Elevation':>9} | "
-          f"{'GHI':>8} | {'DNI':>8} | {'DHI':>8}")
-    print(f"{'':>6} | {'(deg)':>8} | {'(deg)':>9} | "
-          f"{'(W/m²)':>8} | {'(W/m²)':>8} | {'(W/m²)':>8}")
+    print(
+        f"{'Time':>6} | {'Azimuth':>8} | {'Elevation':>9} | "
+        f"{'GHI':>8} | {'DNI':>8} | {'DHI':>8}"
+    )
+    print(
+        f"{'':>6} | {'(deg)':>8} | {'(deg)':>9} | " f"{'(W/m²)':>8} | {'(W/m²)':>8} | {'(W/m²)':>8}"
+    )
     print("-" * 80)
 
     for hour in hours:

@@ -53,10 +53,7 @@ def main():
 
     # Create Location and PVSystem objects
     location = Location(
-        latitude=latitude,
-        longitude=longitude,
-        altitude=altitude,
-        timezone=timezone
+        latitude=latitude, longitude=longitude, altitude=altitude, timezone=timezone
     )
 
     system = PVSystem(
@@ -64,7 +61,7 @@ def main():
         panel_efficiency=weighted_efficiency,
         tilt=tilt,
         azimuth=azimuth,
-        temp_coefficient=weighted_temp_coeff
+        temp_coefficient=weighted_temp_coeff,
     )
 
     # ==================================================================================
@@ -90,7 +87,9 @@ def main():
 
     print("BASELINE RESULTS (Clear Sky):")
     print(f"  Annual Energy: {result_clearsky.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_clearsky.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_clearsky.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp"
+    )
     print(f"  Capacity Factor: {result_clearsky.statistics.capacity_factor*100:.2f}%")
     print(f"  Peak Power: {result_clearsky.statistics.peak_power_w/1000:.2f} kW")
     print()
@@ -111,21 +110,23 @@ def main():
 
     # Create realistic sample data for Prague (representative hours from each season)
     sample_data = {
-        'timestamp': [
-            '2025-01-01 12:00:00+01:00', '2025-04-01 12:00:00+02:00',
-            '2025-07-01 12:00:00+02:00', '2025-10-01 12:00:00+02:00'
+        "timestamp": [
+            "2025-01-01 12:00:00+01:00",
+            "2025-04-01 12:00:00+02:00",
+            "2025-07-01 12:00:00+02:00",
+            "2025-10-01 12:00:00+02:00",
         ],
-        'ghi': [195.4, 762.5, 925.4, 612.5],
-        'dni': [315.2, 862.4, 1012.3, 795.6],
-        'dhi': [118.6, 445.6, 602.5, 398.5],
-        'temp_air': [0.8, 17.8, 28.5, 17.0],
-        'wind_speed': [4.0, 4.2, 4.0, 4.2],
-        'cloud_cover': [65.0, 37.0, 20.0, 47.0]
+        "ghi": [195.4, 762.5, 925.4, 612.5],
+        "dni": [315.2, 862.4, 1012.3, 795.6],
+        "dhi": [118.6, 445.6, 602.5, 398.5],
+        "temp_air": [0.8, 17.8, 28.5, 17.0],
+        "wind_speed": [4.0, 4.2, 4.0, 4.2],
+        "cloud_cover": [65.0, 37.0, 20.0, 47.0],
     }
 
     weather_df = pd.DataFrame(sample_data)
-    weather_df['timestamp'] = pd.to_datetime(weather_df['timestamp'], utc=True)
-    weather_df['month'] = weather_df['timestamp'].dt.month
+    weather_df["timestamp"] = pd.to_datetime(weather_df["timestamp"], utc=True)
+    weather_df["month"] = weather_df["timestamp"].dt.month
 
     print(f"Generated {len(weather_df)} sample weather data points")
     print(f"  Date range: {weather_df['timestamp'].min()} to {weather_df['timestamp'].max()}")
@@ -134,10 +135,18 @@ def main():
 
     # Show sample statistics
     print("Weather Data Statistics:")
-    print(f"  GHI: {weather_df['ghi'].min():.1f} - {weather_df['ghi'].max():.1f} W/m² (avg: {weather_df['ghi'].mean():.1f})")
-    print(f"  DNI: {weather_df['dni'].min():.1f} - {weather_df['dni'].max():.1f} W/m² (avg: {weather_df['dni'].mean():.1f})")
-    print(f"  Temp: {weather_df['temp_air'].min():.1f} - {weather_df['temp_air'].max():.1f}°C (avg: {weather_df['temp_air'].mean():.1f})")
-    print(f"  Cloud: {weather_df['cloud_cover'].min():.0f} - {weather_df['cloud_cover'].max():.0f}% (avg: {weather_df['cloud_cover'].mean():.0f})")
+    print(
+        f"  GHI: {weather_df['ghi'].min():.1f} - {weather_df['ghi'].max():.1f} W/m² (avg: {weather_df['ghi'].mean():.1f})"
+    )
+    print(
+        f"  DNI: {weather_df['dni'].min():.1f} - {weather_df['dni'].max():.1f} W/m² (avg: {weather_df['dni'].mean():.1f})"
+    )
+    print(
+        f"  Temp: {weather_df['temp_air'].min():.1f} - {weather_df['temp_air'].max():.1f}°C (avg: {weather_df['temp_air'].mean():.1f})"
+    )
+    print(
+        f"  Cloud: {weather_df['cloud_cover'].min():.0f} - {weather_df['cloud_cover'].max():.0f}% (avg: {weather_df['cloud_cover'].mean():.0f})"
+    )
     print()
 
     print("Running simulation with sample weather parameters...")
@@ -150,24 +159,26 @@ def main():
     print()
 
     # Use average values from sample data as parameters (workaround until PR #6 merged)
-    avg_temp = weather_df['temp_air'].mean()
-    avg_wind = weather_df['wind_speed'].mean()
-    avg_cloud = weather_df['cloud_cover'].mean()
+    avg_temp = weather_df["temp_air"].mean()
+    avg_wind = weather_df["wind_speed"].mean()
+    avg_cloud = weather_df["cloud_cover"].mean()
 
     result_csv = simulate_annual(
         location=location,
         system=system,
-            year=2025,
-            interval_minutes=60,
-            weather_source="clear_sky",  # Still using clear-sky base
-            ambient_temp=avg_temp,
-            wind_speed=avg_wind,
-            cloud_cover=avg_cloud,
+        year=2025,
+        interval_minutes=60,
+        weather_source="clear_sky",  # Still using clear-sky base
+        ambient_temp=avg_temp,
+        wind_speed=avg_wind,
+        cloud_cover=avg_cloud,
     )
 
     print("RESULTS (with sample-derived parameters):")
     print(f"  Annual Energy: {result_csv.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_csv.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_csv.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp"
+    )
     print(f"  Capacity Factor: {result_csv.statistics.capacity_factor*100:.2f}%")
     print(f"  Parameters used: {avg_temp:.1f}°C, {avg_wind:.1f} m/s, {avg_cloud:.0f}% cloud")
     print()
@@ -185,19 +196,29 @@ def main():
 
     # Create JSON-like structure programmatically
     weather_json = {
-        'location': {
-            'name': 'Prague, Czech Republic',
-            'latitude': latitude,
-            'longitude': longitude
+        "location": {
+            "name": "Prague, Czech Republic",
+            "latitude": latitude,
+            "longitude": longitude,
         },
-        'data': [
-            {'timestamp': '2025-01-01T12:00:00+01:00', 'ghi': 195.4, 'temp_air': 0.8, 'cloud_cover': 65.0},
-            {'timestamp': '2025-07-01T12:00:00+02:00', 'ghi': 925.4, 'temp_air': 28.5, 'cloud_cover': 20.0}
-        ]
+        "data": [
+            {
+                "timestamp": "2025-01-01T12:00:00+01:00",
+                "ghi": 195.4,
+                "temp_air": 0.8,
+                "cloud_cover": 65.0,
+            },
+            {
+                "timestamp": "2025-07-01T12:00:00+02:00",
+                "ghi": 925.4,
+                "temp_air": 28.5,
+                "cloud_cover": 20.0,
+            },
+        ],
     }
 
-    json_df = pd.DataFrame(weather_json['data'])
-    json_df['timestamp'] = pd.to_datetime(json_df['timestamp'], utc=True)
+    json_df = pd.DataFrame(weather_json["data"])
+    json_df["timestamp"] = pd.to_datetime(json_df["timestamp"], utc=True)
 
     print(f"  Location: {weather_json['location']['name']}")
     print(f"  Data points: {len(json_df)}")
@@ -216,8 +237,8 @@ def main():
     print()
 
     # Use average values (workaround)
-    avg_temp_json = json_df['temp_air'].mean()
-    avg_cloud_json = json_df['cloud_cover'].mean()
+    avg_temp_json = json_df["temp_air"].mean()
+    avg_cloud_json = json_df["cloud_cover"].mean()
     avg_wind_json = 3.0  # Default for missing data
 
     result_json = simulate_annual(
@@ -233,7 +254,9 @@ def main():
 
     print("RESULTS (with JSON-derived parameters):")
     print(f"  Annual Energy: {result_json.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_json.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_json.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp"
+    )
     print()
 
     # ==================================================================================
@@ -288,7 +311,9 @@ def main():
 
     print("RESULTS (PVGIS-realistic simulation):")
     print(f"  Annual Energy: {result_pvgis_sim.statistics.total_energy_kwh:.2f} kWh")
-    print(f"  Specific Yield: {result_pvgis_sim.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp")
+    print(
+        f"  Specific Yield: {result_pvgis_sim.statistics.total_energy_kwh/(total_power_wp/1000):.0f} kWh/kWp"
+    )
     print(f"  Capacity Factor: {result_pvgis_sim.statistics.capacity_factor*100:.2f}%")
     print()
 
@@ -304,15 +329,23 @@ def main():
     print(f"{'Scenario':<30} {'Energy (kWh)':<15} {'Yield (kWh/kWp)':<20} {'CF (%)':<10}")
     print("-" * 80)
 
-    print(f"{'Clear Sky (theoretical)':<30} {result_clearsky.statistics.total_energy_kwh:>12.0f}    {result_clearsky.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_clearsky.statistics.capacity_factor*100:>8.2f}")
+    print(
+        f"{'Clear Sky (theoretical)':<30} {result_clearsky.statistics.total_energy_kwh:>12.0f}    {result_clearsky.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_clearsky.statistics.capacity_factor*100:>8.2f}"
+    )
 
     if result_csv:
-        print(f"{'CSV Weather Data':<30} {result_csv.statistics.total_energy_kwh:>12.0f}    {result_csv.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_csv.statistics.capacity_factor*100:>8.2f}")
+        print(
+            f"{'CSV Weather Data':<30} {result_csv.statistics.total_energy_kwh:>12.0f}    {result_csv.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_csv.statistics.capacity_factor*100:>8.2f}"
+        )
 
     if result_json:
-        print(f"{'JSON Weather Data':<30} {result_json.statistics.total_energy_kwh:>12.0f}    {result_json.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_json.statistics.capacity_factor*100:>8.2f}")
+        print(
+            f"{'JSON Weather Data':<30} {result_json.statistics.total_energy_kwh:>12.0f}    {result_json.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_json.statistics.capacity_factor*100:>8.2f}"
+        )
 
-    print(f"{'PVGIS-realistic (55% cloud)':<30} {result_pvgis_sim.statistics.total_energy_kwh:>12.0f}    {result_pvgis_sim.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_pvgis_sim.statistics.capacity_factor*100:>8.2f}")
+    print(
+        f"{'PVGIS-realistic (55% cloud)':<30} {result_pvgis_sim.statistics.total_energy_kwh:>12.0f}    {result_pvgis_sim.statistics.total_energy_kwh/(total_power_wp/1000):>15.0f}    {result_pvgis_sim.statistics.capacity_factor*100:>8.2f}"
+    )
 
     print()
     print("Industry Benchmarks for Prague:")
@@ -331,13 +364,13 @@ def main():
     print()
 
     # Check 1: Clear-sky should be highest
-    clearsky_yield = result_clearsky.statistics.total_energy_kwh / (total_power_wp/1000)
+    clearsky_yield = result_clearsky.statistics.total_energy_kwh / (total_power_wp / 1000)
     print(f"✓ Clear-sky yield: {clearsky_yield:.0f} kWh/kWp")
     print("  (Theoretical maximum without weather losses)")
     assert clearsky_yield > 1500, "Clear-sky yield should be high"
 
     # Check 2: Realistic scenarios should be lower
-    realistic_yield = result_pvgis_sim.statistics.total_energy_kwh / (total_power_wp/1000)
+    realistic_yield = result_pvgis_sim.statistics.total_energy_kwh / (total_power_wp / 1000)
     print(f"✓ Realistic yield: {realistic_yield:.0f} kWh/kWp")
     print("  (With 55% cloud cover)")
     assert realistic_yield < clearsky_yield, "Realistic should be less than clear-sky"
@@ -372,10 +405,10 @@ def main():
 
         # Group by season (using the extracted month column)
         seasons = {
-            'Winter (Jan)': weather_df[weather_df['month'] == 1],
-            'Spring (Apr)': weather_df[weather_df['month'] == 4],
-            'Summer (Jul)': weather_df[weather_df['month'] == 7],
-            'Autumn (Oct)': weather_df[weather_df['month'] == 10],
+            "Winter (Jan)": weather_df[weather_df["month"] == 1],
+            "Spring (Apr)": weather_df[weather_df["month"] == 4],
+            "Summer (Jul)": weather_df[weather_df["month"] == 7],
+            "Autumn (Oct)": weather_df[weather_df["month"] == 10],
         }
 
         print(f"{'Season':<20} {'Avg GHI':<12} {'Avg Temp':<12} {'Avg Cloud':<12}")
@@ -383,10 +416,12 @@ def main():
 
         for season_name, season_data in seasons.items():
             if len(season_data) > 0:
-                avg_ghi = season_data['ghi'].mean()
-                avg_temp = season_data['temp_air'].mean()
-                avg_cloud = season_data['cloud_cover'].mean()
-                print(f"{season_name:<20} {avg_ghi:>8.1f} W/m²  {avg_temp:>8.1f}°C    {avg_cloud:>8.1f}%")
+                avg_ghi = season_data["ghi"].mean()
+                avg_temp = season_data["temp_air"].mean()
+                avg_cloud = season_data["cloud_cover"].mean()
+                print(
+                    f"{season_name:<20} {avg_ghi:>8.1f} W/m²  {avg_temp:>8.1f}°C    {avg_cloud:>8.1f}%"
+                )
 
         print()
         print("Observations:")

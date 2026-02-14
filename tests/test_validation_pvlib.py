@@ -14,6 +14,7 @@ import pytz
 # Import pvlib for comparison
 try:
     import pvlib
+
     PVLIB_AVAILABLE = True
 except ImportError:
     PVLIB_AVAILABLE = False
@@ -67,12 +68,15 @@ class TestSolarPositionValidation:
 
                 # Compare results (allow small differences due to different implementations)
                 # Note: pvsolarsim returns apparent_zenith/apparent_elevation from pvlib
-                assert abs(pvss_pos.azimuth - pvlib_pos["azimuth"].iloc[0]) < 0.01, \
-                    f"Azimuth mismatch at {lat}, {lon}, {timestamp}"
-                assert abs(pvss_pos.zenith - pvlib_pos["apparent_zenith"].iloc[0]) < 0.01, \
-                    f"Zenith mismatch at {lat}, {lon}, {timestamp}"
-                assert abs(pvss_pos.elevation - pvlib_pos["apparent_elevation"].iloc[0]) < 0.01, \
-                    f"Elevation mismatch at {lat}, {lon}, {timestamp}"
+                assert (
+                    abs(pvss_pos.azimuth - pvlib_pos["azimuth"].iloc[0]) < 0.01
+                ), f"Azimuth mismatch at {lat}, {lon}, {timestamp}"
+                assert (
+                    abs(pvss_pos.zenith - pvlib_pos["apparent_zenith"].iloc[0]) < 0.01
+                ), f"Zenith mismatch at {lat}, {lon}, {timestamp}"
+                assert (
+                    abs(pvss_pos.elevation - pvlib_pos["apparent_elevation"].iloc[0]) < 0.01
+                ), f"Elevation mismatch at {lat}, {lon}, {timestamp}"
 
     def test_solar_position_accuracy(self):
         """Test solar position accuracy is within spec (<0.01° error)."""
@@ -81,7 +85,9 @@ class TestSolarPositionValidation:
         lat, lon, alt = 39.742476, -105.1786, 1830.14
 
         location = Location(latitude=lat, longitude=lon, altitude=alt)
-        pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+        pos = calculate_solar_position(
+            timestamp, location.latitude, location.longitude, location.altitude
+        )
 
         # Expected values from NREL SPA (via pvlib)
         pvlib_pos = pvlib.solarposition.get_solarposition(
@@ -111,7 +117,9 @@ class TestClearSkyValidation:
 
         for timestamp in times:
             # Calculate solar position
-            solar_pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+            solar_pos = calculate_solar_position(
+                timestamp, location.latitude, location.longitude, location.altitude
+            )
 
             if solar_pos.elevation > 0:  # Daytime only
                 # Calculate using PVSolarSim
@@ -129,7 +137,7 @@ class TestClearSkyValidation:
                     apparent_zenith=solar_pos.zenith,
                     airmass_absolute=pvlib.atmosphere.get_absolute_airmass(
                         pvlib.atmosphere.get_relative_airmass(solar_pos.zenith),
-                        pressure=pvlib.atmosphere.alt2pres(alt)
+                        pressure=pvlib.atmosphere.alt2pres(alt),
                     ),
                     linke_turbidity=3.0,
                     altitude=alt,
@@ -141,8 +149,12 @@ class TestClearSkyValidation:
                 dni_error_pct = abs(pvss_irr.dni - pvlib_irr["dni"]) / pvlib_irr["dni"] * 100
 
                 # Should be within 2% as per spec
-                assert ghi_error_pct < 2.0, f"GHI error {ghi_error_pct:.2f}% exceeds 2% at {timestamp}"
-                assert dni_error_pct < 2.0, f"DNI error {dni_error_pct:.2f}% exceeds 2% at {timestamp}"
+                assert (
+                    ghi_error_pct < 2.0
+                ), f"GHI error {ghi_error_pct:.2f}% exceeds 2% at {timestamp}"
+                assert (
+                    dni_error_pct < 2.0
+                ), f"DNI error {dni_error_pct:.2f}% exceeds 2% at {timestamp}"
 
     def test_simplified_solis_vs_pvlib(self):
         """Test Simplified Solis model against pvlib."""
@@ -152,7 +164,9 @@ class TestClearSkyValidation:
         lat, lon, alt = 40.0, -105.0, 1655
 
         location = Location(latitude=lat, longitude=lon, altitude=alt)
-        solar_pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+        solar_pos = calculate_solar_position(
+            timestamp, location.latitude, location.longitude, location.altitude
+        )
 
         # Calculate using PVSolarSim
         # Note: Simplified Solis model uses default AOD and precipitable water
@@ -190,7 +204,9 @@ class TestPOAIrradianceValidation:
         surface_azimuth = 180.0  # South-facing
 
         location = Location(latitude=lat, longitude=lon, altitude=alt)
-        solar_pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+        solar_pos = calculate_solar_position(
+            timestamp, location.latitude, location.longitude, location.altitude
+        )
 
         # Get clear-sky irradiance
         clear_sky = calculate_clearsky_irradiance(
@@ -217,6 +233,7 @@ class TestPOAIrradianceValidation:
         # Calculate POA using pvlib
         # Get extraterrestrial DNI for Perez model
         import pvlib.irradiance
+
         dni_extra = pvlib.irradiance.get_extra_radiation(timestamp)
 
         pvlib_poa = pvlib.irradiance.get_total_irradiance(
@@ -233,7 +250,9 @@ class TestPOAIrradianceValidation:
         )
 
         # Compare (allow small numerical differences from delegated calculations)
-        poa_error_pct = abs(pvss_poa.poa_global - pvlib_poa["poa_global"]) / pvlib_poa["poa_global"] * 100
+        poa_error_pct = (
+            abs(pvss_poa.poa_global - pvlib_poa["poa_global"]) / pvlib_poa["poa_global"] * 100
+        )
         assert poa_error_pct < 2.0, f"POA global error {poa_error_pct:.2f}% exceeds 2%"
 
     def test_poa_isotropic_vs_pvlib(self):
@@ -244,7 +263,9 @@ class TestPOAIrradianceValidation:
         surface_azimuth = 180.0
 
         location = Location(latitude=lat, longitude=lon)
-        solar_pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+        solar_pos = calculate_solar_position(
+            timestamp, location.latitude, location.longitude, location.altitude
+        )
 
         # Sample irradiance
         dni, dhi, ghi = 800.0, 100.0, 850.0
@@ -274,7 +295,9 @@ class TestPOAIrradianceValidation:
         )
 
         # Should match closely (allow 3% tolerance for numerical differences)
-        poa_error_pct = abs(pvss_poa.poa_global - pvlib_poa["poa_global"]) / pvlib_poa["poa_global"] * 100
+        poa_error_pct = (
+            abs(pvss_poa.poa_global - pvlib_poa["poa_global"]) / pvlib_poa["poa_global"] * 100
+        )
         assert poa_error_pct < 3.0, f"POA global error {poa_error_pct:.2f}% exceeds 3%"
 
 
@@ -305,7 +328,9 @@ class TestTemperatureModelsValidation:
         )
 
         # Should match closely
-        assert abs(pvss_temp - pvlib_temp) < 0.1, f"Temperature difference: {abs(pvss_temp - pvlib_temp):.2f}°C"
+        assert (
+            abs(pvss_temp - pvlib_temp) < 0.1
+        ), f"Temperature difference: {abs(pvss_temp - pvlib_temp):.2f}°C"
 
     def test_sapm_vs_pvlib(self):
         """Test SAPM temperature model against pvlib."""
@@ -335,7 +360,9 @@ class TestTemperatureModelsValidation:
         )
 
         # Should be reasonably close (within a few degrees)
-        assert abs(pvss_temp - pvlib_temp) < 5.0, f"Temperature difference: {abs(pvss_temp - pvlib_temp):.2f}°C"
+        assert (
+            abs(pvss_temp - pvlib_temp) < 5.0
+        ), f"Temperature difference: {abs(pvss_temp - pvlib_temp):.2f}°C"
 
 
 class TestAccuracyMetrics:
@@ -353,18 +380,22 @@ class TestAccuracyMetrics:
         elevation_errors = []
 
         for timestamp in times:
-            pvss_pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+            pvss_pos = calculate_solar_position(
+                timestamp, location.latitude, location.longitude, location.altitude
+            )
             pvlib_pos = pvlib.solarposition.get_solarposition(
                 timestamp, lat, lon, altitude=alt, method="nrel_numpy"
             )
 
             azimuth_errors.append(abs(pvss_pos.azimuth - pvlib_pos["azimuth"].iloc[0]))
             # Use apparent_elevation for fair comparison
-            elevation_errors.append(abs(pvss_pos.elevation - pvlib_pos["apparent_elevation"].iloc[0]))
+            elevation_errors.append(
+                abs(pvss_pos.elevation - pvlib_pos["apparent_elevation"].iloc[0])
+            )
 
         # Calculate metrics
-        azimuth_rmse = np.sqrt(np.mean(np.array(azimuth_errors)**2))
-        elevation_rmse = np.sqrt(np.mean(np.array(elevation_errors)**2))
+        azimuth_rmse = np.sqrt(np.mean(np.array(azimuth_errors) ** 2))
+        elevation_rmse = np.sqrt(np.mean(np.array(elevation_errors) ** 2))
 
         azimuth_mae = np.mean(azimuth_errors)
         elevation_mae = np.mean(elevation_errors)
@@ -393,7 +424,9 @@ class TestAccuracyMetrics:
         dni_errors = []
 
         for timestamp in times:
-            solar_pos = calculate_solar_position(timestamp, location.latitude, location.longitude, location.altitude)
+            solar_pos = calculate_solar_position(
+                timestamp, location.latitude, location.longitude, location.altitude
+            )
 
             if solar_pos.elevation > 0:
                 pvss_irr = calculate_clearsky_irradiance(
@@ -408,7 +441,7 @@ class TestAccuracyMetrics:
                     apparent_zenith=solar_pos.zenith,
                     airmass_absolute=pvlib.atmosphere.get_absolute_airmass(
                         pvlib.atmosphere.get_relative_airmass(solar_pos.zenith),
-                        pressure=pvlib.atmosphere.alt2pres(alt)
+                        pressure=pvlib.atmosphere.alt2pres(alt),
                     ),
                     linke_turbidity=3.0,
                     altitude=alt,

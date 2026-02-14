@@ -33,23 +33,27 @@ def main():
     # Panel specifications
     # 16x München Energieprodukte MSMD450M6-72 M6
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'area_m2': 2.108 * 1.048,  # 2.209 m²
+        "count": 16,
+        "power_wp": 450,
+        "area_m2": 2.108 * 1.048,  # 2.209 m²
     }
 
     # 18x Canadian Solar HiKu CS3L-380MS
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'area_m2': 1.765 * 1.048,  # 1.850 m²
+        "count": 18,
+        "power_wp": 380,
+        "area_m2": 1.765 * 1.048,  # 1.850 m²
     }
 
     # Total system
-    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
-                      canadian_panels['count'] * canadian_panels['power_wp'])
-    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
-                     canadian_panels['count'] * canadian_panels['area_m2'])
+    total_power_wp = (
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
+    )
+    total_area_m2 = (
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
+    )
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
 
     print(f"Location: {latitude}°N, {longitude}°E")
@@ -70,17 +74,19 @@ def main():
     print("-" * 80)
     print("POA Irradiance Analysis - December 25, 2025 (Prague timezone)")
     print("-" * 80)
-    print(f"{'Time':>6} | {'Sol Elev':>8} | {'GHI':>8} | {'POA Direct':>10} | "
-          f"{'POA Diffuse':>11} | {'POA Ground':>10} | {'POA Global':>10}")
-    print(f"{'':>6} | {'(deg)':>8} | {'(W/m²)':>8} | {'(W/m²)':>10} | "
-          f"{'(W/m²)':>11} | {'(W/m²)':>10} | {'(W/m²)':>10}")
+    print(
+        f"{'Time':>6} | {'Sol Elev':>8} | {'GHI':>8} | {'POA Direct':>10} | "
+        f"{'POA Diffuse':>11} | {'POA Ground':>10} | {'POA Global':>10}"
+    )
+    print(
+        f"{'':>6} | {'(deg)':>8} | {'(W/m²)':>8} | {'(W/m²)':>10} | "
+        f"{'(W/m²)':>11} | {'(W/m²)':>10} | {'(W/m²)':>10}"
+    )
     print("-" * 80)
 
     # Create POA calculator with Perez model (industry standard)
     poa_calc = POAIrradiance(
-        diffuse_model="perez",
-        iam_model="physical",
-        albedo=0.2  # Typical ground
+        diffuse_model="perez", iam_model="physical", albedo=0.2  # Typical ground
     )
 
     for hour in hours:
@@ -122,10 +128,7 @@ def main():
                 f"{poa.poa_ground:10.1f} | {poa.poa_global:10.1f}"
             )
         else:
-            print(
-                f"{hour:02d}:00 | {position.elevation:8.2f} | "
-                f"Sun below horizon"
-            )
+            print(f"{hour:02d}:00 | {position.elevation:8.2f} | " f"Sun below horizon")
 
     print()
     print("-" * 80)
@@ -213,7 +216,9 @@ def main():
             diffuse_model="perez",
             albedo=albedo_val,
         )
-        print(f"{surface:>20} | {albedo_val:7.1f} | {poa.poa_ground:10.1f} | {poa.poa_global:10.1f} W/m²")
+        print(
+            f"{surface:>20} | {albedo_val:7.1f} | {poa.poa_ground:10.1f} | {poa.poa_global:10.1f} W/m²"
+        )
 
     # Actual power estimation with POA
     print("\n" + "-" * 80)
@@ -267,7 +272,9 @@ def main():
 
     # Comparison with old estimate
     old_estimate_poa = noon_irradiance.ghi * 0.9  # From test_pr1.py
-    old_estimate_power = total_power_wp * (old_estimate_poa / 1000) * (1 + temp_coeff * (assumed_panel_temp - 25))
+    old_estimate_power = (
+        total_power_wp * (old_estimate_poa / 1000) * (1 + temp_coeff * (assumed_panel_temp - 25))
+    )
 
     print("\n" + "-" * 80)
     print("Improvement Over PR #1 Estimate")

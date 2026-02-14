@@ -124,9 +124,7 @@ print(f"Total loss: {(1 - result_aged.power_w/result_new.power_w)*100:.1f}%")
 # Example 6: With inverter
 print("\n6. DC vs AC Power (with inverter)")
 print("-" * 70)
-result_with_inverter = calculate_power(
-    location, system, timestamp, inverter_efficiency=0.96
-)
+result_with_inverter = calculate_power(location, system, timestamp, inverter_efficiency=0.96)
 
 print(f"DC Power: {result_with_inverter.power_w:.2f} W")
 print(f"AC Power: {result_with_inverter.power_ac_w:.2f} W")

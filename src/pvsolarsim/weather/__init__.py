@@ -70,4 +70,3 @@ __all__ = [
     "check_irradiance_consistency",
     "create_quality_report",
 ]
-

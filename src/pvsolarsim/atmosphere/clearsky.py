@@ -139,8 +139,7 @@ def calculate_clearsky_irradiance(
         result = pvlib.clearsky.ineichen(
             apparent_zenith=apparent_zenith,
             airmass_absolute=pvlib.atmosphere.get_absolute_airmass(
-                pvlib.atmosphere.get_relative_airmass(apparent_zenith),
-                pressure=pressure
+                pvlib.atmosphere.get_relative_airmass(apparent_zenith), pressure=pressure
             ),
             linke_turbidity=linke_turbidity,
             altitude=altitude,

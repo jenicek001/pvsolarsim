@@ -20,7 +20,9 @@ def create_test_csv(filepath: Path, include_header: bool = True) -> None:
     # Add some data rows
     for i in range(24):
         hour = f"{i:02d}"
-        content.append(f"2025-01-01 {hour}:00:00,{100 + i},{200 + i},{50 + i},{20 + i},{2 + i * 0.1:.1f},{i * 2}")
+        content.append(
+            f"2025-01-01 {hour}:00:00,{100 + i},{200 + i},{50 + i},{20 + i},{2 + i * 0.1:.1f},{i * 2}"
+        )
 
     filepath.write_text("\n".join(content))
 

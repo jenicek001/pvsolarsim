@@ -24,11 +24,7 @@ class TestOpenWeatherMapClientBasics:
 
     def test_client_custom_parameters(self):
         """Test client with custom cache and timeout."""
-        client = OpenWeatherMapClient(
-            api_key="custom_key",
-            cache_ttl=3600,
-            timeout=60
-        )
+        client = OpenWeatherMapClient(api_key="custom_key", cache_ttl=3600, timeout=60)
         assert client.cache_ttl == 3600
         assert client.timeout == 60
 
@@ -41,8 +37,6 @@ class TestOpenWeatherMapClientBasics:
         # Check that adapters are mounted
         assert "http://" in session.adapters
         assert "https://" in session.adapters
-
-
 
 
 class TestPVGISClientBasics:
@@ -67,8 +61,6 @@ class TestPVGISClientBasics:
         session = client._create_session()
 
         assert isinstance(session, requests.Session)
-
-
 
 
 class TestOpenWeatherMapParsing:
@@ -164,8 +156,6 @@ class TestPVGISParsing:
         assert "dhi" in df.columns
         assert "temp_air" in df.columns
         assert "wind_speed" in df.columns
-
-
 
 
 class TestWeatherCacheIntegration:

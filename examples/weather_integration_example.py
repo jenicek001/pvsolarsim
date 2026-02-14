@@ -21,9 +21,7 @@ def example_1_csv_weather_data():
         csv_path = Path(tmpdir) / "weather.csv"
 
         # Generate sample weather data for a week
-        timestamps = pd.date_range(
-            "2025-01-01", periods=168, freq="H", tz="America/Denver"
-        )
+        timestamps = pd.date_range("2025-01-01", periods=168, freq="H", tz="America/Denver")
 
         # Simulate realistic weather patterns
         hours = timestamps.hour.values
@@ -104,9 +102,7 @@ def example_2_dataframe_weather_data():
 
     # Set up location and system
     location = Location(latitude=49.8, longitude=15.5, altitude=300, timezone="UTC")
-    system = PVSystem(
-        panel_area=30.0, panel_efficiency=0.22, tilt=30, azimuth=180
-    )
+    system = PVSystem(panel_area=30.0, panel_efficiency=0.22, tilt=30, azimuth=180)
 
     # Run simulation with DataFrame
     results = simulate_annual(
@@ -167,8 +163,7 @@ def example_3_clear_sky_comparison():
     print(f"  Capacity factor: {results_cloudy.statistics.capacity_factor * 100:.2f}%")
 
     energy_loss = (
-        (results_clear.statistics.total_energy_kwh
-         - results_cloudy.statistics.total_energy_kwh)
+        (results_clear.statistics.total_energy_kwh - results_cloudy.statistics.total_energy_kwh)
         / results_clear.statistics.total_energy_kwh
         * 100
     )

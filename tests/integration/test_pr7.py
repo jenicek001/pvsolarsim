@@ -51,40 +51,51 @@ def main():  # noqa: C901 - Integration test with multiple demonstration section
     # System parameters - Real installation with 2 panel types
     # String 1: 16x München Energieprodukte MSMD450M6-72 M6
     munchen_panels = {
-        'count': 16,
-        'power_wp': 450,
-        'efficiency': 0.2037,  # 20.37%
-        'temp_coeff_pmax': -0.0035,  # -0.35%/°C
-        'area_m2': 2.108 * 1.048,  # 2.209 m²
+        "count": 16,
+        "power_wp": 450,
+        "efficiency": 0.2037,  # 20.37%
+        "temp_coeff_pmax": -0.0035,  # -0.35%/°C
+        "area_m2": 2.108 * 1.048,  # 2.209 m²
     }
 
     # String 2: 18x Canadian Solar HiKu CS3L-380MS
     canadian_panels = {
-        'count': 18,
-        'power_wp': 380,
-        'efficiency': 0.205,  # ~20.5%
-        'temp_coeff_pmax': -0.0037,  # -0.37%/°C
-        'area_m2': 1.765 * 1.048,  # 1.850 m²
+        "count": 18,
+        "power_wp": 380,
+        "efficiency": 0.205,  # ~20.5%
+        "temp_coeff_pmax": -0.0037,  # -0.37%/°C
+        "area_m2": 1.765 * 1.048,  # 1.850 m²
     }
 
     # Total system
-    total_power_wp = (munchen_panels['count'] * munchen_panels['power_wp'] +
-                      canadian_panels['count'] * canadian_panels['power_wp'])
-    total_area_m2 = (munchen_panels['count'] * munchen_panels['area_m2'] +
-                     canadian_panels['count'] * canadian_panels['area_m2'])
+    total_power_wp = (
+        munchen_panels["count"] * munchen_panels["power_wp"]
+        + canadian_panels["count"] * canadian_panels["power_wp"]
+    )
+    total_area_m2 = (
+        munchen_panels["count"] * munchen_panels["area_m2"]
+        + canadian_panels["count"] * canadian_panels["area_m2"]
+    )
     weighted_efficiency = total_power_wp / (total_area_m2 * 1000)  # At STC (1000 W/m²)
-    weighted_temp_coeff = ((munchen_panels['count'] * munchen_panels['power_wp'] * munchen_panels['temp_coeff_pmax'] +
-                           canadian_panels['count'] * canadian_panels['power_wp'] * canadian_panels['temp_coeff_pmax']) /
-                          total_power_wp)
+    weighted_temp_coeff = (
+        munchen_panels["count"] * munchen_panels["power_wp"] * munchen_panels["temp_coeff_pmax"]
+        + canadian_panels["count"]
+        * canadian_panels["power_wp"]
+        * canadian_panels["temp_coeff_pmax"]
+    ) / total_power_wp
     tilt = 35.0  # degrees (optimal for Central Europe)
     azimuth = 202.0  # degrees (SSW orientation)
 
     print("System Configuration:")
     print(f"  Location: {latitude}°N, {longitude}°E, {altitude}m")
-    print(f"  String 1: {munchen_panels['count']}x München MSMD450M6-72 @ {munchen_panels['power_wp']}W")
+    print(
+        f"  String 1: {munchen_panels['count']}x München MSMD450M6-72 @ {munchen_panels['power_wp']}W"
+    )
     print(f"    - Capacity: {munchen_panels['count'] * munchen_panels['power_wp']/1000:.2f} kWp")
     print(f"    - Efficiency: {munchen_panels['efficiency']*100:.2f}%")
-    print(f"  String 2: {canadian_panels['count']}x Canadian Solar CS3L-380MS @ {canadian_panels['power_wp']}W")
+    print(
+        f"  String 2: {canadian_panels['count']}x Canadian Solar CS3L-380MS @ {canadian_panels['power_wp']}W"
+    )
     print(f"    - Capacity: {canadian_panels['count'] * canadian_panels['power_wp']/1000:.2f} kWp")
     print(f"    - Efficiency: {canadian_panels['efficiency']*100:.2f}%")
     print(f"  Total Capacity: {total_power_wp/1000:.2f} kWp")
@@ -359,7 +370,9 @@ def main():  # noqa: C901 - Integration test with multiple demonstration section
     print("-" * 80)
 
     print("Weather Data Quality Assessment:")
-    print(f"  Data completeness:     {(1 - clean_weather.isna().sum().sum() / (len(clean_weather) * len(clean_weather.columns)))*100:.2f}%")
+    print(
+        f"  Data completeness:     {(1 - clean_weather.isna().sum().sum() / (len(clean_weather) * len(clean_weather.columns)))*100:.2f}%"
+    )
     print(f"  Quality score:         {summary['quality_percentage']:.2f}%")
     print(f"  Gaps filled:           {len(filled_weather) - len(weather_data)}")
     print(f"  NaNs interpolated:     {total_nans if total_nans > 0 else 0}")

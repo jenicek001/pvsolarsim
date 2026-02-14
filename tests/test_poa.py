@@ -216,7 +216,9 @@ class TestPOAIrradiance:
 
     def test_poa_sun_below_horizon(self):
         """Test POA when sun is below horizon."""
-        poa_calc = POAIrradiance(diffuse_model="isotropic")  # Use isotropic to avoid Perez div by zero
+        poa_calc = POAIrradiance(
+            diffuse_model="isotropic"
+        )  # Use isotropic to avoid Perez div by zero
         components = poa_calc.calculate(
             surface_tilt=35.0,
             surface_azimuth=180.0,
@@ -297,9 +299,7 @@ class TestPOAIrradiance:
 
     def test_model_enums(self):
         """Test using model enums directly."""
-        poa_calc = POAIrradiance(
-            diffuse_model=DiffuseModel.PEREZ, iam_model=IAMModel.ASHRAE
-        )
+        poa_calc = POAIrradiance(diffuse_model=DiffuseModel.PEREZ, iam_model=IAMModel.ASHRAE)
         components = poa_calc.calculate(
             surface_tilt=35.0,
             surface_azimuth=180.0,
