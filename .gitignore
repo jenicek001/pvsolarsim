@@ -58,3 +58,6 @@ dmypy.json
 .ruff_cache/
 tests/integration/sample_data/*.csv
 tests/integration/sample_data/*.json
+
+# Environment variables (secrets)
+.env

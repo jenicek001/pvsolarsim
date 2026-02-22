@@ -27,7 +27,11 @@ Examples
 >>> quality = perform_quality_checks(filled_data, latitude=45.0, longitude=8.0)
 """
 
-from pvsolarsim.weather.api_clients import OpenWeatherMapClient, PVGISClient
+from pvsolarsim.weather.api_clients import (
+    OpenWeatherMapClient,
+    PVGISClient,
+    VisualCrossingClient,
+)
 from pvsolarsim.weather.base import WeatherDataSource
 from pvsolarsim.weather.cache import WeatherCache
 from pvsolarsim.weather.interpolation import (
@@ -54,6 +58,7 @@ __all__ = [
     "JSONWeatherReader",
     "OpenWeatherMapClient",
     "PVGISClient",
+    "VisualCrossingClient",
     "WeatherCache",
     # Interpolation
     "interpolate_weather_data",
