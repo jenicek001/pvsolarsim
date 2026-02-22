@@ -27,9 +27,7 @@ Sign up: https://www.visualcrossing.com/weather-api
 """
 
 import os
-import tempfile
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -181,10 +179,10 @@ def prague_system():
 @pytest.fixture
 def mock_vc_client(tmp_path):
     """VisualCrossingClient with HTTP calls fully mocked."""
-    with patch("pvsolarsim.weather.api_clients.WeatherCache") as MockCache:
+    with patch("pvsolarsim.weather.api_clients.WeatherCache") as mock_cache_cls:
         mock_cache = MagicMock()
         mock_cache.get.return_value = None  # cache miss → always fetch
-        MockCache.return_value = mock_cache
+        mock_cache_cls.return_value = mock_cache
 
         client = VisualCrossingClient(api_key="MOCK_KEY", cache_ttl=0)
 
@@ -210,10 +208,10 @@ def test_client_instantiation():
     assert "weather.visualcrossing.com" in client.BASE_URL
     assert client.session is not None
 
-    print(f"\n  API key set:       ✅")
+    print("\n  API key set:       ✅")
     print(f"  BASE_URL:          {client.BASE_URL}")
     print(f"  Timeout:           {client.timeout}s")
-    print(f"  HTTP session:      ✅ (with retry logic)")
+    print("  HTTP session:      ✅ (with retry logic)")
 
 
 # ==================================================================================
@@ -427,7 +425,6 @@ def test_power_calculation_with_vc_data(prague_location, prague_system):
             )
 
     total_energy_kwh = total_energy_wh / 1000
-    daily_energy_ac = sum(r["power_ac_kw"] for r in production_rows)
     specific_yield = total_energy_kwh / (TOTAL_POWER_WP / 1000)
 
     print("PRODUCTION SUMMARY (June 15 – mocked VC data):")
@@ -733,7 +730,7 @@ def test_simulate_annual_with_visual_crossing_mocked(prague_location, prague_sys
     month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     energy_col = "energy_kwh"
-    for i, (idx, row) in enumerate(monthly.iterrows()):
+    for i, (_idx, row) in enumerate(monthly.iterrows()):
         bar_len = int(row[energy_col] / 50)
         print(f"    {month_names[i]}: {row[energy_col]:>7.1f} kWh  {'█' * min(bar_len, 40)}")
 
@@ -857,7 +854,7 @@ def test_live_api_power_calculation(prague_location, prague_system):
 
     assert total_kwh >= 0, "Energy must be non-negative"
     assert peak_w >= 0, "Peak power must be non-negative"
-    print(f"\n  ✅ Live VC data → power calculation succeeded for Jun 21 2025")
+    print("\n  ✅ Live VC data → power calculation succeeded for Jun 21 2025")
 
 
 # ==================================================================================

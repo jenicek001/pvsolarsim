@@ -53,7 +53,7 @@ def simulate_annual(
     interval_minutes : int, default 5
         Time interval in minutes (1-60 recommended)
     weather_source : str, default 'clear_sky'
-        Weather data source ('clear_sky', 'weather_data', 'csv', 'pvgis', 
+        Weather data source ('clear_sky', 'weather_data', 'csv', 'pvgis',
         'openweathermap', 'visual_crossing')
     weather_data : pd.DataFrame or WeatherDataSource, optional
         Pre-loaded weather data or data source instance.
@@ -241,7 +241,7 @@ def _load_weather_data(
     Parameters
     ----------
     weather_source : str
-        Type of weather source ('weather_data', 'csv', 'pvgis', 'openweathermap', 
+        Type of weather source ('weather_data', 'csv', 'pvgis', 'openweathermap',
         'visual_crossing')
     weather_data : pd.DataFrame or WeatherDataSource, optional
         Pre-loaded data or data source instance
@@ -325,25 +325,8 @@ def _load_weather_data(
             end=end,
         )
 
-    elif weather_source == "visual_crossing" or weather_source == "visualcrossing":
-        # Load from Visual Crossing API
-        from pvsolarsim.weather import VisualCrossingClient
-
-        api_key = kwargs.get("api_key")
-        if not api_key:
-            raise ValueError("api_key must be provided when weather_source='visual_crossing'")
-
-        vc_client = VisualCrossingClient(
-            api_key=api_key,
-            cache_ttl=kwargs.get("cache_ttl", 86400),
-            timeout=kwargs.get("timeout", 60),
-        )
-        return vc_client.read(
-            latitude=location.latitude,
-            longitude=location.longitude,
-            start=start,
-            end=end,
-        )
+    elif weather_source in ("visual_crossing", "visualcrossing"):
+        return _load_from_visual_crossing(location, start, end, **kwargs)
 
     else:
         raise ValueError(
@@ -351,6 +334,32 @@ def _load_weather_data(
             "Supported sources: 'clear_sky', 'weather_data', 'csv', 'pvgis', "
             "'openweathermap', 'visual_crossing'"
         )
+
+
+def _load_from_visual_crossing(
+    location: Location,
+    start: datetime,
+    end: datetime,
+    **kwargs: Any,
+) -> pd.DataFrame:
+    """Load weather data from the Visual Crossing API."""
+    from pvsolarsim.weather import VisualCrossingClient
+
+    api_key = kwargs.get("api_key")
+    if not api_key:
+        raise ValueError("api_key must be provided when weather_source='visual_crossing'")
+
+    vc_client = VisualCrossingClient(
+        api_key=api_key,
+        cache_ttl=kwargs.get("cache_ttl", 86400),
+        timeout=kwargs.get("timeout", 60),
+    )
+    return vc_client.read(
+        latitude=location.latitude,
+        longitude=location.longitude,
+        start=start,
+        end=end,
+    )
 
 
 def _calculate_statistics(
